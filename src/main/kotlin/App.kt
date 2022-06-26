@@ -1,3 +1,4 @@
+import core.Game
 import ext.aspectRatio
 import ext.minus
 import stats.js.Stats
@@ -29,9 +30,12 @@ class Cube {
 
     private val cube = Mesh(BoxGeometry(1, 1, 1), MeshPhongMaterial().apply { color = Color(0x0000ff) })
 
+    private val test = Mesh(CylinderGeometry(radiusTop = 10, radiusBottom = 30, height = 50), MeshBasicMaterial().apply { color = Color(0xffffff) })
+
     private val scene = Scene().apply {
         add(cube)
-
+        add(test)
+        test.position.add(Vector3(15, -2, 1))
         add(DirectionalLight(0xffffff, 1).apply { position.set(-1, 2, 4) })
         add(AmbientLight(0x404040, 1))
     }
@@ -49,6 +53,16 @@ class Cube {
         stats.begin()
         val delta = clock.getDelta().toDouble()
 
+        window.onkeydown = {
+            var vector3: Vector3 = Vector3()
+            if (it.keyCode == 39) {
+                vector3 = Vector3(1, 0, 0)
+            } else if (it.keyCode == 40) {
+                vector3 = Vector3(0, -1, 0)
+            }
+            scene.position.add(vector3.multiplyScalar(delta))
+        }
+
         cube.rotation.x -= delta
         cube.rotation.y -= delta
 
@@ -60,4 +74,6 @@ class Cube {
     }
 }
 
-fun main() = Cube().animate()
+fun main() {
+    Game.mainLoop()
+}
