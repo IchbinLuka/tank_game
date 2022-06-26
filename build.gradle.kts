@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
 plugins {
-    id("org.jetbrains.kotlin.js") version "1.4.0"
+    kotlin("js") version "1.7.0"
 }
 
 group = "com.liorgonnen"
@@ -25,4 +25,9 @@ kotlin {
 
 tasks.withType(KotlinJsCompile::class.java).named("compileKotlinJs") {
     kotlinOptions.moduleKind = "commonjs"
+}
+
+// Fixes webpack-cli incompatibility by pinning the newest version.
+rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
+    versions.webpackCli.version = "4.10.0"
 }
