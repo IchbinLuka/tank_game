@@ -4,8 +4,8 @@ plugins {
     kotlin("js") version "1.7.0"
 }
 
-group = "com.liorgonnen"
-version = "1.0-SNAPSHOT"
+//group = "com.liorgonnen"
+//version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()

@@ -4,6 +4,7 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import scenes.MainScene
 import three.js.Clock
+import three.js.Loader
 import three.js.WebGLRenderer
 
 object Game {
