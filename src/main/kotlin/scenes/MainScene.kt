@@ -8,12 +8,9 @@ import kotlinx.browser.window
 import org.w3c.dom.WorkerGlobalScope
 import three.GLTFLoader
 import three.js.*
+import util.ResourceManager
 import util.await
 import util.launch
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.coroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 class MainScene : GameScene() {
 
@@ -37,8 +34,9 @@ class MainScene : GameScene() {
     }
     private suspend fun loadAssets() {
         val loader = GLTFLoader()
+        window.onkeypress
         console.log("Loading suzanne")
-        val suzanne = loader.loadAsync("suzanne.gltf").await()
+        val suzanne = ResourceManager.suzanne.await()
         console.log("Loaded Suzanne")
         scene.add(suzanne.scene)
     }

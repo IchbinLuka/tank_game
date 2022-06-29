@@ -31,4 +31,5 @@ tasks.withType(KotlinJsCompile::class.java).named("compileKotlinJs") {
 // Fixes webpack-cli incompatibility by pinning the newest version.
 rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
     versions.webpackCli.version = "4.10.0"
+    versions.webpackDevServer.version = "4.8.0"
 }

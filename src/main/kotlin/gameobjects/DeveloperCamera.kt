@@ -1,0 +1,4 @@
+package gameobjects
+
+class DeveloperCamera {
+}
