@@ -14,6 +14,7 @@ repositories {
 dependencies {
     api(project(":threejs_kt"))
     api(project(":statsjs_kt"))
+    //implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
 }
 
 kotlin {

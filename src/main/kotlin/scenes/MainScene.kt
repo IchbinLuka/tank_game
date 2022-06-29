@@ -5,9 +5,15 @@ import core.GameScene
 import ext.aspectRatio
 import gameobjects.TestObject
 import kotlinx.browser.window
+import org.w3c.dom.WorkerGlobalScope
 import three.GLTFLoader
 import three.js.*
-import util.ResourceUtil
+import util.await
+import util.launch
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.coroutineContext
+import kotlin.coroutines.startCoroutine
+import kotlin.coroutines.suspendCoroutine
 
 class MainScene : GameScene() {
 
@@ -25,11 +31,16 @@ class MainScene : GameScene() {
     init {
         //objects.add(TestObject())
         objects.forEach { scene.add(it.visual) }
+        launch {
+            loadAssets()
+        }
+    }
+    private suspend fun loadAssets() {
         val loader = GLTFLoader()
-        loader.load("suzanne.gltf", {
-            console.log("Loaded Suzanne")
-            scene.add(it.scene)
-        })
+        console.log("Loading suzanne")
+        val suzanne = loader.loadAsync("suzanne.gltf").await()
+        console.log("Loaded Suzanne")
+        scene.add(suzanne.scene)
     }
     override fun update(delta: Double) {
 
