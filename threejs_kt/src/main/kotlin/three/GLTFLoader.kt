@@ -5,6 +5,8 @@ package three
 import org.w3c.xhr.ProgressEvent
 import three.js.Group
 import org.w3c.xhr.XMLHttpRequest
+import three.js.AnimationClip
+import three.js.Camera
 import three.js.Loader
 import kotlin.js.Promise
 
@@ -17,4 +19,8 @@ external class GLTFLoader : Loader {
 
 external interface GLTF {
     val scene: Group
+    val scenes: Array<Group>
+    val animations: Array<AnimationClip>
+    val asset: Any
+    val cameras: Array<Camera>
 }

@@ -6,6 +6,7 @@ import scenes.MainScene
 import three.js.Clock
 import three.js.Loader
 import three.js.WebGLRenderer
+import util.EventManager
 
 object Game {
     private val clock = Clock()
@@ -19,6 +20,7 @@ object Game {
 
     fun mainLoop() {
         val delta = clock.getDelta().toDouble()
+        EventManager.keyboardEvents.switchBatches()
         currentScene.update(delta)
         renderer.render(currentScene.scene, currentScene.camera)
         window.requestAnimationFrame { mainLoop() }

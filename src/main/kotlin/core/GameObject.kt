@@ -3,7 +3,9 @@ package core
 import three.js.Object3D
 
 abstract class GameObject {
-    abstract var visual: Object3D
+    abstract val renderable: Object3D?
 
-    abstract fun update()
+    abstract suspend fun initVisual()
+
+    abstract fun update(deltaTime: Float)
 }

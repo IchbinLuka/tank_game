@@ -3,9 +3,8 @@ package scenes
 import core.GameObject
 import core.GameScene
 import ext.aspectRatio
-import gameobjects.TestObject
+import gameobjects.Tank
 import kotlinx.browser.window
-import org.w3c.dom.WorkerGlobalScope
 import three.GLTFLoader
 import three.js.*
 import util.ResourceManager
@@ -23,24 +22,20 @@ class MainScene : GameScene() {
         position.z = 10
     }
 
-    private val objects: MutableList<GameObject> = mutableListOf()
+    private val objects: MutableList<GameObject> = mutableListOf(
+        Tank()
+    )
 
     init {
-        //objects.add(TestObject())
-        objects.forEach { scene.add(it.visual) }
+        objects.forEach { o -> o.renderable?.let { scene.add(it) } }
         launch {
             loadAssets()
         }
     }
     private suspend fun loadAssets() {
-        val loader = GLTFLoader()
-        window.onkeypress
-        console.log("Loading suzanne")
-        val suzanne = ResourceManager.suzanne.await()
-        console.log("Loaded Suzanne")
-        scene.add(suzanne.scene)
+        objects.forEach { it.initVisual() }
     }
-    override fun update(delta: Double) {
-
+    override fun update(delta: Float) {
+        objects.forEach { it.update(delta) }
     }
 }
