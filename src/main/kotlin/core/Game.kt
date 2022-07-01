@@ -19,7 +19,7 @@ object Game {
     }
 
     fun mainLoop() {
-        val delta = clock.getDelta().toDouble()
+        val delta = clock.getDelta().toFloat()
         EventManager.keyboardEvents.switchBatches()
         currentScene.update(delta)
         renderer.render(currentScene.scene, currentScene.camera)

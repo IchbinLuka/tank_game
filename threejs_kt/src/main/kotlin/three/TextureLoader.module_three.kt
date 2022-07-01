@@ -20,4 +20,6 @@ import org.w3c.xhr.*
 
 open external class TextureLoader(manager: LoadingManager = definedExternally) : Loader {
     open fun load(url: String, onLoad: (texture: Texture) -> Unit = definedExternally, onProgress: (event: ProgressEvent) -> Unit = definedExternally, onError: (event: ErrorEvent) -> Unit = definedExternally): Texture
+
+    override fun loadAsync(url: String, onProgress: (event: ProgressEvent) -> Unit): Promise<Texture>
 }

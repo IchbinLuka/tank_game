@@ -24,6 +24,12 @@ kotlin {
     }
 }
 
+tasks.create("debug") {
+    dependsOn.add("browserDevelopmentWebpack")
+    dependsOn.add("browserDevelopmentRun")
+    tasks.findByName("browserDevelopmentRun")?.mustRunAfter("browserDevelopmentWebpack")
+}
+
 tasks.withType(KotlinJsCompile::class.java).named("compileKotlinJs") {
     kotlinOptions.moduleKind = "commonjs"
 }

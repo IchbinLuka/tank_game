@@ -19,7 +19,9 @@ class MainScene : GameScene() {
         add(AmbientLight(0x404040, 1))
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 10
+        position.z = 50
+        position.y = 3
+        rotation.x = 0.3
     }
 
     private val objects: MutableList<GameObject> = mutableListOf(
@@ -27,13 +29,14 @@ class MainScene : GameScene() {
     )
 
     init {
-        objects.forEach { o -> o.renderable?.let { scene.add(it) } }
         launch {
             loadAssets()
+            objects.forEach { o -> o.renderable?.let { scene.add(it) } }
         }
     }
     private suspend fun loadAssets() {
         objects.forEach { it.initVisual() }
+        ResourceManager.sunnySky.then { scene.background = it }
     }
     override fun update(delta: Float) {
         objects.forEach { it.update(delta) }

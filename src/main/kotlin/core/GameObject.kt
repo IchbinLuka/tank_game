@@ -7,5 +7,5 @@ abstract class GameObject {
 
     abstract suspend fun initVisual()
 
-    abstract fun update(deltaTime: Float)
+    open fun update(deltaTime: Float) {}
 }
