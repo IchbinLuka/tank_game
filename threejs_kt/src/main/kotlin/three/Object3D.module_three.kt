@@ -85,7 +85,7 @@ open external class Object3D : EventDispatcher {
     open fun getWorldScale(target: Vector3): Vector3
     open fun getWorldDirection(target: Vector3): Vector3
     open fun raycast(raycaster: Raycaster, intersects: Array<Intersection>)
-    open fun traverse(callback: (obj: Object3D) -> Any)
+    open fun traverse(callback: (obj: Object3D) -> Unit)
     open fun traverseVisible(callback: (obj: Object3D) -> Any)
     open fun traverseAncestors(callback: (obj: Object3D) -> Any)
     open fun updateMatrix()

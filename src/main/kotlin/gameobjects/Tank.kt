@@ -2,6 +2,7 @@ package gameobjects
 
 import core.GameObject
 import ext.plus
+import extensions.enableShadows
 import kotlinx.browser.window
 import three.GLTF
 import three.js.Euler
@@ -24,13 +25,15 @@ class Tank() : GameObject() {
     override suspend fun initVisual() {
         Log.v("Loading tank")
         gltf = ResourceManager.tank.await()
+        gltf?.scene?.enableShadows()
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
+        mainBone?.position?.y = 0
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
         Log.d("Loaded tank")
     }
 
     private fun move(vector3: Vector3, deltaTime: Float = 1f) {
-        renderable?.position?.addScaledVector(vector3, deltaTime)
+        mainBone?.position?.addScaledVector(vector3, deltaTime)
     }
 
     private fun setDirection(direction: Direction) {
@@ -51,11 +54,11 @@ class Tank() : GameObject() {
             when(it.keyCode) {
                 97  -> {
                     setDirection(Direction.Left)
-                    move(Vector3(-1, 0, 0), deltaTime)
+                    move(Vector3(-3, 0, 0), deltaTime)
                 }
                 100 -> {
                     setDirection(Direction.Right)
-                    move(Vector3(1, 0, 0), deltaTime)
+                    move(Vector3(3, 0, 0), deltaTime)
                 }
                 119 -> rotateCannon(1f, deltaTime)
                 115 -> rotateCannon(-1f, deltaTime)

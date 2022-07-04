@@ -3,19 +3,26 @@ package core
 import kotlinx.browser.document
 import kotlinx.browser.window
 import scenes.MainScene
-import three.js.Clock
-import three.js.Loader
-import three.js.WebGLRenderer
+import scenes.MeshTestScene
+import three.OrbitControls
+import three.js.*
 import util.EventManager
 
 object Game {
     private val clock = Clock()
-    var currentScene: GameScene = MainScene()
+    var currentScene: GameScene = MeshTestScene() // MainScene()
 
-    private val renderer = WebGLRenderer().apply {
+    private val renderer = WebGLRenderer(object : WebGLRendererParameters {
+        override var antialias: Boolean? = true
+    }).apply {
         document.body?.appendChild(domElement)
+        //shadowMap.enabled = true
         setSize(window.innerWidth, window.innerHeight)
         setPixelRatio(window.devicePixelRatio)
+    }
+
+    init {
+        val controls = OrbitControls(currentScene.camera, renderer.domElement)
     }
 
     fun mainLoop() {
