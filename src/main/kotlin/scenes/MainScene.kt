@@ -10,9 +10,7 @@ import gameobjects.Tank
 import kotlinx.browser.window
 import three.GLTFLoader
 import three.js.*
-import util.ResourceManager
-import util.await
-import util.launch
+import util.*
 
 class MainScene : GameScene() {
 
@@ -36,10 +34,21 @@ class MainScene : GameScene() {
         //rotation.x = 0.3
     }
 
-    private val objects: MutableList<GameObject> = mutableListOf(
-        Tank(),
-        Ground()
+    private val objects: MutableList<GameObject> by lazy {
+        mutableListOf<GameObject>(
+            ground,
+        ).apply {
+            addAll(tanks)
+        }
+    }
+
+    private val ground = Ground(offset = Vector3(-100, -20, 12))
+
+    private val tanks = listOf<Tank>(
+        Tank()
     )
+
+    private var currentTank: Int = 0
 
     init {
         launch {
@@ -58,5 +67,18 @@ class MainScene : GameScene() {
     }
     override fun update(delta: Float) {
         objects.forEach { it.update(delta) }
+        val currentTank = tanks.getOrNull(currentTank)
+        EventManager.keyboardEvents.events.forEach {
+            when(it.keyCode) {
+                97  -> {
+                    currentTank?.setDirection(Direction.Left)
+                    currentTank?.move(Vector3(-3, 0, 0), delta, ground)
+                }
+                100 -> {
+                    currentTank?.setDirection(Direction.Right)
+                    currentTank?.move(Vector3(3, 0, 0), delta, ground)
+                }
+            }
+        }
     }
 }

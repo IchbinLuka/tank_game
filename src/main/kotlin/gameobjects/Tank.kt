@@ -3,6 +3,7 @@ package gameobjects
 import core.GameObject
 import ext.plus
 import extensions.enableShadows
+import extensions.toFloatList
 import kotlinx.browser.window
 import three.GLTF
 import three.js.Euler
@@ -32,11 +33,17 @@ class Tank() : GameObject() {
         Log.d("Loaded tank")
     }
 
-    private fun move(vector3: Vector3, deltaTime: Float = 1f) {
+    fun move(vector3: Vector3, deltaTime: Float = 1f, ground: Ground) {
         mainBone?.position?.addScaledVector(vector3, deltaTime)
+        Log.d("Tank position: ${mainBone?.position?.toFloatList()}")
+        mainBone?.position?.let {
+            val pos = mainBone!!.position.x.toFloat()
+            it.y = ground.heightAt(pos)
+            mainBone?.rotation?.z = ground.rotationAt(pos)
+        }
     }
 
-    private fun setDirection(direction: Direction) {
+    fun setDirection(direction: Direction) {
         if (direction != this.direction) {
             mainBone?.rotateX(PI)
         }
@@ -50,20 +57,6 @@ class Tank() : GameObject() {
     }
 
     override fun update(deltaTime: Float) {
-        EventManager.keyboardEvents.events.forEach {
-            when(it.keyCode) {
-                97  -> {
-                    setDirection(Direction.Left)
-                    move(Vector3(-3, 0, 0), deltaTime)
-                }
-                100 -> {
-                    setDirection(Direction.Right)
-                    move(Vector3(3, 0, 0), deltaTime)
-                }
-                119 -> rotateCannon(1f, deltaTime)
-                115 -> rotateCannon(-1f, deltaTime)
-            }
-        }
     }
 
 

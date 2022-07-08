@@ -97,10 +97,10 @@ external interface MaterialParameters {
     var flatShading: Boolean?
         get() = definedExternally
         set(value) = definedExternally
-    var side: Side?
+    var side: Int?
         get() = definedExternally
         set(value) = definedExternally
-    var shadowSide: Side?
+    var shadowSide: Int?
         get() = definedExternally
         set(value) = definedExternally
     var toneMapped: Boolean?
@@ -175,8 +175,8 @@ open external class Material : EventDispatcher {
     open var premultipliedAlpha: Boolean
     open var dithering: Boolean
     open var flatShading: Boolean
-    open var side: Side
-    open var shadowSide: Side
+    open var side: Int
+    open var shadowSide: Int
     open var toneMapped: Boolean
     open var transparent: Boolean
     open var type: String

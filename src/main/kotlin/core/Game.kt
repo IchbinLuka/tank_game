@@ -10,7 +10,7 @@ import util.EventManager
 
 object Game {
     private val clock = Clock()
-    var currentScene: GameScene = MeshTestScene() // MainScene()
+    var currentScene: GameScene = MainScene()
 
     private val renderer = WebGLRenderer(object : WebGLRendererParameters {
         override var antialias: Boolean? = true

@@ -26,10 +26,6 @@ external enum class ShadowMapType {
 
 }
 
-external enum class Side {
-
-}
-
 external enum class Blending {
 
 }
