@@ -42,7 +42,7 @@ class MainScene : GameScene() {
         }
     }
 
-    private val ground = Ground(offset = Vector3(-100, -20, 12))
+    private val ground = Ground(offset = Vector3(-100, -20, 12), res = 100)
 
     private val tanks = listOf<Tank>(
         Tank()

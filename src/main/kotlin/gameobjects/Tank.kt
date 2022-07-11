@@ -39,7 +39,8 @@ class Tank() : GameObject() {
         mainBone?.position?.let {
             val pos = mainBone!!.position.x.toFloat()
             it.y = ground.heightAt(pos)
-            mainBone?.rotation?.z = ground.rotationAt(pos)
+            val rotation = ground.rotationAt(pos)
+            mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
         }
     }
 

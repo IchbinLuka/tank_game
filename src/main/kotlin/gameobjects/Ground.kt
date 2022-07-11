@@ -70,18 +70,21 @@ class Ground(
 
     fun heightAt(position: Float): Float {
         val pos = position - offset.x.toFloat()
-        if (pos < 0 || pos > heightData.size - 1) return 0f
-        val previous = heightData[floor(pos).toInt()]
-        val next = heightData[ceil(pos).toInt()]
-        val progress = 1 - ceil(pos) + pos
+        if (pos < 0 || pos > width - 1) return 0f
+        val normPos = pos * res / width
+        val previous = heightData[floor(normPos).toInt()]
+        val next = heightData[ceil(normPos).toInt()]
+        val progress = 1 - ceil(normPos) + normPos
         return offset.y.toFloat() + previous + (next - previous) * progress
     }
 
     fun rotationAt(position: Float): Float {
         val pos = position - offset.x.toFloat()
-        if (pos < 0 || pos > heightData.size - 1) return 0f
-        val previous = heightData[floor(pos).toInt()]
-        val next = heightData[ceil(pos).toInt()]
+        if (pos < 0 || pos > width - 1) return 0f
+        val normPos = pos * res / width
+        // TODO: Fix rotation
+        val previous = heightData[floor(normPos).toInt()]
+        val next = heightData[ceil(normPos).toInt()]
         return (atan((next - previous) % (2 * PI)) + 1.5 *  PI).toFloat()
     }
 
