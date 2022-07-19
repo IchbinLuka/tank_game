@@ -23,6 +23,12 @@ object Game {
 
     init {
         val controls = OrbitControls(currentScene.camera, renderer.domElement)
+        window.onresize = {
+            renderer.apply {
+                setSize(window.innerWidth, window.innerHeight)
+                setPixelRatio(window.devicePixelRatio)
+            }
+        }
     }
 
     fun mainLoop() {

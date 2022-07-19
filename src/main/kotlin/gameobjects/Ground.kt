@@ -1,13 +1,14 @@
 package gameobjects
 
 import core.GameObject
-import ext.plus
 import extensions.enableShadows
 import extensions.toFloatList
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.js.*
 import util.Log
+import util.angleFromAscent
+import util.getLinearGradient
 import kotlin.math.*
 
 class Ground(
@@ -31,7 +32,7 @@ class Ground(
                 val previous = currentPos.clone().add(Vector3(-(width / res), 0, 0))
                 val previousTop = previous.clone().add(Vector3(0, heightData[i-1], 0))
                 val previousBack = previousTop.clone().add(Vector3(0, 0, -depth))
-                Log.d("previousTop: ${previousTop.toFloatList()}, previous: ${previous.toFloatList()}" )
+                //Log.d("previousTop: ${previousTop.toFloatList()}, previous: ${previous.toFloatList()}" )
                 vertices.addAll(currentPos.toFloatList())
                 vertices.addAll(previousTop.toFloatList())
                 vertices.addAll(currentTop.toFloatList())
@@ -54,8 +55,6 @@ class Ground(
                 normals.addAll(arrayOf(0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f, 0f))
 
             }
-            Log.d(vertices.size)
-            //Log.d(vertices.toString())
             geometry.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
             geometry.setAttribute("normal", BufferAttribute(Float32Array(normals.toTypedArray()).asDynamic(), 3))
             return Mesh(geometry, MeshPhongMaterial().apply {
@@ -75,7 +74,11 @@ class Ground(
         val previous = heightData[floor(normPos).toInt()]
         val next = heightData[ceil(normPos).toInt()]
         val progress = 1 - ceil(normPos) + normPos
-        return offset.y.toFloat() + previous + (next - previous) * progress
+        return offset.y.toFloat() + getLinearGradient(previous, next, progress)
+    }
+
+    private fun averageAscent(start: Int, end: Int): Float {
+        return (heightData[end] - heightData[start]) / (end - start)
     }
 
     fun rotationAt(position: Float): Float {
@@ -83,9 +86,12 @@ class Ground(
         if (pos < 0 || pos > width - 1) return 0f
         val normPos = pos * res / width
         // TODO: Fix rotation
-        val previous = heightData[floor(normPos).toInt()]
-        val next = heightData[ceil(normPos).toInt()]
-        return (atan((next - previous) % (2 * PI)) + 1.5 *  PI).toFloat()
+        val previous = floor(normPos).toInt()
+        val next = ceil(normPos).toInt()
+        val startAsc = angleFromAscent(averageAscent(previous - 1, previous) * res / width)
+        val endAsc = angleFromAscent(averageAscent(next, next + 1) * res / width)
+        Log.d("start: $startAsc, end: $endAsc")
+        return getLinearGradient(startAsc, endAsc, normPos - previous)
     }
 
     override suspend fun initVisual() {

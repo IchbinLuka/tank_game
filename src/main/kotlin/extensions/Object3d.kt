@@ -1,6 +1,8 @@
 package extensions
 
+import three.js.Euler
 import three.js.Object3D
+import three.js.Quaternion
 
 fun Object3D.enableShadows() {
     traverse {
@@ -9,4 +11,9 @@ fun Object3D.enableShadows() {
             it.castShadow = true
         }
     }
+}
+
+fun Object3D.getWorldEuler(target: Euler): Euler {
+    val quaternion = getWorldQuaternion(Quaternion().setFromEuler(target))
+    return Euler().setFromQuaternion(quaternion)
 }

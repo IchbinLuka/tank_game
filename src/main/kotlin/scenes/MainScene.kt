@@ -1,14 +1,15 @@
 package scenes
 
+import core.Game
 import core.GameObject
 import core.GameScene
 import ext.aspectRatio
-import ext.plus
 import extensions.enableShadows
+import extensions.toFloatList
 import gameobjects.Ground
 import gameobjects.Tank
 import kotlinx.browser.window
-import three.GLTFLoader
+import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import util.*
 
@@ -42,7 +43,12 @@ class MainScene : GameScene() {
         }
     }
 
-    private val ground = Ground(offset = Vector3(-100, -20, 12), res = 100)
+    private val aimingAidPlane = Mesh(PlaneGeometry(500, 500), MeshPhongMaterial().apply { visible = false })
+    private val aimingCaster = Raycaster()
+    private val aimingPoint = Vector2()
+    private var aiming = true
+
+    private val ground = Ground(offset = Vector3(-100, -20, 4), res = 200, depth = 8f)
 
     private val tanks = listOf<Tank>(
         Tank()
@@ -51,11 +57,19 @@ class MainScene : GameScene() {
     private var currentTank: Int = 0
 
     init {
+        window.addEventListener("pointermove", {
+            it as PointerEvent
+            aimingPoint.x = ( it.clientX.toFloat() / window.innerWidth ) * 2 - 1
+            aimingPoint.y = - ( it.clientY.toFloat() / window.innerHeight ) * 2 + 1
+            Log.d("x: ${aimingPoint.x}, y: ${aimingPoint.y}")
+        })
         launch {
             loadAssets()
             objects.forEach { o -> o.renderable?.let { scene.add(it) } }
+            scene.add(aimingAidPlane)
         }
     }
+
     private suspend fun loadAssets() {
         objects.forEach { it.initVisual() }
         scene.add(ResourceManager.testLandscape.await().scene.apply {
@@ -71,13 +85,19 @@ class MainScene : GameScene() {
         EventManager.keyboardEvents.events.forEach {
             when(it.keyCode) {
                 97  -> {
-                    currentTank?.setDirection(Direction.Left)
                     currentTank?.move(Vector3(-3, 0, 0), delta, ground)
                 }
                 100 -> {
-                    currentTank?.setDirection(Direction.Right)
                     currentTank?.move(Vector3(3, 0, 0), delta, ground)
                 }
+            }
+        }
+        if (aiming) {
+            aimingCaster.setFromCamera(aimingPoint, camera)
+            val intersection = aimingCaster.intersectObject(aimingAidPlane)
+            if (intersection.isNotEmpty()) {
+                val point = intersection.first().point
+                currentTank?.aim(Vector2(point.x, point.y))
             }
         }
     }
