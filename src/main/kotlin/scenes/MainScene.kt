@@ -61,7 +61,6 @@ class MainScene : GameScene() {
             it as PointerEvent
             aimingPoint.x = ( it.clientX.toFloat() / window.innerWidth ) * 2 - 1
             aimingPoint.y = - ( it.clientY.toFloat() / window.innerHeight ) * 2 + 1
-            Log.d("x: ${aimingPoint.x}, y: ${aimingPoint.y}")
         })
         launch {
             loadAssets()

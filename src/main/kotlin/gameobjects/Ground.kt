@@ -85,13 +85,21 @@ class Ground(
         val pos = position - offset.x.toFloat()
         if (pos < 0 || pos > width - 1) return 0f
         val normPos = pos * res / width
-        // TODO: Fix rotation
         val previous = floor(normPos).toInt()
         val next = ceil(normPos).toInt()
-        val startAsc = angleFromAscent(averageAscent(previous - 1, previous) * res / width)
-        val endAsc = angleFromAscent(averageAscent(next, next + 1) * res / width)
-        Log.d("start: $startAsc, end: $endAsc")
-        return getLinearGradient(startAsc, endAsc, normPos - previous)
+        val nearest = normPos.roundToInt()
+        val currentAngle = angleFromAscent(averageAscent(previous, next) * res / width)
+        val nearestAsc = (res / width) * if (nearest == previous) {
+            averageAscent(previous - 1, previous)
+        } else {
+            averageAscent(next, next + 1)
+        }
+        var progress = 0.5f + normPos - nearest
+        if (normPos - nearest < 0) {
+            progress = 1 - progress // Invert progress if nearest is right
+        }
+        Log.v(progress)
+        return getLinearGradient(angleFromAscent(nearestAsc), currentAngle, progress)
     }
 
     override suspend fun initVisual() {

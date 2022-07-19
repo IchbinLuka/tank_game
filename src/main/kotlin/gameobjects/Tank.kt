@@ -45,7 +45,6 @@ class Tank() : GameObject() {
             rotation += PI.toFloat()
         }
         val angle = rotation - globalRot.z - 0.5 * PI
-        Log.d(cannon!!.rotation.z.toFloat() + angle.toFloat())
         if (toUnitCircle(cannon!!.rotation.z.toDouble() + angle.toDouble()) < 2.8) {
             cannon?.rotateOnWorldAxis(Vector3(0, 0, 1), angle)
         }
