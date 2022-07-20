@@ -1,11 +1,9 @@
 package scenes
 
-import core.Game
 import core.GameObject
 import core.GameScene
 import ext.aspectRatio
 import extensions.enableShadows
-import extensions.toFloatList
 import gameobjects.Ground
 import gameobjects.Tank
 import kotlinx.browser.window
@@ -63,6 +61,7 @@ class MainScene : GameScene() {
             aimingPoint.y = - ( it.clientY.toFloat() / window.innerHeight ) * 2 + 1
         })
         launch {
+            GUIHelper.loadGUI("start")
             loadAssets()
             objects.forEach { o -> o.renderable?.let { scene.add(it) } }
             scene.add(aimingAidPlane)

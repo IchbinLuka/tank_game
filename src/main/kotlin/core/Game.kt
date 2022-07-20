@@ -6,7 +6,7 @@ import scenes.MainScene
 import three.OrbitControls
 import three.js.*
 import util.EventManager
-import util.HUDHelper
+import util.GUIHelper
 
 object Game {
     private val clock = Clock()
@@ -14,7 +14,7 @@ object Game {
     var currentScene: GameScene
     get() = currentScene_
     set(value) {
-        HUDHelper.resetHUD()
+        GUIHelper.resetGUI()
         currentScene_ = value
     }
 
