@@ -65,7 +65,7 @@ class Ground(
 
     private var object3D: Object3D? = null
 
-    private val heightData: Array<Float> = Array<Float>(res) { (height * 0.5 * (1 - sin(0.1 * it))).toFloat() }
+    private val heightData: Array<Float> = Array<Float>(res) { (height * 0.2 * (1 - sin(0.1 * it))).toFloat() + height / 2 }
 
     fun heightAt(position: Float): Float {
         val pos = position - offset.x.toFloat()

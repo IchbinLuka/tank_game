@@ -3,14 +3,20 @@ package core
 import kotlinx.browser.document
 import kotlinx.browser.window
 import scenes.MainScene
-import scenes.MeshTestScene
 import three.OrbitControls
 import three.js.*
 import util.EventManager
+import util.HUDHelper
 
 object Game {
     private val clock = Clock()
-    var currentScene: GameScene = MainScene()
+    private var currentScene_: GameScene = MainScene()
+    var currentScene: GameScene
+    get() = currentScene_
+    set(value) {
+        HUDHelper.resetHUD()
+        currentScene_ = value
+    }
 
     private val renderer = WebGLRenderer(object : WebGLRendererParameters {
         override var antialias: Boolean? = true
@@ -27,6 +33,7 @@ object Game {
             renderer.apply {
                 setSize(window.innerWidth, window.innerHeight)
                 setPixelRatio(window.devicePixelRatio)
+                currentScene.camera.asDynamic().aspect = window.innerWidth / window.innerHeight
             }
         }
     }
