@@ -7,8 +7,8 @@ import three.js.*
 open external class RenderPass(
     scene: Scene,
     camera: Camera,
-    overrideMaterial: Material,
-    clearColor: Color,
+    overrideMaterial: Material = definedExternally,
+    clearColor: Color = definedExternally,
     clearAlpha: Int = definedExternally
 ) : Pass {
 

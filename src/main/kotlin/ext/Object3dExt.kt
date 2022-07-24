@@ -1,4 +1,4 @@
-package extensions
+package ext
 
 import three.js.Euler
 import three.js.Object3D

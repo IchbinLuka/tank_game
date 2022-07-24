@@ -4,7 +4,6 @@ import core.GameScene
 import ext.aspectRatio
 import gameobjects.Ground
 import kotlinx.browser.window
-import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Float32Array
 import three.js.*
 import kotlin.math.PI

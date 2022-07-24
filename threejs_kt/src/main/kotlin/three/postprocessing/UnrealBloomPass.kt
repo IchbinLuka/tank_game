@@ -6,13 +6,14 @@ import three.js.*
 
 open external class UnrealBloomPass(
     resolution: Vector2 = definedExternally,
-    strength: Int = definedExternally,
+    strength: Number = definedExternally,
     radius: Number,
     threshold: Number
 ): Pass {
     open var clearColor: Color
     open var radius: Number
     open var threshold: Number
+    open var strength: Number
     open var resolution: Vector2
     open var renderTargetBright: WebGLRenderTarget
     open var highPassUniforms: WebGLUniforms

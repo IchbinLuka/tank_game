@@ -51,7 +51,6 @@ external enum class Combine {
 }
 
 external enum class ToneMapping {
-
 }
 
 external enum class Mapping {

@@ -1,9 +1,9 @@
 package gameobjects
 
 import core.GameObject
-import extensions.enableShadows
-import extensions.getWorldEuler
-import extensions.minus
+import ext.enableShadows
+import ext.getWorldEuler
+import ext.minus
 import three.GLTF
 import three.js.*
 import util.*

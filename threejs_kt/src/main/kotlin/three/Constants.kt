@@ -1,5 +1,13 @@
+@file:JsModule("three")
+@file:JsNonModule
 package three
 
-const val DoubleSide = 2
-const val FrontSide = 1
-const val BackSide = 0
+import three.js.ToneMapping
+
+external val DoubleSide: Int
+external val FrontSide: Int
+external val BackSide: Int
+
+external val NoToneMapping: ToneMapping
+external val LinearToneMapping: ToneMapping
+external val ReinhardToneMapping: ToneMapping

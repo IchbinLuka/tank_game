@@ -3,7 +3,7 @@ package scenes
 import core.GameObject
 import core.GameScene
 import ext.aspectRatio
-import extensions.enableShadows
+import ext.enableShadows
 import gameobjects.Ground
 import gameobjects.Tank
 import kotlinx.browser.window
@@ -22,7 +22,6 @@ class MainScene : GameScene() {
         }
         add(light)
         add(DirectionalLightHelper(light, size = 10, color = 0xFDFFD9))
-
         fog = FogExp2(0x5f9be5, 0.005)
         //add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5).apply {})
@@ -34,9 +33,7 @@ class MainScene : GameScene() {
     }
 
     private val objects: MutableList<GameObject> by lazy {
-        mutableListOf<GameObject>(
-            ground,
-        ).apply {
+        mutableListOf<GameObject>().apply {
             addAll(tanks)
         }
     }
@@ -46,7 +43,8 @@ class MainScene : GameScene() {
     private val aimingPoint = Vector2()
     private var aiming = true
 
-    private val ground = Ground(offset = Vector3(-100, -20, 4), res = 200, depth = 8f)
+    private val ground = Ground(offset = Vector3(-100, -20, 4), res = 50, depth = 8f)
+    private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(
         Tank()
@@ -61,10 +59,11 @@ class MainScene : GameScene() {
             aimingPoint.y = - ( it.clientY.toFloat() / window.innerHeight ) * 2 + 1
         })
         launch {
-            GUIHelper.loadGUI("start")
+            //GUIHelper.loadGUI("start")
             loadAssets()
             objects.forEach { o -> o.renderable?.let { scene.add(it) } }
             scene.add(aimingAidPlane)
+            scene.add(groundRenderable)
         }
     }
 

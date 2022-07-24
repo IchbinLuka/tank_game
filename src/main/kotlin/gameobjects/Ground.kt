@@ -1,10 +1,9 @@
 package gameobjects
 
 import core.GameObject
-import extensions.enableShadows
-import extensions.toFloatList
+import ext.enableShadows
+import ext.toFloatList
 import org.khronos.webgl.Float32Array
-import three.DoubleSide
 import three.js.*
 import util.Log
 import util.angleFromAscent
@@ -32,40 +31,43 @@ class Ground(
                 val previous = currentPos.clone().add(Vector3(-(width / res), 0, 0))
                 val previousTop = previous.clone().add(Vector3(0, heightData[i-1], 0))
                 val previousBack = previousTop.clone().add(Vector3(0, 0, -depth))
+                currentPos.add(Vector3(0, 0, 3))
+                previous.add(Vector3(0, 0, 3))
                 //Log.d("previousTop: ${previousTop.toFloatList()}, previous: ${previous.toFloatList()}" )
                 vertices.addAll(currentPos.toFloatList())
-                vertices.addAll(previousTop.toFloatList())
                 vertices.addAll(currentTop.toFloatList())
+                vertices.addAll(previousTop.toFloatList())
 
                 vertices.addAll(previous.toFloatList())
                 vertices.addAll(currentPos.toFloatList())
                 vertices.addAll(previousTop.toFloatList())
 
                 normals.addAll(arrayOf(0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f))
-                normals.addAll(arrayOf(0f, 0f, -1f, 0f, 0f, -1f, 0f, 0f, -1f))
+                normals.addAll(arrayOf(0f, 0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f))
 
                 vertices.addAll(previousTop.toFloatList())
                 vertices.addAll(currentTop.toFloatList())
                 vertices.addAll(previousBack.toFloatList())
 
                 vertices.addAll(currentTop.toFloatList())
-                vertices.addAll(previousBack.toFloatList())
                 vertices.addAll(currentBack.toFloatList())
-                normals.addAll(arrayOf(0f, -1f, 0f, 0f, -1f, 0f, 0f, -1f, 0f))
+                vertices.addAll(previousBack.toFloatList())
+                normals.addAll(arrayOf(0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f, 0f))
                 normals.addAll(arrayOf(0f, 1f, 0f, 0f, 1f, 0f, 0f, 1f, 0f))
 
             }
             geometry.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
             geometry.setAttribute("normal", BufferAttribute(Float32Array(normals.toTypedArray()).asDynamic(), 3))
             return Mesh(geometry, MeshPhongMaterial().apply {
-                color = Color(0x00ff00)
-                side = DoubleSide
+                color = Color(0x195917)
+                //side = DoubleSide
+                shininess = 50
             })
         }
 
     private var object3D: Object3D? = null
 
-    private val heightData: Array<Float> = Array<Float>(res) { (height * 0.2 * (1 - sin(0.1 * it))).toFloat() + height / 2 }
+    private val heightData: Array<Float> = Array<Float>(res) { (height * 0.2 * (1 - sin(0.5 * it))).toFloat() + height / 2 }
 
     fun heightAt(position: Float): Float {
         val pos = position - offset.x.toFloat()
