@@ -1,6 +1,7 @@
 package gameobjects
 
 import core.GameObject
+import ext.applyCustomMat
 import ext.enableShadows
 import ext.getWorldEuler
 import ext.minus
@@ -11,7 +12,9 @@ import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.atan
 
-class Tank() : GameObject() {
+class Tank(
+    val color: Color = Color(0x338530)
+) : GameObject() {
     override val renderable: Object3D? get() = gltf?.scene
 
     private var gltf: GLTF? = null
@@ -22,13 +25,16 @@ class Tank() : GameObject() {
     private var cannon: Object3D? = null
 
     override suspend fun initVisual() {
-        Log.v("Loading tank")
+        Log.v(TAG, "Loading tank")
         gltf = ResourceManager.tank.await()
-        gltf?.scene?.enableShadows()
+        gltf?.scene?.apply {
+            enableShadows()
+            applyCustomMat(MeshPhongMaterial().apply { color = this@Tank.color })
+        }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
         mainBone?.position?.y = 0
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
-        Log.d("Loaded tank")
+        Log.d(TAG, "Loaded tank")
     }
 
     fun aim(point: Vector2) {
@@ -78,5 +84,7 @@ class Tank() : GameObject() {
     override fun update(deltaTime: Float) {
     }
 
-
+    companion object {
+        const val TAG = "Tank"
+    }
 }

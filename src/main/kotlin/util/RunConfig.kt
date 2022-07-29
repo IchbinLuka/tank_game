@@ -2,10 +2,10 @@ package util
 
 val debugLevel = RunConfig.Verbose
 
-enum class RunConfig {
+enum class RunConfig() {
     Verbose,
     Debug,
     Warning,
     Info,
-    Error,
+    Error;
 }

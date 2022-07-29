@@ -2,6 +2,7 @@ package core
 
 import kotlinx.browser.document
 import kotlinx.browser.window
+import scenes.MainScene
 import scenes.ParticleTestScene
 import stats.js.Stats
 import three.OrbitControls
@@ -15,7 +16,7 @@ import util.GUIHelper
 
 object Game {
     private val clock = Clock()
-    private var currentScene_: GameScene = ParticleTestScene()
+    private var currentScene_: GameScene = MainScene()
     var currentScene: GameScene
     get() = currentScene_
     set(value) {
@@ -52,7 +53,7 @@ object Game {
         val height = window.innerHeight
         val controls = OrbitControls(currentScene.camera, renderer.domElement)
         //renderer.toneMappingExposure = 1
-        val bloomPass = UnrealBloomPass(Vector2( window.innerWidth, window.innerHeight ), 0.75, 0.2, 0.85)
+        val bloomPass = UnrealBloomPass(Vector2( window.innerWidth, window.innerHeight ), 0.75, 0.2, 0.3)
         val ssaoPass = SSAOPass(currentScene.scene, currentScene.camera, width, height).apply {
             kernelRadius = 5
             maxDistance = 50

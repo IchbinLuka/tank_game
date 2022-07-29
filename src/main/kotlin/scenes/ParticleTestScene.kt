@@ -13,16 +13,20 @@ class ParticleTestScene: GameScene() {
         position.z = 4
     }
     private val particleSystem = BasicParticleSystem(
-        particleLifetime = 30000f,
+        particleLifetime = 700f,
         totalLifetime = 1000000.0,
         spawnBurst = 10,
-        emitter = CircleEmitter(Vector3(), 2f, Vector3(0, 1, 0)),
-        startVelocity = 0f,
-        gravity = 0f,
-        spawnDelta = 100f,
-        startSize = 0.5f,
+        emitter = CircleEmitter(Vector3(), 3f, Vector3(0, 1, 0)),
+        startVelocity = 1f,
+        gravity = 50f,
+        spawnDelta = 6f,
+        startSize = 1.5f,
         endSize = 0f,
-        startColor = Color(0xff0000),
+        startColor = Color(0xfcecd6),
+        endColor = Color(0xfc5f2f),
+        startDirectionRandomness = 0.2f,
+        particleLifetimeRandomness = 0.3f,
+        velocityRandomness = 0.3f
     )
 
     override val scene = Scene().apply {
@@ -31,6 +35,6 @@ class ParticleTestScene: GameScene() {
     }
 
     override fun update(delta: Float) {
-        particleSystem.update(delta / 1000)
+        particleSystem.update(delta)
     }
 }

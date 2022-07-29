@@ -19,7 +19,7 @@ class Ground(
 ) : GameObject() {
     override val renderable: Object3D
         get() {
-            Log.d("Generating ground")
+            Log.d(TAG, "Generating ground")
             val geometry = BufferGeometry()
             val vertices = mutableListOf<Float>()
             val normals = mutableListOf<Float>()
@@ -100,7 +100,6 @@ class Ground(
         if (normPos - nearest < 0) {
             progress = 1 - progress // Invert progress if nearest is right
         }
-        Log.v(progress)
         return getLinearGradient(angleFromAscent(nearestAsc), currentAngle, progress)
     }
 
@@ -111,5 +110,9 @@ class Ground(
             position.y = -100
             enableShadows()
         }
+    }
+
+    companion object {
+        const val TAG = "Ground"
     }
 }

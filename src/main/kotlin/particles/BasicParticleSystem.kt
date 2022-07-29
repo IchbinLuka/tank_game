@@ -6,7 +6,6 @@ import ext.times
 import ext.toFloatList
 import org.khronos.webgl.Float32Array
 import three.js.*
-import util.Log
 import util.getLinearGradient
 import kotlin.js.Date
 import kotlin.math.floor
@@ -24,8 +23,8 @@ class BasicParticleSystem(
     val startVelocity: Float = 0f,
     val startDirectionRandomness: Float = 0f, // TODO: Random start direction
     val velocityRandomness: Float = 0f,
-    val startColor: Color = Color(0xffffff),
-    val endColor: Color = Color(0xffffff),
+    startColor: Color = Color(0xffffff),
+    endColor: Color = Color(0xffffff),
     val spawnDelta: Float = 1f,
     val spawnBurst: Int = 0,
     val startSize: Float = 1f,
@@ -37,7 +36,7 @@ class BasicParticleSystem(
         var velocity: Vector3,
         var position: Vector3,
         var size: Float,
-        var color: Color,
+        var color: Collection<Float>,
         var birthTime: Double
         )
 
@@ -47,13 +46,23 @@ class BasicParticleSystem(
 
     private val geometry = BufferGeometry()
 
+    private val startColList = startColor.toFloatList()
+    private val colors = startColList zip endColor.toFloatList()
+
     override val renderable: Object3D by lazy {
         // Lazy initialization to make sure that geometry is defined
         Points(geometry, PointsMaterial().apply {
             vertexColors = true
+            size = size
             sizeAttenuation = true
+            opacity = 0.7f
+            transparent = true
+            toneMapped = true
+
         })
     }
+
+    private var lastBirth: Double = 0.0
 
     init {
         addParticles(spawnBurst)
@@ -62,19 +71,15 @@ class BasicParticleSystem(
     private fun updateMesh() {
         val vertices = mutableListOf<Float>()
         val colors = mutableListOf<Float>()
-        val sizes = mutableListOf<Float>()
         for (particle in particles) {
             vertices.addAll(particle.position.toFloatList())
-            colors.addAll(particle.color.toArray().map { it.toFloat() })
-            sizes.add(particle.size)
+            colors.addAll(particle.color)
         }
         geometry.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
         geometry.setAttribute("color", BufferAttribute(Float32Array(colors.toTypedArray()).asDynamic(), 3))
-        geometry.setAttribute("size", BufferAttribute(Float32Array(colors.toTypedArray()).asDynamic(), 1))
     }
 
     private fun addParticles(number: Int = 1, time: Double = Date.now()) {
-        Log.d((emitter.normal.clone() * startVelocity).toFloatList().toString())
         for (i in 1 .. number) {
             val deltaTime = particleLifetimeRandomness * particleLifetime * (2 * Random.nextFloat() - 1)
             val deltaVelocity = velocityRandomness * startVelocity * (2 * Random.nextFloat() - 1)
@@ -82,10 +87,11 @@ class BasicParticleSystem(
                 velocity = emitter.normal.clone() * (startVelocity + deltaVelocity),
                 birthTime = time + deltaTime,
                 size = startSize,
-                color = startColor,
+                color = startColList,
                 position = emitter.randomPoint()
             ))
         }
+        lastBirth = time
     }
 
     override fun update(deltaTime: Float) {
@@ -98,7 +104,7 @@ class BasicParticleSystem(
         }
         // Update each particle
         particles.forEachIndexed { index, particle ->
-            val lifeProgress = (currentTime - particle.birthTime) / particleLifetime
+            val lifeProgress = ((currentTime - particle.birthTime) / particleLifetime).toFloat()
             if (lifeProgress > 1) {
                 particles.removeAt(index)
                 /*for (i in 0..particles.lastIndex - index) {
@@ -107,14 +113,18 @@ class BasicParticleSystem(
                 return@forEachIndexed*/
             }
             particle.velocity.addScaledVector(emitter.normal, gravity * deltaTime)
-            particle.size = getLinearGradient(startSize, endSize, lifeProgress.toFloat())
+            // particle.size = getLinearGradient(startSize, endSize, lifeProgress)
             particle.position += particle.velocity * deltaTime
-            // TODO: Change particle color
+            particle.color = colors.map { getLinearGradient(it.first, it.second, lifeProgress) }
         }
         // Add new particles
-        val newParticleCount = floor((currentTime - particles.first().birthTime) / spawnDelta).toInt()
+        val newParticleCount = floor((currentTime - lastBirth) / spawnDelta).toInt()
         addParticles(newParticleCount, currentTime)
         updateMesh()
+    }
+
+    companion object {
+        const val TAG = "BasicParticleSystem"
     }
 
 }

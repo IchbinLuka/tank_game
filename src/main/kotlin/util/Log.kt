@@ -1,30 +1,30 @@
 package util
 
 object Log {
-    private fun logIfLevelOver(config: RunConfig, vararg message: Any?) {
+    private fun logIfLevelOver(config: RunConfig, tag: String, message: String) {
         if (debugLevel.ordinal <= config.ordinal) {
-            console.log(*message)
+            console.log("$tag:${config.name.uppercase()}: $message")
         }
     }
 
-    fun d(vararg message: Any?) {
-        logIfLevelOver(RunConfig.Debug, *message)
+    fun d(tag: String, message: String) {
+        logIfLevelOver(RunConfig.Debug, tag, message)
     }
 
-    fun e(vararg message: Any?) {
-        logIfLevelOver(RunConfig.Error, *message)
+    fun e(tag: String, message: String) {
+        logIfLevelOver(RunConfig.Error, tag, message)
     }
 
-    fun v(vararg message: Any?) {
-        logIfLevelOver(RunConfig.Verbose, *message)
+    fun v(tag: String, message: String) {
+        logIfLevelOver(RunConfig.Verbose, tag, message)
     }
 
-    fun i(vararg message: Any?) {
-        logIfLevelOver(RunConfig.Info, *message)
+    fun i(tag: String, message: String) {
+        logIfLevelOver(RunConfig.Info, tag, message)
     }
 
-    fun w(vararg message: Any?) {
-        logIfLevelOver(RunConfig.Warning, *message)
+    fun w(tag: String, message: String) {
+        logIfLevelOver(RunConfig.Warning, tag, message)
     }
 
 
