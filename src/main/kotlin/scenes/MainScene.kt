@@ -76,7 +76,7 @@ class MainScene : GameScene() {
             scene.background = it
         }
     }
-    override fun update(delta: Float) {
+    override fun update(delta: Double) {
         objects.forEach { it.update(delta) }
         val currentTank = tanks.getOrNull(currentTank)
         EventManager.keyboardEvents.events.forEach {

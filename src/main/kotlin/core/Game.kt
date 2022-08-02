@@ -2,7 +2,6 @@ package core
 
 import kotlinx.browser.document
 import kotlinx.browser.window
-import scenes.MainScene
 import scenes.ParticleTestScene
 import stats.js.Stats
 import three.OrbitControls
@@ -13,10 +12,11 @@ import three.postprocessing.SSAOPass
 import three.postprocessing.UnrealBloomPass
 import util.EventManager
 import util.GUIHelper
+import util.Log
 
 object Game {
     private val clock = Clock()
-    private var currentScene_: GameScene = MainScene()
+    private var currentScene_: GameScene = ParticleTestScene()
     var currentScene: GameScene
     get() = currentScene_
     set(value) {
@@ -49,9 +49,10 @@ object Game {
         window.onloadend = {
             renderer.domElement.focus()
         }
+        stats.begin()
         val width = window.innerWidth
         val height = window.innerHeight
-        val controls = OrbitControls(currentScene.camera, renderer.domElement)
+        OrbitControls(currentScene.camera, renderer.domElement)
         //renderer.toneMappingExposure = 1
         val bloomPass = UnrealBloomPass(Vector2( window.innerWidth, window.innerHeight ), 0.75, 0.2, 0.3)
         val ssaoPass = SSAOPass(currentScene.scene, currentScene.camera, width, height).apply {
@@ -62,7 +63,7 @@ object Game {
         composer.apply {
             addPass(renderPass)
             //addPass(ssaoPass)
-            //addPass(bloomPass)
+            addPass(bloomPass)
         }
         window.onresize = {
             renderer.apply {
@@ -75,12 +76,11 @@ object Game {
 
     fun mainLoop() {
         stats.begin()
-        val delta = clock.getDelta().toFloat()
+        val delta = clock.getDelta().toDouble()
         EventManager.keyboardEvents.switchBatches()
+        window.requestAnimationFrame { mainLoop() }
         currentScene.update(delta)
         composer.render()
-
-        stats.end()
-        window.requestAnimationFrame { mainLoop() }
+        stats.update()
     }
 }

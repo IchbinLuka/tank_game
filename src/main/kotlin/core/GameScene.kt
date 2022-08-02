@@ -8,5 +8,5 @@ abstract class GameScene {
     abstract val scene: Scene
     abstract val camera: Camera
 
-    abstract fun update(delta: Float)
+    abstract fun update(delta: Double)
 }

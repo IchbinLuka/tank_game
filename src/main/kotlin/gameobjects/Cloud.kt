@@ -20,7 +20,7 @@ class Cloud(
         gltf = ResourceManager.cloud.await()
     }
 
-    override fun update(deltaTime: Float) {
+    override fun update(deltaTime: Double) {
         gltf?.scene?.position?.addScaledVector(direction.vector3, speed * deltaTime)
     }
 }

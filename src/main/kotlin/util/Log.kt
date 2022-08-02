@@ -1,9 +1,12 @@
 package util
 
+import three.js.Clock
+import kotlin.js.Date
+
 object Log {
     private fun logIfLevelOver(config: RunConfig, tag: String, message: String) {
         if (debugLevel.ordinal <= config.ordinal) {
-            console.log("$tag:${config.name.uppercase()}: $message")
+            console.log("${Date().toISOString()}::$tag::${config.name.uppercase()}:: $message")
         }
     }
 

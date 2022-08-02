@@ -9,33 +9,35 @@ import three.js.*
 import util.getLinearGradient
 import kotlin.js.Date
 import kotlin.math.floor
+import kotlin.math.min
 import kotlin.random.Random
 
 /**
  * Class for creating particle systems, inspired by blender's particle systems
  */
 class BasicParticleSystem(
-    val particleLifetime: Float,
-    val particleLifetimeRandomness: Float = 0f,
+    val particleLifetime: Double,
+    val particleLifetimeRandomness: Double = 0.0,
     val totalLifetime: Double = Double.POSITIVE_INFINITY,
     val emitter: ParticleEmitter,
-    val gravity: Float = -10f,
-    val startVelocity: Float = 0f,
-    val startDirectionRandomness: Float = 0f, // TODO: Random start direction
-    val velocityRandomness: Float = 0f,
+    val gravity: Double = -10.0,
+    val startVelocity: Double = 0.0,
+    val startDirectionRandomness: Double = 0.0, // TODO: Random start direction,
+    //val material: Material
+    val velocityRandomness: Double = 0.0,
     startColor: Color = Color(0xffffff),
     endColor: Color = Color(0xffffff),
-    val spawnDelta: Float = 1f,
+    val spawnDelta: Double = 1.0,
     val spawnBurst: Int = 0,
-    val startSize: Float = 1f,
-    val endSize: Float = 1f,
+    val startSize: Double = 1.0,
+    val endSize: Double = 1.0,
     val onFinished: () -> Unit = {}
 ): GameObject() {
 
     private data class Particle(
         var velocity: Vector3,
         var position: Vector3,
-        var size: Float,
+        var size: Double,
         var color: Collection<Float>,
         var birthTime: Double
         )
@@ -94,7 +96,7 @@ class BasicParticleSystem(
         lastBirth = time
     }
 
-    override fun update(deltaTime: Float) {
+    override fun update(deltaTime: Double) {
         super.update(deltaTime)
         if (!alive || particles.isEmpty()) return
         val currentTime = Date.now()
@@ -118,7 +120,7 @@ class BasicParticleSystem(
             particle.color = colors.map { getLinearGradient(it.first, it.second, lifeProgress) }
         }
         // Add new particles
-        val newParticleCount = floor((currentTime - lastBirth) / spawnDelta).toInt()
+        val newParticleCount = floor(min((currentTime - lastBirth), particleLifetime * spawnDelta) / spawnDelta).toInt()
         addParticles(newParticleCount, currentTime)
         updateMesh()
     }

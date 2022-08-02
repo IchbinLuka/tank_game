@@ -35,7 +35,7 @@ class Bullet(
     private var velocity: Vector2 = startVelocity
     private var position: Vector2 = startPos
 
-    override fun update(deltaTime: Float) {
+    override fun update(deltaTime: Double) {
         super.update(deltaTime)
         position.addScaledVector(velocity, deltaTime)
         velocity.y += g * deltaTime

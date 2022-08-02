@@ -60,7 +60,7 @@ class Tank(
         }
     }
 
-    fun move(vector3: Vector3, deltaTime: Float = 1f, ground: Ground) {
+    fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
         mainBone?.position?.addScaledVector(vector3, deltaTime)
         mainBone?.position?.let {
             val pos = mainBone!!.position.x.toFloat()
@@ -81,7 +81,7 @@ class Tank(
         setDirection(direction.inverse)
     }
 
-    override fun update(deltaTime: Float) {
+    override fun update(deltaTime: Double) {
     }
 
     companion object {

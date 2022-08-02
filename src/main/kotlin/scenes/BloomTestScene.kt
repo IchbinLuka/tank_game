@@ -21,5 +21,5 @@ class BloomTestScene: GameScene() {
         position.z = 4
     }
 
-    override fun update(delta: Float) {}
+    override fun update(delta: Double) {}
 }

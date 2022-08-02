@@ -51,5 +51,5 @@ class MeshTestScene : GameScene() {
 
     }
 
-    override fun update(delta: Float) {}
+    override fun update(delta: Double) {}
 }
