@@ -18,6 +18,14 @@ fun launch(block: suspend () -> Unit) {
             }
         }
         fun resume(value: Unit) {}
-        fun resumeWithException(e: Throwable) { console.log("Coroutine failed: $e") }
+        fun resumeWithException(e: Throwable) {
+            Log.e("Coroutine", "Coroutine failed: $e")
+            e.printStackTrace()
+        }
     })
 }
+
+/*inline fun <T> async(crossinline block: ((Throwable) -> Unit) -> T): Promise<T> = Promise {
+    success, error ->
+    success.invoke(block.invoke(error))
+}*/

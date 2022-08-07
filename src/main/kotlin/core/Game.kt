@@ -1,7 +1,11 @@
 package core
 
+import ext.TAG
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.coroutines.*
+import scenes.GameScene
+import scenes.LoadingScene
 import scenes.ParticleTestScene
 import stats.js.Stats
 import three.OrbitControls
@@ -13,15 +17,40 @@ import three.postprocessing.UnrealBloomPass
 import util.EventManager
 import util.GUIHelper
 import util.Log
+import util.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 
-object Game {
+class Game(
+    initialScene: GameScene
+): CoroutineScope {
+
+    override val coroutineContext: CoroutineContext = MainScope().coroutineContext
+
     private val clock = Clock()
-    private var currentScene_: GameScene = ParticleTestScene()
+    private lateinit var currentScene_: GameScene
     var currentScene: GameScene
     get() = currentScene_
     set(value) {
-        GUIHelper.resetGUI()
-        currentScene_ = value
+        currentScene_ = LoadingScene()
+        updateComposer()
+        launch {
+            value.loadAssets()
+            GUIHelper.resetGUI()
+            currentScene_ = value
+            updateComposer()
+        }
+        Log.d("Game", "Loading assets")
+    }
+
+    companion object {
+        private var instance_: Game? = null
+        val instance: Game get() {
+            if (instance_ == null) {
+                throw IllegalStateException("No instance intialized")
+            }
+            return instance_!!
+        }
     }
 
     private val stats = Stats().apply {
@@ -43,13 +72,9 @@ object Game {
         setPixelRatio(window.devicePixelRatio)
     }
 
-    private val composer: EffectComposer = EffectComposer(renderer)
-
-    init {
-        window.onloadend = {
-            renderer.domElement.focus()
-        }
-        stats.begin()
+    private var composer: EffectComposer = EffectComposer(renderer)
+    private fun updateComposer() {
+        composer = EffectComposer(renderer)
         val width = window.innerWidth
         val height = window.innerHeight
         OrbitControls(currentScene.camera, renderer.domElement)
@@ -65,6 +90,14 @@ object Game {
             //addPass(ssaoPass)
             addPass(bloomPass)
         }
+    }
+
+    init {
+        window.onloadend = {
+            renderer.domElement.focus()
+        }
+        stats.begin()
+        currentScene = initialScene
         window.onresize = {
             renderer.apply {
                 setSize(window.innerWidth, window.innerHeight)
@@ -73,14 +106,16 @@ object Game {
             }
         }
     }
-
-    fun mainLoop() {
-        stats.begin()
-        val delta = clock.getDelta().toDouble()
-        EventManager.keyboardEvents.switchBatches()
-        window.requestAnimationFrame { mainLoop() }
-        currentScene.update(delta)
-        composer.render()
-        stats.update()
+    private var running = true
+    fun mainLoop() = launch {
+        var delta = window.performance.now()
+        while (running) {
+            stats.begin()
+            EventManager.keyboardEvents.switchBatches()
+            currentScene.update(delta)
+            composer.render()
+            stats.update()
+            delta = window.awaitAnimationFrame()
+        }
     }
 }

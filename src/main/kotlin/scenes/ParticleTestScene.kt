@@ -1,16 +1,18 @@
 package scenes
 
-import core.GameScene
+import core.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import particles.BasicParticleSystem
 import particles.CircleEmitter
 import three.js.*
+import util.launch
 
 class ParticleTestScene: GameScene() {
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 4
     }
+
     private val particleSystem = BasicParticleSystem(
         particleLifetime = 700.0,
         totalLifetime = 1000000.0,
@@ -28,8 +30,9 @@ class ParticleTestScene: GameScene() {
         velocityRandomness = 0.3
     )
 
+    override val objects = mutableListOf<GameObject>().apply { add(particleSystem) }
+
     override val scene = Scene().apply {
-        add(particleSystem.renderable)
         add(AmbientLight(color = Color(0xffffff)))
     }
 

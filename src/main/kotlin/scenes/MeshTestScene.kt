@@ -1,6 +1,6 @@
 package scenes
 
-import core.GameScene
+import core.GameObject
 import ext.aspectRatio
 import gameobjects.Ground
 import kotlinx.browser.window
@@ -9,6 +9,9 @@ import three.js.*
 import kotlin.math.PI
 
 class MeshTestScene : GameScene() {
+
+    override val objects: Collection<GameObject>
+        get() = TODO("Not yet implemented")
 
     override val scene = Scene().apply {
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 1))

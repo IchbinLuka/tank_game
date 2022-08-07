@@ -52,7 +52,7 @@ class Bullet(
                 vertices.removeLast()
             }
         }
-        if (ground.heightAt(position.x.toFloat()) > position.y.toFloat()) {
+        if (ground.heightAt(position.x.toDouble()) > position.y.toFloat()) {
             TODO("Exploding not yet implemented")
         }
     }

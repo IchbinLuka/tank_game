@@ -3,10 +3,10 @@ package util
 import kotlin.math.PI
 import kotlin.math.atan
 
-fun getLinearGradient(start: Float, end: Float, progress: Float): Float {
+fun getLinearGradient(start: Double, end: Double, progress: Double): Double {
     return start + (end - start) * progress
 }
 
-fun angleFromAscent(ascent: Float): Float {
-    return ((atan(ascent)) + 1.5 *  PI).toFloat()
+fun angleFromAscent(ascent: Double): Double {
+    return atan(ascent) + 1.5 *  PI
 }

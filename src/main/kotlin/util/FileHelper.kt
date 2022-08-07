@@ -1,8 +1,7 @@
 package util
 
-import org.w3c.files.File
+import ext.TAG
 import org.w3c.xhr.XMLHttpRequest
-import kotlin.js.Promise
 
 object FileHelper {
     /**
@@ -10,15 +9,15 @@ object FileHelper {
      *
      * Thanks to https://stackoverflow.com/a/41133213
      */
-    fun readFile(path: String): Promise<String> = Promise<String>() {
-        resolve, reject ->
+    suspend fun readFile(path: String): String? {
         val httpRequest = XMLHttpRequest()
         httpRequest.open("GET", path, false)
         httpRequest.send()
-        if (httpRequest.status == 200.toShort()) {
-            resolve(httpRequest.responseText)
+        return if (httpRequest.status == 200.toShort()) {
+            Log.d(TAG, "Loaded $path")
+            httpRequest.responseText
         } else {
-            reject(Exception())
+            null
         }
     }
 }

@@ -1,6 +1,6 @@
 package scenes
 
-import core.GameScene
+import core.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import three.js.*
@@ -11,6 +11,9 @@ class BloomTestScene: GameScene() {
         emissiveIntensity = 2
         color = Color(0x00aa00)
     })
+
+    override val objects: Collection<GameObject>
+        get() = TODO("Not yet implemented")
 
     override val scene: Scene = Scene().apply {
         add(cube)

@@ -12,10 +12,10 @@ import kotlin.math.*
 
 class Ground(
     private val res: Int = 200,
-    private val width: Float = 200f,
+    private val width: Double = 200.0,
     private val offset: Vector3 = Vector3(0, 0, 0),
-    private val height: Float = 40f,
-    private val depth: Float = 20f
+    private val height: Double = 40.0,
+    private val depth: Double = 20.0
 ) : GameObject() {
     override val renderable: Object3D
         get() {
@@ -67,11 +67,11 @@ class Ground(
 
     private var object3D: Object3D? = null
 
-    private val heightData: Array<Float> = Array<Float>(res) { (height * 0.2 * (1 - sin(0.5 * it))).toFloat() + height / 2 }
+    private val heightData: Array<Double> = Array(res) { (height * 0.2 * (1 - sin(0.5 * it))) + height / 2 }
 
-    fun heightAt(position: Float): Float {
+    fun heightAt(position: Double): Double {
         val pos = position - offset.x.toFloat()
-        if (pos < 0 || pos > width - 1) return 0f
+        if (pos < 0 || pos > width - 1) return 0.0
         val normPos = pos * res / width
         val previous = heightData[floor(normPos).toInt()]
         val next = heightData[ceil(normPos).toInt()]
@@ -79,13 +79,13 @@ class Ground(
         return offset.y.toFloat() + getLinearGradient(previous, next, progress)
     }
 
-    private fun averageAscent(start: Int, end: Int): Float {
+    private fun averageAscent(start: Int, end: Int): Double {
         return (heightData[end] - heightData[start]) / (end - start)
     }
 
-    fun rotationAt(position: Float): Float {
+    fun rotationAt(position: Double): Double {
         val pos = position - offset.x.toFloat()
-        if (pos < 0 || pos > width - 1) return 0f
+        if (pos < 0 || pos > width - 1) return 0.0
         val normPos = pos * res / width
         val previous = floor(normPos).toInt()
         val next = ceil(normPos).toInt()

@@ -1,12 +1,12 @@
 package scenes
 
 import core.GameObject
-import core.GameScene
 import ext.aspectRatio
 import ext.enableShadows
 import gameobjects.Ground
 import gameobjects.Tank
 import kotlinx.browser.window
+import kotlinx.coroutines.*
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import util.*
@@ -32,7 +32,7 @@ class MainScene : GameScene() {
         //rotation.x = 0.3
     }
 
-    private val objects: MutableList<GameObject> by lazy {
+    override val objects: MutableList<GameObject> by lazy {
         mutableListOf<GameObject>().apply {
             addAll(tanks)
         }
@@ -43,7 +43,7 @@ class MainScene : GameScene() {
     private val aimingPoint = Vector2()
     private var aiming = true
 
-    private val ground = Ground(offset = Vector3(-100, -20, 4), res = 50, depth = 8f)
+    private val ground = Ground(offset = Vector3(-100, -20, 4), res = 50, depth = 8.0)
     private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(
@@ -58,23 +58,21 @@ class MainScene : GameScene() {
             aimingPoint.x = ( it.clientX.toFloat() / window.innerWidth ) * 2 - 1
             aimingPoint.y = - ( it.clientY.toFloat() / window.innerHeight ) * 2 + 1
         })
-        launch {
-            //GUIHelper.loadGUI("start")
-            loadAssets()
-            objects.forEach { o -> o.renderable?.let { scene.add(it) } }
-            scene.add(aimingAidPlane)
-            scene.add(groundRenderable)
-        }
     }
 
-    private suspend fun loadAssets() {
-        objects.forEach { it.initVisual() }
+    override suspend fun loadAssets() {
+        super.loadAssets()
         scene.add(ResourceManager.testLandscape.await().scene.apply {
             enableShadows()
         })
-        ResourceManager.sunnySky.then {
-            scene.background = it
+        coroutineScope {
+            launch {
+                scene.background = ResourceManager.sunnySky.await()
+            }
         }
+        objects.forEach { o -> o.renderable?.let { scene.add(it) } }
+        scene.add(aimingAidPlane)
+        scene.add(groundRenderable)
     }
     override fun update(delta: Double) {
         objects.forEach { it.update(delta) }

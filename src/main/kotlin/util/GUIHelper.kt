@@ -13,11 +13,11 @@ object GUIHelper {
         val content = if (cachedGUIs.containsKey(name)) {
             cachedGUIs[name]!!
         } else {
-            val s = FileHelper.readFile("GUIs/${name}.html").await()
-            cachedGUIs[name] = s
+            val s = FileHelper.readFile("GUIs/${name}.html")
+            s?.let { cachedGUIs[name] = s }
             s
         }
-        gUIElement?.innerHTML = content
+        gUIElement?.innerHTML = content ?: "Unable to load GUI"
     }
 
     fun resetGUI() {

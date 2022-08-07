@@ -63,7 +63,7 @@ class Tank(
     fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
         mainBone?.position?.addScaledVector(vector3, deltaTime)
         mainBone?.position?.let {
-            val pos = mainBone!!.position.x.toFloat()
+            val pos = mainBone!!.position.x.toDouble()
             it.y = ground.heightAt(pos)
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
