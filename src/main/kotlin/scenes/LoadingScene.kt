@@ -12,9 +12,5 @@ class LoadingScene: GameScene() {
         GUIHelper.loadGUI("loading_screen")
     }
 
-    init {
-        launch { loadAssets() }
-    }
-
     override fun update(delta: Double) {}
 }

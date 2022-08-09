@@ -1,4 +1,4 @@
-package particles
+package particles.emitter
 
 import ext.plus
 import ext.times

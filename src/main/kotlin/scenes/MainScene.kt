@@ -60,20 +60,21 @@ class MainScene : GameScene() {
         })
     }
 
-    override suspend fun loadAssets() {
-        super.loadAssets()
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         scene.add(ResourceManager.testLandscape.await().scene.apply {
             enableShadows()
         })
-        coroutineScope {
-            launch {
-                scene.background = ResourceManager.sunnySky.await()
-            }
-        }
         objects.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(aimingAidPlane)
         scene.add(groundRenderable)
     }
+
+    override suspend fun loadAssets() {
+        super.loadAssets()
+        scene.background = ResourceManager.sunnySky.await()
+    }
+
     override fun update(delta: Double) {
         objects.forEach { it.update(delta) }
         val currentTank = tanks.getOrNull(currentTank)

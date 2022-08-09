@@ -1,6 +1,5 @@
-package particles
+package particles.emitter
 
-import three.js.Plane
 import three.js.Vector3
 import kotlin.random.Random
 

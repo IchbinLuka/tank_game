@@ -6,7 +6,6 @@ import kotlinx.browser.window
 import kotlinx.coroutines.*
 import scenes.GameScene
 import scenes.LoadingScene
-import scenes.ParticleTestScene
 import stats.js.Stats
 import three.OrbitControls
 import three.js.*
@@ -17,9 +16,7 @@ import three.postprocessing.UnrealBloomPass
 import util.EventManager
 import util.GUIHelper
 import util.Log
-import util.launch
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 class Game(
     initialScene: GameScene
@@ -33,12 +30,14 @@ class Game(
     get() = currentScene_
     set(value) {
         currentScene_ = LoadingScene()
+        launch { currentScene_.loadAssets() }
         updateComposer()
         launch {
-            value.loadAssets()
+            value.preloadAssets()
             GUIHelper.resetGUI()
             currentScene_ = value
             updateComposer()
+            currentScene_.loadAssets()
         }
         Log.d("Game", "Loading assets")
     }
@@ -88,7 +87,7 @@ class Game(
         composer.apply {
             addPass(renderPass)
             //addPass(ssaoPass)
-            addPass(bloomPass)
+            //addPass(bloomPass)
         }
     }
 
@@ -108,14 +107,19 @@ class Game(
     }
     private var running = true
     fun mainLoop() = launch {
-        var delta = window.performance.now()
+        val clock = Clock()
         while (running) {
+            val delta = clock.getDelta().toDouble() / 1000
             stats.begin()
             EventManager.keyboardEvents.switchBatches()
             currentScene.update(delta)
             composer.render()
             stats.update()
-            delta = window.awaitAnimationFrame()
+            val error = renderer.getContext().getError()
+            if (error != 0) {
+                Log.e(TAG, error.toString())
+            }
+            window.awaitAnimationFrame()
         }
     }
 }

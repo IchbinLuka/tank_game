@@ -15,6 +15,8 @@ object ResourceManager {
     val cloud get() = gltfLoader.loadAsync("models/cloud.glb").asDeferred()
 
     val sunnySky get() = textureLoader.loadAsync("textures/skies/sky_sunny.jpg").asDeferred()
+    val disc get() = textureLoader.loadAsync("textures/sprites/disc.png").asDeferred()
+    val box get() = textureLoader.loadAsync("textures/sprites/box.png").asDeferred()
 
     val testLandscape get() = gltfLoader.loadAsync("models/test_landscape.glb").asDeferred()
 }

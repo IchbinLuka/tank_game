@@ -1,17 +1,20 @@
 package particles
 
 import core.GameObject
+import core.rendering.UniformContainer
 import ext.plusAssign
 import ext.times
 import ext.toDoubleList
 import ext.toFloatList
 import org.khronos.webgl.Float32Array
+import particles.emitter.ParticleEmitter
+import three.AdditiveBlending
+import three.LessEqualDepth
 import three.js.*
 import util.FileHelper
 import util.Log
-import util.await
+import util.ResourceManager
 import util.getLinearGradient
-import kotlin.coroutines.coroutineContext
 import kotlin.js.Date
 import kotlin.math.floor
 import kotlin.math.min
@@ -78,7 +81,19 @@ class BasicParticleSystem(
                 FileHelper.readFile("shaders/customPointsVertex.glsl")?.let {
                     vertexShader = it
                 }
+                val texture = ResourceManager.box.await()
+                uniforms = object {
+                    @property:JsName("color") val color = Uniform(Color(0xffffff))
+                    @property:JsName("pointTexture") val pointTexture = Uniform(texture)
+                    @property:JsName("alphaTest") val alphaTest = Uniform(0.9)
+                }
+
+                uniformsNeedUpdate = true
+                transparent = true
+                depthFunc = LessEqualDepth
+                alphaTest = 0.9
             }
+
         }
         renderableP = Points(geometry, material!!)
     }
@@ -122,10 +137,10 @@ class BasicParticleSystem(
         for (particle in particles) {
             vertices.addAll(particle.position.toFloatList())
             colors.addAll(particle.color.map { it.toFloat() })
-            colors.add(particle.size.toFloat())
+            sizes.add(particle.size.toFloat())
         }
         geometry.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
-        geometry.setAttribute("color", BufferAttribute(Float32Array(colors.toTypedArray()).asDynamic(), 3))
+        geometry.setAttribute("customColor", BufferAttribute(Float32Array(colors.toTypedArray()).asDynamic(), 3))
         geometry.setAttribute("size", BufferAttribute(Float32Array(sizes.toTypedArray()).asDynamic(), 1))
     }
 

@@ -1,10 +1,7 @@
 package gameobjects
 
 import core.GameObject
-import ext.applyCustomMat
-import ext.enableShadows
-import ext.getWorldEuler
-import ext.minus
+import ext.*
 import three.GLTF
 import three.js.*
 import util.*
@@ -68,6 +65,7 @@ class Tank(
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
         }
+        Log.d(TAG, mainBone!!.position.toFloatList().toString())
     }
 
     private fun setDirection(direction: Direction) {
@@ -82,9 +80,5 @@ class Tank(
     }
 
     override fun update(deltaTime: Double) {
-    }
-
-    companion object {
-        const val TAG = "Tank"
     }
 }

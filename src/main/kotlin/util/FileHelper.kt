@@ -14,9 +14,10 @@ object FileHelper {
         httpRequest.open("GET", path, false)
         httpRequest.send()
         return if (httpRequest.status == 200.toShort()) {
-            Log.d(TAG, "Loaded $path")
+            Log.v(TAG, "Loaded $path")
             httpRequest.responseText
         } else {
+            Log.e(TAG, "Failed to load $path")
             null
         }
     }

@@ -34,7 +34,7 @@ external interface `T$42` {
 }
 
 external interface ShaderMaterialParameters : MaterialParameters {
-    var uniforms: `T$8`?
+    var uniforms: dynamic
         get() = definedExternally
         set(value) = definedExternally
     var vertexShader: String?
@@ -85,7 +85,7 @@ external interface `T$43` {
 open external class ShaderMaterial(parameters: ShaderMaterialParameters = definedExternally) : Material {
     override var type: String
     override var defines: Json
-    open var uniforms: `T$8`
+    open var uniforms: dynamic
     open var vertexShader: String
     open var fragmentShader: String
     open var linewidth: Number

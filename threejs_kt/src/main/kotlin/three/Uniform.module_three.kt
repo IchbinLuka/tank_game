@@ -18,11 +18,11 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-open external class Uniform {
+open external class Uniform: IUniform {
     constructor(value: Any)
     constructor(type: String, value: Any)
     open var type: String
-    open var value: Any
+    override var value: Any
     open var dynamic: Boolean
     open var onUpdateCallback: Function<*>
     open fun onUpdate(callback: Function<*>): Uniform
