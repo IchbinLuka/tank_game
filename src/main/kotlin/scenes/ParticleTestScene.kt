@@ -1,6 +1,6 @@
 package scenes
 
-import core.GameObject
+import core.gameobjects.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import particles.BasicParticleSystem
@@ -20,7 +20,7 @@ class ParticleTestScene: GameScene() {
         startVelocity = 1.0,
         gravity = 50.0,
         spawnDelta = 6.0,
-        startSize = 0.5,
+        startSize = 2.0,
         endSize = 0.5,
         startColor = Color(0xfcecd6),
         endColor = Color(0xfc5f2f),

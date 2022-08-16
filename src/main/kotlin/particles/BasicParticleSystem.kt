@@ -1,14 +1,12 @@
 package particles
 
-import core.GameObject
-import core.rendering.UniformContainer
+import core.gameobjects.GameObject
 import ext.plusAssign
 import ext.times
 import ext.toDoubleList
 import ext.toFloatList
 import org.khronos.webgl.Float32Array
 import particles.emitter.ParticleEmitter
-import three.AdditiveBlending
 import three.LessEqualDepth
 import three.js.*
 import util.FileHelper
@@ -63,7 +61,6 @@ class BasicParticleSystem(
     private var lastBirth: Double = 0.0
 
     // region - PUBLIC -
-    var alive: Boolean = true
     override val renderable: Object3D? get() = renderableP
 
     init {
@@ -90,8 +87,9 @@ class BasicParticleSystem(
 
                 uniformsNeedUpdate = true
                 transparent = true
+                opacity = 0.4
                 depthFunc = LessEqualDepth
-                alphaTest = 0.9
+                // alphaTest = 0.9
             }
 
         }

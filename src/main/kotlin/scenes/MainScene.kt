@@ -1,12 +1,12 @@
 package scenes
 
-import core.GameObject
+import core.gameobjects.GameObject
 import ext.aspectRatio
 import ext.enableShadows
 import gameobjects.Ground
 import gameobjects.Tank
 import kotlinx.browser.window
-import kotlinx.coroutines.*
+import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import util.*
@@ -50,13 +50,26 @@ class MainScene : GameScene() {
         Tank()
     )
 
-    private var currentTank: Int = 0
+    private var currentTankIndex: Int = 0
+    private val currentTank get() = tanks[currentTankIndex]
+
+    private var awaitingShot = false
 
     init {
         window.addEventListener("pointermove", {
             it as PointerEvent
             aimingPoint.x = ( it.clientX.toFloat() / window.innerWidth ) * 2 - 1
             aimingPoint.y = - ( it.clientY.toFloat() / window.innerHeight ) * 2 + 1
+        })
+        window.addEventListener("click", {
+            it as MouseEvent
+            if (!awaitingShot) {
+                val bullet = currentTank.shoot(25.0, ground)
+                bullet?.run {
+                    objects.add(bullet)
+                    scene.add(bullet.renderable)
+                }
+            }
         })
     }
 
@@ -76,8 +89,14 @@ class MainScene : GameScene() {
     }
 
     override fun update(delta: Double) {
-        objects.forEach { it.update(delta) }
-        val currentTank = tanks.getOrNull(currentTank)
+        objects.forEachIndexed {
+            i, o ->
+            o.update(delta)
+            if (!o.alive) {
+                objects.removeAt(i) // TODO: Improve this inefficient approach
+            }
+        }
+        val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
             when(it.keyCode) {
                 97  -> {

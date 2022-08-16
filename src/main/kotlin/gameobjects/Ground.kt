@@ -1,6 +1,6 @@
 package gameobjects
 
-import core.GameObject
+import core.gameobjects.GameObject
 import ext.enableShadows
 import ext.toFloatList
 import org.khronos.webgl.Float32Array

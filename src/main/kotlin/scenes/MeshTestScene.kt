@@ -1,6 +1,6 @@
 package scenes
 
-import core.GameObject
+import core.gameobjects.GameObject
 import ext.aspectRatio
 import gameobjects.Ground
 import kotlinx.browser.window

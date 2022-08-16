@@ -1,15 +1,17 @@
 package gameobjects
 
-import core.GameObject
-import ext.plus
+import core.gameobjects.GameObject
+import core.gameobjects.MovingGameObject
+import ext.*
 import org.khronos.webgl.Float32Array
 import three.js.*
+import util.Log
 
 class Bullet(
-    startVelocity: Vector2,
-    startPos: Vector2,
+    startVelocity: Vector3,
+    startPos: Vector3,
     private val ground: Ground
-) : GameObject() {
+) : MovingGameObject() {
     override val renderable: Object3D get() = Group().apply {
         add(bulletMesh)
         val geometry = BufferGeometry()
@@ -21,6 +23,10 @@ class Bullet(
         ))
     }
 
+    override var position: Vector3
+        get() = bulletMesh.position
+        set(value) { bulletMesh.position.set(value) }
+
     private val vertices = ArrayDeque<Float>()
 
     private val bulletMesh = Mesh(
@@ -28,18 +34,16 @@ class Bullet(
         MeshPhongMaterial().apply {
             color = Color(0x111111)
         }
-    )
+    ).apply { this@apply.position.set(startPos) }
 
     override suspend fun initVisual() {}
 
-    private var velocity: Vector2 = startVelocity
-    private var position: Vector2 = startPos
+    override var velocity: Vector3 = startVelocity
+    override var acceleration: Vector3 = Vector3(0, g, 0)
 
     override fun update(deltaTime: Double) {
         super.update(deltaTime)
-        position.addScaledVector(velocity, deltaTime)
-        velocity.y += g * deltaTime
-        val length = vertices.lastIndex
+        /*val length = vertices.lastIndex
         if (position.distanceTo(Vector2(vertices[length - 2], vertices[length - 1])).toFloat() > 4) {
             vertices.apply {
                 addFirst(0f)
@@ -51,14 +55,15 @@ class Bullet(
             for (i in 1..3) {
                 vertices.removeLast()
             }
-        }
+        }*/
         if (ground.heightAt(position.x.toDouble()) > position.y.toFloat()) {
-            TODO("Exploding not yet implemented")
+            alive = false
+            //TODO("Exploding not yet implemented")
         }
     }
 
     companion object {
-        const val g = -0.4
+        const val g = -20
         const val bulletRadius = 0.5f
         const val explosionWidth = 5f
     }

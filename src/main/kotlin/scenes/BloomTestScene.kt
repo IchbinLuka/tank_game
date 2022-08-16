@@ -1,6 +1,6 @@
 package scenes
 
-import core.GameObject
+import core.gameobjects.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import three.js.*

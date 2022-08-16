@@ -1,11 +1,10 @@
 package gameobjects
 
-import core.GameObject
+import core.gameobjects.GameObject
 import three.GLTF
 import three.js.Object3D
 import util.Direction
 import util.ResourceManager
-import util.await
 
 class Cloud(
     private val speed: Float = 1f,

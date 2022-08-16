@@ -4,6 +4,7 @@ import ext.TAG
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
+import org.w3c.dom.WorkerGlobalScope
 import scenes.GameScene
 import scenes.LoadingScene
 import stats.js.Stats
@@ -17,6 +18,8 @@ import util.EventManager
 import util.GUIHelper
 import util.Log
 import kotlin.coroutines.CoroutineContext
+
+external val self: WorkerGlobalScope
 
 class Game(
     initialScene: GameScene
@@ -109,7 +112,7 @@ class Game(
     fun mainLoop() = launch {
         val clock = Clock()
         while (running) {
-            val delta = clock.getDelta().toDouble() / 1000
+            val delta = clock.getDelta().toDouble()
             stats.begin()
             EventManager.keyboardEvents.switchBatches()
             currentScene.update(delta)

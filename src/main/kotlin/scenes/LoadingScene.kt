@@ -1,8 +1,7 @@
 package scenes
 
-import core.GameObject
+import core.gameobjects.GameObject
 import util.GUIHelper
-import util.launch
 
 class LoadingScene: GameScene() {
 
