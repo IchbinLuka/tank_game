@@ -1,17 +1,18 @@
-package scenes
+package scenes.test
 
 import core.gameobjects.GameObject
 import ext.aspectRatio
 import gameobjects.Ground
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
+import scenes.GameScene
 import three.js.*
 import kotlin.math.PI
 
 class MeshTestScene : GameScene() {
 
     override val objects: Collection<GameObject>
-        get() = TODO("Not yet implemented")
+        get() = mutableListOf()
 
     override val scene = Scene().apply {
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 1))
@@ -31,19 +32,33 @@ class MeshTestScene : GameScene() {
             -2.0f, -1.0f, 1.0f,
             -1.0f, -2.0f, 1.0f
         )
+        val positions2 = arrayOf(
+            -1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -2.0f, -1.0f, 1.0f,
+            -1.0f, -2.0f, 1.0f
+        )
+
+        val indices = mutableListOf<Int>(
+            0, 1, 2,
+            2, 3, 0,
+            0, 4, 5
+        )
 
         val normals = Array<Float>(27) {
             if ((it + 1) % 3 == 0) 1f else 0f
         }
-        //add(Mesh(BoxGeometry(0.5, 0.5, 0.5), MeshPhongMaterial().apply { color = Color(0xff0000) }))
-        geometry.setAttribute("position", BufferAttribute(Float32Array(positions).asDynamic(), 3))
+        // add(Mesh(BoxGeometry(0.5, 0.5, 0.5), MeshPhongMaterial().apply { color = Color(0xff0000) }))
+        geometry.setAttribute("position", BufferAttribute(Float32Array(positions2).asDynamic(), 3))
+        geometry.setIndex(indices.toTypedArray())
         geometry.setAttribute("normal", BufferAttribute(Float32Array(normals).asDynamic(), 3))
         val mesh = Mesh(geometry, MeshPhongMaterial().apply {
             color  = Color(0x00ff00)
         })
         mesh.rotation.z = 2 * PI
-        add(Ground().renderable)
-        //add(mesh)
+        add(mesh)
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 3

@@ -1,8 +1,9 @@
-package scenes
+package scenes.test
 
 import core.gameobjects.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
+import scenes.GameScene
 import three.js.*
 
 class BloomTestScene: GameScene() {

@@ -1,12 +1,12 @@
 package tests
 
+import core.HeightMap
 import ext.TAG
 import kotlinx.browser.document
 import kotlinx.dom.appendElement
 import org.khronos.webgl.Uint8ClampedArray
 import org.w3c.dom.*
 import util.Log
-import util.noise.HeightMap
 
 class HeightmapRenderer {
 

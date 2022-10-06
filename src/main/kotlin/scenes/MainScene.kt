@@ -43,7 +43,7 @@ class MainScene : GameScene() {
     private val aimingPoint = Vector2()
     private var aiming = true
 
-    private val ground = Ground(offset = Vector3(-100, -20, 4), res = 50, depth = 8.0)
+    private val ground = Ground(offset = Vector3(-100, -20, 4), depth = 8)
     private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(

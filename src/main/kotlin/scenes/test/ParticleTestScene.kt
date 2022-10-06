@@ -1,10 +1,11 @@
-package scenes
+package scenes.test
 
 import core.gameobjects.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import particles.BasicParticleSystem
 import particles.emitter.CircleEmitter
+import scenes.GameScene
 import three.js.*
 
 class ParticleTestScene: GameScene() {

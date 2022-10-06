@@ -9,7 +9,10 @@ import scenes.GameScene
 import scenes.LoadingScene
 import stats.js.Stats
 import three.OrbitControls
-import three.js.*
+import three.js.Clock
+import three.js.Vector2
+import three.js.WebGLRenderer
+import three.js.WebGLRendererParameters
 import three.postprocessing.EffectComposer
 import three.postprocessing.RenderPass
 import three.postprocessing.SSAOPass
@@ -19,49 +22,37 @@ import util.GUIHelper
 import util.Log
 import kotlin.coroutines.CoroutineContext
 
-external val self: WorkerGlobalScope
-
 class Game(
     initialScene: GameScene
-): CoroutineScope {
+) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext = MainScope().coroutineContext
 
     private val clock = Clock()
     private lateinit var currentScene_: GameScene
     var currentScene: GameScene
-    get() = currentScene_
-    set(value) {
-        currentScene_ = LoadingScene()
-        launch { currentScene_.loadAssets() }
-        updateComposer()
-        launch {
-            value.preloadAssets()
-            GUIHelper.resetGUI()
-            currentScene_ = value
+        get() = currentScene_
+        set(value) {
+            currentScene_ = LoadingScene()
+            launch { currentScene_.loadAssets() }
             updateComposer()
-            currentScene_.loadAssets()
-        }
-        Log.d("Game", "Loading assets")
-    }
-
-    companion object {
-        private var instance_: Game? = null
-        val instance: Game get() {
-            if (instance_ == null) {
-                throw IllegalStateException("No instance intialized")
+            launch(Dispatchers.Unconfined) {
+                value.preloadAssets()
+                GUIHelper.resetGUI()
+                currentScene_ = value
+                updateComposer()
+                currentScene_.loadAssets()
             }
-            return instance_!!
+            Log.d("Game", "Loading assets")
         }
-    }
 
     private val stats = Stats().apply {
         showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
         document.body?.appendChild(domElement)
-        with (domElement.style) {
-            position="fixed"
-            top="0px"
-            left="0px"
+        with(domElement.style) {
+            position = "fixed"
+            top = "0px"
+            left = "0px"
         }
     }
 
@@ -81,7 +72,7 @@ class Game(
         val height = window.innerHeight
         OrbitControls(currentScene.camera, renderer.domElement)
         //renderer.toneMappingExposure = 1
-        val bloomPass = UnrealBloomPass(Vector2( window.innerWidth, window.innerHeight ), 0.75, 0.2, 0.3)
+        val bloomPass = UnrealBloomPass(Vector2(window.innerWidth, window.innerHeight), 0.75, 0.2, 0.3)
         val ssaoPass = SSAOPass(currentScene.scene, currentScene.camera, width, height).apply {
             kernelRadius = 5
             maxDistance = 50
@@ -108,6 +99,7 @@ class Game(
             }
         }
     }
+
     private var running = true
     fun mainLoop() = launch {
         val clock = Clock()

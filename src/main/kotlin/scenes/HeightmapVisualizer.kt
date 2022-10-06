@@ -1,11 +1,11 @@
 package scenes
 
+import core.HeightMap
 import core.gameobjects.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
 import three.js.*
-import util.noise.HeightMap
 
 class HeightmapVisualizer(
     private val pointDistance: Float = 1f,

@@ -1,5 +1,6 @@
 package ext
 
+import three.js.Vector
 import three.js.Vector3
 
 fun Vector3.toFloatList(): List<Float> = toArray().map { it.toFloat() }
@@ -12,3 +13,5 @@ operator fun Vector3.times(number: Number): Vector3 = Vector3().addScaledVector(
 operator fun Vector3.plusAssign(vector3: Vector3) { add(vector3) }
 
 operator fun Vector3.plus(vector3: Vector3): Vector3 = clone().add(vector3)
+
+operator fun Vector3.minus(vector: Vector3): Vector3 = clone().addScaledVector(vector, -1)

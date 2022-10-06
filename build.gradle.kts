@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
 plugins {
     kotlin("js") version "1.7.0"
+    id("io.kotest.multiplatform") version "5.5.0"
 }
 
 //group = "com.liorgonnen"
@@ -17,11 +18,22 @@ dependencies {
 }
 
 kotlin {
-    js {
+    js(IR) {
         browser()
         binaries.executable()
         dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.6.4")
+        }
+
+    }
+
+    sourceSets {
+        test {
+            dependencies {
+                implementation("io.kotest:kotest-framework-engine-js:5.5.0")
+                implementation("io.kotest:kotest-assertions-core-js:5.5.0")
+                implementation("io.kotest:kotest-property-js:5.5.0")
+            }
         }
     }
 }

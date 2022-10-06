@@ -5,7 +5,7 @@ import three.js.Camera
 import three.js.Scene
 import util.Log
 
-sealed class GameScene {
+abstract class GameScene {
 
     open val scene: Scene = Scene()
     open val camera: Camera = Camera()
@@ -21,5 +21,7 @@ sealed class GameScene {
 
     /** Called right after the scene starts being rendered */
     open suspend fun loadAssets() {}
-    abstract fun update(delta: Double)
+    open fun update(delta: Double) {
+        objects.forEach { it.update(delta) }
+    }
 }

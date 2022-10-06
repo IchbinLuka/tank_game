@@ -1,13 +1,12 @@
 package util.noise
 
+import core.HeightMap
 import ext.TAG
 import util.Log
 import util.getLinearGradient
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
-
-typealias HeightMap = Array<DoubleArray>
 
 class ValueNoise(
     private val width: Int,
@@ -32,8 +31,8 @@ class ValueNoise(
             val deltaX: Int = max(width / (xFrequency), 1)
             val deltaY: Int = max(height / (yFrequency), 1)
             // Generate random points
-            for (k in 1 until xFrequency) {
-                for (m in 1 until yFrequency) {
+            for (k in 0 until xFrequency) {
+                for (m in 0 until yFrequency) {
                     tempData[k * deltaX][m * deltaY] = random.nextDouble() * maxHeight
                 }
             }

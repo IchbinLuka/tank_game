@@ -1,5 +1,6 @@
 package util.noise
 
+import core.HeightMap
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -11,11 +12,13 @@ class GroundNoise(
         val data = ValueNoise(
             width = width, height = depth
         ).allValues()
-        val invertNoise = data.mapIndexed { i, doubles ->
-            doubles.mapIndexed { j, d ->
-                d - abs(data[i][j] - d) * 0.05 * j.toDouble().pow(2)
-            }.toDoubleArray()
-        }.toTypedArray()
-        return invertNoise
+        for (i in data.indices) {
+            for (j in data[i].indices) {
+                val value = data[i][j]
+                val pref = data[i].getOrElse(j - 1) { value }
+                data[i][j] = pref - (abs(pref - value)) * j.toDouble().pow(2) * 0.01
+            }
+        }
+        return data
     }
 }
