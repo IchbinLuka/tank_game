@@ -33,7 +33,9 @@ class MainScene : GameScene() {
     }
 
     override val objects: MutableList<GameObject> by lazy {
-        mutableListOf<GameObject>().apply {
+        mutableListOf<GameObject>(
+            ground
+        ).apply {
             addAll(tanks)
         }
     }
@@ -43,7 +45,7 @@ class MainScene : GameScene() {
     private val aimingPoint = Vector2()
     private var aiming = true
 
-    private val ground = Ground(offset = Vector3(-100, -20, 4), depth = 8)
+    private val ground = Ground(offset = Vector3(x = -100))
     private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(

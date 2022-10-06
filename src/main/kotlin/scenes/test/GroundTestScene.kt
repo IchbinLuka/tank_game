@@ -1,17 +1,15 @@
 package scenes.test
 
 import core.gameobjects.GameObject
-import ext.TAG
 import ext.aspectRatio
 import gameobjects.Ground
 import kotlinx.browser.window
 import scenes.GameScene
 import three.js.*
-import util.Log
 
 class GroundTestScene: GameScene() {
     override val objects: Collection<GameObject> = listOf(
-        Ground(width = 4, depth = 3)
+        Ground(width = 50, depth = 15)
     )
 
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
