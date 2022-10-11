@@ -2,12 +2,9 @@ package gameobjects
 
 import core.HeightMap
 import core.gameobjects.GameObject
-import ext.minus
 import ext.plus
-import ext.toFloatArray
 import ext.toFloatList
 import org.khronos.webgl.Float32Array
-import tests.FlatNoise
 import three.DoubleSide
 import three.js.*
 import util.Log
@@ -65,26 +62,24 @@ class Ground(
 
     //region PUBLIC
     fun heightAt(position: Double): Double {
-        TODO("Not yet implemented")
-        /*val pos = position - offset.x.toFloat()
-        if (pos < 0 || pos > width - 1) return 0.0
-        val normPos = pos * pointDistance / width
+        val pos = position - offset.x.toFloat()
+        val normPos = pos / pointDistance
+        if (normPos < 0 || normPos > width - 1) return 0.0
         val previous = data[floor(normPos).toInt()].first() * heightScale
         val next = data[ceil(normPos).toInt()].first() * heightScale
         val progress = 1 - ceil(normPos) + normPos
-        return offset.y.toFloat() + getLinearGradient(previous, next, progress)*/
+        return offset.y.toFloat() + getLinearGradient(previous, next, progress)
     }
 
     fun rotationAt(position: Double): Double {
-        TODO("Not yet implemented")
-        /*val pos = position - offset.x.toFloat()
-        if (pos < 0 || pos > width - 1) return 0.0
-        val normPos = pos * pointDistance / width
+        val pos = position - offset.x.toFloat()
+        val normPos = pos / pointDistance
+        if (normPos < 0 || normPos > width - 1) return 0.0
         val previous = floor(normPos).toInt()
         val next = ceil(normPos).toInt()
         val nearest = normPos.roundToInt()
-        val currentAngle = angleFromAscent(averageAscent(previous, next) * pointDistance / width)
-        val nearestAsc = (pointDistance / width) * if (nearest == previous) {
+        val currentAngle = angleFromAscent(averageAscent(previous, next))
+        val nearestAsc = if (nearest == previous) {
             averageAscent(previous - 1, previous)
         } else {
             averageAscent(next, next + 1)
@@ -93,13 +88,13 @@ class Ground(
         if (normPos - nearest < 0) {
             progress = 1 - progress // Invert progress if nearest is right
         }
-        return getLinearGradient(angleFromAscent(nearestAsc), currentAngle, progress)*/
+        return getLinearGradient(angleFromAscent(nearestAsc), currentAngle, progress)
     }
     //endregion
 
     //region PRIVATE
     private fun averageAscent(start: Int, end: Int): Double {
-        return (data[end].first() - data[start].first()) * heightScale / (end - start)
+        return (data[end].first() - data[start].first()) * heightScale / ((end - start) * pointDistance)
     }
 
     private fun updateMesh() {
