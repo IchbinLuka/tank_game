@@ -11,9 +11,7 @@ import util.Log
 import util.angleFromAscent
 import util.getLinearGradient
 import util.noise.GroundNoise
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 class Ground(
     val width: Int = 200,
@@ -46,7 +44,7 @@ class Ground(
     // private val heightData: Array<Double> = Array(res) { (height * 0.2 * (1 - sin(0.5 * it))) + height / 2 }
     private val data: HeightMap =
         GroundNoise(width = width, depth = depth, min = -height).allValues()
-    private var vertices: List<Vector3> = Array<Array<Vector3>>(data.size) { i ->
+    private var vertices: Array<Vector3> = Array<Array<Vector3>>(data.size) { i ->
         Array<Vector3>(data[i].size) { j ->
             Vector3(
                 i * pointDistance,
@@ -54,16 +52,32 @@ class Ground(
                 j * pointDistance
             ) + offset
         }
-    }.flatten()
+    }.flatten().toTypedArray()
 
     override suspend fun initVisual() {
         updateMesh()
     }
 
     //region PUBLIC
+    fun destroy(position: Double, strength: Double) {
+        // TODO
+        val n = 10
+        val function: (Double) -> Double = {
+            if (it in 0.0..2 * PI) {
+                (cos(it / n) - 1) * strength
+            } else {
+                0.0
+            }
+        }
+
+        val center = Vector3(x = position, z = offset.z)
+        vertices.forEach { v ->
+            v.y += function(v.distanceTo(center).toDouble())
+        }
+    }
+
     fun heightAt(position: Double): Double {
-        val pos = position - offset.x.toFloat()
-        val normPos = pos / pointDistance
+        val normPos = normalizePos(position)
         if (normPos < 0 || normPos > width - 1) return 0.0
         val previous = data[floor(normPos).toInt()].first() * heightScale
         val next = data[ceil(normPos).toInt()].first() * heightScale
@@ -72,8 +86,7 @@ class Ground(
     }
 
     fun rotationAt(position: Double): Double {
-        val pos = position - offset.x.toFloat()
-        val normPos = pos / pointDistance
+        val normPos = normalizePos(position)
         if (normPos < 0 || normPos > width - 1) return 0.0
         val previous = floor(normPos).toInt()
         val next = ceil(normPos).toInt()
@@ -93,6 +106,11 @@ class Ground(
     //endregion
 
     //region PRIVATE
+    private fun normalizePos(position: Double): Double {
+        val pos = position - offset.x.toFloat()
+        return pos / pointDistance
+    }
+
     private fun averageAscent(start: Int, end: Int): Double {
         return (data[end].first() - data[start].first()) * heightScale / ((end - start) * pointDistance)
     }
