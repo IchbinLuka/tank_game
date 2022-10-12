@@ -42,10 +42,10 @@ class MainScene : GameScene() {
 
     private val aimingAidPlane = Mesh(PlaneGeometry(500, 500), MeshPhongMaterial().apply { visible = false })
     private val aimingCaster = Raycaster()
-    private val aimingPoint = Vector2()
+    private var aimIntersection = Vector3()
     private var aiming = true
 
-    private val ground = Ground(offset = Vector3(x = -100), pointDistance = 3.0)
+    private val ground = Ground(offset = Vector3(x = -100), pointDistance = 3.0, width = 75)
     private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(
@@ -58,15 +58,30 @@ class MainScene : GameScene() {
     private var awaitingShot = false
 
     init {
+        initListeners()
+    }
+
+    private fun initListeners() {
         window.addEventListener("pointermove", {
             it as PointerEvent
+            val aimingPoint = Vector2()
             aimingPoint.x = ( it.clientX.toFloat() / window.innerWidth ) * 2 - 1
             aimingPoint.y = - ( it.clientY.toFloat() / window.innerHeight ) * 2 + 1
+
+            if (aiming) {
+                aimingCaster.setFromCamera(aimingPoint, camera)
+                val intersection = aimingCaster.intersectObject(aimingAidPlane)
+                if (intersection.isNotEmpty()) {
+                    aimIntersection = intersection.first().point
+                    currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
+                }
+            }
         })
         window.addEventListener("click", {
             it as MouseEvent
             if (!awaitingShot) {
-                val bullet = currentTank.shoot(25.0, ground)
+                val distance = aimIntersection.distanceTo(currentTank.position)
+                val bullet = currentTank.shoot(distance.toDouble() / 2, ground)
                 bullet?.run {
                     objects.add(bullet)
                     scene.add(bullet.renderable)
@@ -107,14 +122,6 @@ class MainScene : GameScene() {
                 100 -> {
                     currentTank?.move(Vector3(3, 0, 0), delta, ground)
                 }
-            }
-        }
-        if (aiming) {
-            aimingCaster.setFromCamera(aimingPoint, camera)
-            val intersection = aimingCaster.intersectObject(aimingAidPlane)
-            if (intersection.isNotEmpty()) {
-                val point = intersection.first().point
-                currentTank?.aim(Vector2(point.x, point.y))
             }
         }
     }

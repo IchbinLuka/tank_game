@@ -1,31 +1,32 @@
 package gameobjects
 
-import core.gameobjects.GameObject
 import core.gameobjects.MovingGameObject
-import ext.*
+import ext.set
 import org.khronos.webgl.Float32Array
 import three.js.*
-import util.Log
 
 class Bullet(
     startVelocity: Vector3,
     startPos: Vector3,
     private val ground: Ground
 ) : MovingGameObject() {
-    override val renderable: Object3D get() = Group().apply {
-        add(bulletMesh)
-        val geometry = BufferGeometry()
-        geometry.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
-        add(Points(geometry,
-            PointsMaterial().apply {
-                color = Color(0xcccccc)
-            }
-        ))
-    }
+    override val renderable: Object3D
+        get() = Group().apply {
+            add(bulletMesh)
+            val geometry = BufferGeometry()
+            geometry.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
+            add(Points(geometry,
+                PointsMaterial().apply {
+                    color = Color(0xcccccc)
+                }
+            ))
+        }
 
     override var position: Vector3
         get() = bulletMesh.position
-        set(value) { bulletMesh.position.set(value) }
+        set(value) {
+            bulletMesh.position.set(value)
+        }
 
     private val vertices = ArrayDeque<Float>()
 
@@ -58,13 +59,13 @@ class Bullet(
         }*/
         if (ground.heightAt(position.x.toDouble()) > position.y.toFloat()) {
             alive = false
-            //TODO("Exploding not yet implemented")
+            ground.destroy(position.x.toDouble(), explosionWidth)
         }
     }
 
     companion object {
         const val g = -20
         const val bulletRadius = 0.5f
-        const val explosionWidth = 5f
+        const val explosionWidth = 15.0
     }
 }

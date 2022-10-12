@@ -2,6 +2,7 @@ package gameobjects
 
 import core.HeightMap
 import core.gameobjects.GameObject
+import ext.minus
 import ext.plus
 import ext.toFloatList
 import org.khronos.webgl.Float32Array
@@ -61,19 +62,28 @@ class Ground(
     //region PUBLIC
     fun destroy(position: Double, strength: Double) {
         // TODO
-        val n = 10
         val function: (Double) -> Double = {
-            if (it in 0.0..2 * PI) {
-                (cos(it / n) - 1) * strength
+            if (it in 0.0..PI) {
+                -1 * (cos(it) + 1) * strength
             } else {
                 0.0
             }
         }
 
-        val center = Vector3(x = position, z = offset.z)
-        vertices.forEach { v ->
-            v.y += function(v.distanceTo(center).toDouble())
+        val center = Vector2(x = position, y = heightAt(position))
+
+        val function2: (Double, Double) -> Double = { distance, height ->
+            if (distance > strength) {
+                height
+            } else {
+                center.y - sqrt(strength.pow(2) - distance.pow(2))
+            }
         }
+
+        vertices.forEach { v ->
+            v.y = function2(Vector2(x = v.x, y = v.y).distanceTo(center).toDouble(), v.y.toDouble())
+        }
+        updateMesh()
     }
 
     fun heightAt(position: Double): Double {
