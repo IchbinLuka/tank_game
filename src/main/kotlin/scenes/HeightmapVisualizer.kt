@@ -15,7 +15,7 @@ class HeightmapVisualizer(
     override val objects: Collection<GameObject> = listOf()
 
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 4
+        position.z = 4.0
     }
 
     private val geometry = BufferGeometry()

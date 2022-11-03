@@ -48,10 +48,10 @@ external interface Vector {
 }
 
 open external class Vector2(x: Number = definedExternally, y: Number = definedExternally) : Vector {
-    open var x: Number
-    open var y: Number
-    open var width: Number
-    open var height: Number
+    open var x: Double
+    open var y: Double
+    open var width: Double
+    open var height: Double
     open var isVector2: Boolean
     open fun set(x: Number, y: Number): Vector2 /* this */
     override fun setScalar(scalar: Number): Vector2 /* this */

@@ -27,8 +27,8 @@ class MainScene : GameScene() {
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5).apply {})
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 50
-        position.y = 3
+        position.z = 50.0
+        position.y = 3.0
         //rotation.x = 0.3
     }
 
@@ -65,8 +65,8 @@ class MainScene : GameScene() {
         window.addEventListener("pointermove", {
             it as PointerEvent
             val aimingPoint = Vector2()
-            aimingPoint.x = ( it.clientX.toFloat() / window.innerWidth ) * 2 - 1
-            aimingPoint.y = - ( it.clientY.toFloat() / window.innerHeight ) * 2 + 1
+            aimingPoint.x = ( it.clientX.toDouble() / window.innerWidth ) * 2 - 1
+            aimingPoint.y = - ( it.clientY.toDouble() / window.innerHeight ) * 2 + 1
 
             if (aiming) {
                 aimingCaster.setFromCamera(aimingPoint, camera)

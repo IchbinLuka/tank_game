@@ -2,7 +2,6 @@ package gameobjects
 
 import core.HeightMap
 import core.gameobjects.GameObject
-import ext.minus
 import ext.plus
 import ext.toFloatList
 import org.khronos.webgl.Float32Array
@@ -20,8 +19,9 @@ class Ground(
     height: Double = 40.0,
     depth: Int = 20,
     showVertex: Boolean = false,
-    private val heightScale: Double = 3.0,
-    private val pointDistance: Double = 1.0
+    private val heightScale: Double = 1.0,
+    private val pointDistance: Double = 1.0,
+    data: HeightMap = GroundNoise(width = width, depth = depth, min = -height).allValues()
 ) : GameObject() {
 
     override val renderable: Object3D by lazy {
@@ -43,17 +43,15 @@ class Ground(
     private val geometry = BufferGeometry()
 
     // private val heightData: Array<Double> = Array(res) { (height * 0.2 * (1 - sin(0.5 * it))) + height / 2 }
-    private val data: HeightMap =
-        GroundNoise(width = width, depth = depth, min = -height).allValues()
-    private var vertices: Array<Vector3> = Array<Array<Vector3>>(data.size) { i ->
+    private var vertices = Array<Array<Vector3>>(data.size) { i ->
         Array<Vector3>(data[i].size) { j ->
             Vector3(
                 i * pointDistance,
-                data[i][j].toFloat() * heightScale,
+                data[i][j] * heightScale,
                 j * pointDistance
             ) + offset
         }
-    }.flatten().toTypedArray()
+    }
 
     override suspend fun initVisual() {
         updateMesh()
@@ -72,27 +70,30 @@ class Ground(
 
         val center = Vector2(x = position, y = heightAt(position))
 
-        val function2: (Double, Double) -> Double = { distance, height ->
+        val function2: (Vector3) -> Double = {
+            val distance = abs(position - it.x)
             if (distance > strength) {
-                height
+                it.y
             } else {
-                center.y - sqrt(strength.pow(2) - distance.pow(2))
+                it.y - sqrt(strength.pow(2) - distance.pow(2)) - abs((offset.y - it.z) * 0.005).pow(2)
             }
         }
 
-        vertices.forEach { v ->
-            v.y = function2(Vector2(x = v.x, y = v.y).distanceTo(center).toDouble(), v.y.toDouble())
+        for (row in vertices) {
+            for (vertex in row) {
+                vertex.y = function2(vertex)
+            }
         }
         updateMesh()
     }
 
     fun heightAt(position: Double): Double {
         val normPos = normalizePos(position)
-        if (normPos < 0 || normPos > width - 1) return 0.0
-        val previous = data[floor(normPos).toInt()].first() * heightScale
-        val next = data[ceil(normPos).toInt()].first() * heightScale
-        val progress = 1 - ceil(normPos) + normPos
-        return offset.y.toFloat() + getLinearGradient(previous, next, progress)
+        if (position !in vertices.first().first().y..vertices.last().first().y) return 0.0
+        val previous = vertices[floor(normPos).toInt()].first()
+        val next = vertices[ceil(normPos).toInt()].first()
+        val progress = (position - previous.y) / pointDistance
+        return getLinearGradient(previous.y, next.y, progress)
     }
 
     fun rotationAt(position: Double): Double {
@@ -107,6 +108,7 @@ class Ground(
         } else {
             averageAscent(next, next + 1)
         }
+
         var progress = 0.5f + normPos - nearest
         if (normPos - nearest < 0) {
             progress = 1 - progress // Invert progress if nearest is right
@@ -122,20 +124,21 @@ class Ground(
     }
 
     private fun averageAscent(start: Int, end: Int): Double {
-        return (data[end].first() - data[start].first()) * heightScale / ((end - start) * pointDistance)
+        return (vertices[end].first().y - vertices[start].first().y) / ((end - start) * pointDistance)
     }
 
     private fun updateMesh() {
         val positions = mutableListOf<Float>()
         val indices = mutableListOf<Int>()
-        for (vertex in vertices) {
-            positions.addAll(vertex.toFloatList())
+        for (row in vertices) {
+            for (vertex in row) {
+                positions.addAll(vertex.toFloatList())
+            }
         }
-        Log.d(TAG, "Size: ${data.size} x ${data.first().size}")
-        for (i in 1..data.lastIndex) {
-            for (j in 0 until data[i].lastIndex) {
-                val frontStart: Int = i * data[i].size + j
-                val backStart: Int = frontStart - data[i].size
+        for (i in 1..vertices.lastIndex) {
+            for (j in 0 until vertices[i].lastIndex) {
+                val frontStart: Int = i * vertices[i].size + j
+                val backStart: Int = frontStart - vertices[i].size
                 indices.addAll(
                     arrayOf(
                         frontStart, backStart, backStart + 1,

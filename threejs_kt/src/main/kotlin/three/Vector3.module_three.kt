@@ -19,9 +19,9 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 open external class Vector3(x: Number = definedExternally, y: Number = definedExternally, z: Number = definedExternally) : Vector {
-    open var x: Number
-    open var y: Number
-    open var z: Number
+    open var x: Double
+    open var y: Double
+    open var z: Double
     open var isVector3: Boolean
     open fun set(x: Number, y: Number, z: Number): Vector3 /* this */
     override fun setScalar(scalar: Number): Vector3 /* this */

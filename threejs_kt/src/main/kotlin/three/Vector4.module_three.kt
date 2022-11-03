@@ -19,12 +19,12 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 
 open external class Vector4(x: Number = definedExternally, y: Number = definedExternally, z: Number = definedExternally, w: Number = definedExternally) : Vector {
-    open var x: Number
-    open var y: Number
-    open var z: Number
-    open var w: Number
-    open var width: Number
-    open var height: Number
+    open var x: Double
+    open var y: Double
+    open var z: Double
+    open var w: Double
+    open var width: Double
+    open var height: Double
     open var isVector4: Boolean
     open fun set(x: Number, y: Number, z: Number, w: Number): Vector4 /* this */
     override fun setScalar(scalar: Number): Vector4 /* this */

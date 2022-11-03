@@ -27,7 +27,7 @@ class Tank(
             applyCustomMat(MeshPhongMaterial().apply { color = this@Tank.color })
         }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
-        mainBone?.position?.y = 0
+        mainBone?.position?.y = 0.0
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
         if (mainBone == null || cannon == null) {
             Log.e(TAG, "Failed to identify mainBone and cannon")

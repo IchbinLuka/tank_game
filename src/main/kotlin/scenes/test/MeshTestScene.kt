@@ -61,9 +61,9 @@ class MeshTestScene : GameScene() {
         add(mesh)
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 3
-        position.y = 0
-        position.x = 1
+        position.z = 3.0
+        position.y = 0.0
+        position.x = 1.0
         rotation.x = 0.1
         rotation.y = 0.5
 

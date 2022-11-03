@@ -10,7 +10,7 @@ import three.js.*
 
 class ParticleTestScene: GameScene() {
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 4
+        position.z = 4.0
     }
 
     private val particleSystem = BasicParticleSystem(

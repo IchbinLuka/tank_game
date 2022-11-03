@@ -109,10 +109,6 @@ class BasicParticleSystem(
             val lifeProgress = (currentTime - particle.birthTime) / particleLifetime
             if (lifeProgress > 1) {
                 particles.removeAt(index)
-                /*for (i in 0..particles.lastIndex - index) {
-                    particles.removeLast()
-                }
-                return@forEachIndexed*/
             }
             particle.velocity.addScaledVector(emitter.normal, gravity * deltaTime)
             particle.size = getLinearGradient(startSize, endSize, lifeProgress)

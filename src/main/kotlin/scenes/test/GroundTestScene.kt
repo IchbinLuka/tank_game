@@ -13,7 +13,7 @@ class GroundTestScene: GameScene() {
     )
 
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 4
+        position.z = 4.0
     }
 
     override suspend fun preloadAssets() {
@@ -22,8 +22,8 @@ class GroundTestScene: GameScene() {
             add(AmbientLight(color = Color(0xffffff)))
             add(DirectionalLight(color = Color(0xffffff), intensity = 2).apply {
                 position.apply {
-                    x = 50
-                    y = 20
+                    x = 50.0
+                    y = 20.0
                 }
                 rotation.apply {
                     x = 10
