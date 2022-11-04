@@ -9,7 +9,7 @@ import three.js.*
 
 class GroundTestScene: GameScene() {
     override val objects: Collection<GameObject> = listOf(
-        Ground(width = 50, depth = 15)
+        Ground()
     )
 
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {

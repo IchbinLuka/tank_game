@@ -14,14 +14,11 @@ import util.noise.GroundNoise
 import kotlin.math.*
 
 class Ground(
-    val width: Int = 200,
     private val offset: Vector3 = Vector3(0, 0, 0),
-    height: Double = 40.0,
-    depth: Int = 20,
     showVertex: Boolean = false,
     private val heightScale: Double = 1.0,
     private val pointDistance: Double = 1.0,
-    data: HeightMap = GroundNoise(width = width, depth = depth, min = -height).allValues()
+    data: HeightMap = GroundNoise(width = 75, depth = 20, min = -40.0).allValues()
 ) : GameObject() {
 
     override val renderable: Object3D by lazy {
@@ -89,16 +86,17 @@ class Ground(
 
     fun heightAt(position: Double): Double {
         val normPos = normalizePos(position)
-        if (position !in vertices.first().first().y..vertices.last().first().y) return 0.0
+        if (position !in vertices.first().first().x..vertices.last().first().x)
+            throw IndexOutOfBoundsException("$position is not in Bounds ${vertices.first().first().x} - ${vertices.last().first().x}")
         val previous = vertices[floor(normPos).toInt()].first()
         val next = vertices[ceil(normPos).toInt()].first()
-        val progress = (position - previous.y) / pointDistance
+        val progress = (position - previous.x) / pointDistance
         return getLinearGradient(previous.y, next.y, progress)
     }
 
     fun rotationAt(position: Double): Double {
         val normPos = normalizePos(position)
-        if (normPos < 0 || normPos > width - 1) return 0.0
+        if (normPos < 0 || normPos > vertices.size - 1) return 0.0
         val previous = floor(normPos).toInt()
         val next = ceil(normPos).toInt()
         val nearest = normPos.roundToInt()

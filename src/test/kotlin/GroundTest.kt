@@ -1,9 +1,7 @@
 import core.HeightMap
 import gameobjects.Ground
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.data.row
 import io.kotest.matchers.shouldBe
-import io.kotest.property.forAll
 import three.js.Plane
 import three.js.Ray
 import three.js.Vector3
@@ -34,9 +32,14 @@ class GroundTest : StringSpec({
         flat.heightAt(30.0) shouldBe 0.0
     }
     "Ground.heightAt with a tilted plane should return the correct height" {
-        val tilted = Ground(data = PlaneNoise(50, 50, Vector3(-1, 1, 0)).allValues())
+        val plane = PlaneNoise(50, 50, Vector3(-1, 1, 0)).allValues()
+        val tilted = Ground(data = plane)
         tilted.heightAt(10.0) shouldBe 10.0
         tilted.heightAt(30.0) shouldBe 30.0
         tilted.heightAt(30.5) shouldBe 30.5
+
+        val tiltedOffset = Ground(data = plane, offset = Vector3(x = -10))
+        tiltedOffset.heightAt(10.0) shouldBe 20.0
+        tiltedOffset.heightAt(20.0) shouldBe 30.0
     }
 })

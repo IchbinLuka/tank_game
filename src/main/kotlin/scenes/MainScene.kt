@@ -45,7 +45,7 @@ class MainScene : GameScene() {
     private var aimIntersection = Vector3()
     private var aiming = true
 
-    private val ground = Ground(offset = Vector3(x = -100), pointDistance = 3.0, width = 75)
+    private val ground = Ground(offset = Vector3(x = -100, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(
