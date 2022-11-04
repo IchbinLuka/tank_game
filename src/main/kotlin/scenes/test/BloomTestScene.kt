@@ -13,7 +13,7 @@ class BloomTestScene: GameScene() {
         color = Color(0x00aa00)
     })
 
-    override val objects: Collection<GameObject>
+    override val objects: HashSet<GameObject>
         get() = TODO("Not yet implemented")
 
     override val scene: Scene = Scene().apply {

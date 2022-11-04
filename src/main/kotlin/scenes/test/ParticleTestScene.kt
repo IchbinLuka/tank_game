@@ -31,7 +31,7 @@ class ParticleTestScene: GameScene() {
         //material = PointsMaterial().apply { vertexColors = false; size = 0.5; color = Color(0xffffff) }
     )
 
-    override val objects = mutableListOf<GameObject>(
+    override val objects = hashSetOf<GameObject>(
         particleSystem,
     )
 

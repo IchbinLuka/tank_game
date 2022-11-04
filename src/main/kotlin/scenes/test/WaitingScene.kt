@@ -7,8 +7,8 @@ import scenes.GameScene
 class WaitingScene(
     private val duration: Long = 5000L
 ): GameScene() {
-    override val objects: Collection<GameObject>
-        get() = listOf()
+    override val objects: HashSet<GameObject>
+        get() = hashSetOf()
 
     override suspend fun preloadAssets() {
         super.preloadAssets()

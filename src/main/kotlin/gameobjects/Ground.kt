@@ -64,15 +64,13 @@ class Ground(
                 0.0
             }
         }
-
-        val center = Vector2(x = position, y = heightAt(position))
-
+        val height = heightAt(position)
         val function2: (Vector3) -> Double = {
             val distance = abs(position - it.x)
             if (distance > strength) {
                 it.y
             } else {
-                it.y - sqrt(strength.pow(2) - distance.pow(2)) - abs((offset.y - it.z) * 0.005).pow(2)
+                min(height - sqrt(strength.pow(2) - distance.pow(2)), it.y) //- abs((offset.y - it.z) * 0.0005).pow(2)
             }
         }
 

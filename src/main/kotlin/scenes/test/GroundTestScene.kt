@@ -8,7 +8,7 @@ import scenes.GameScene
 import three.js.*
 
 class GroundTestScene: GameScene() {
-    override val objects: Collection<GameObject> = listOf(
+    override val objects: HashSet<GameObject> = hashSetOf(
         Ground()
     )
 

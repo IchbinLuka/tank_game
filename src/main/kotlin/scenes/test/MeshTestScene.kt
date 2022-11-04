@@ -2,7 +2,6 @@ package scenes.test
 
 import core.gameobjects.GameObject
 import ext.aspectRatio
-import gameobjects.Ground
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
 import scenes.GameScene
@@ -11,8 +10,8 @@ import kotlin.math.PI
 
 class MeshTestScene : GameScene() {
 
-    override val objects: Collection<GameObject>
-        get() = mutableListOf()
+    override val objects: HashSet<GameObject>
+        get() = hashSetOf()
 
     override val scene = Scene().apply {
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 1))
@@ -20,9 +19,9 @@ class MeshTestScene : GameScene() {
         background = Color(0x5f9be5)
         val geometry = BufferGeometry()
         val positions = arrayOf(
-            -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
 
             1.0f,  1.0f,  1.0f,
             -1.0f,  1.0f,  1.0f,

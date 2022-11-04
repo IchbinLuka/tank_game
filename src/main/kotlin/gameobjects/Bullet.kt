@@ -57,9 +57,9 @@ class Bullet(
                 vertices.removeLast()
             }
         }*/
-        if (ground.heightAt(position.x.toDouble()) > position.y.toFloat()) {
+        if (ground.heightAt(position.x) > position.y.toFloat()) {
             alive = false
-            ground.destroy(position.x.toDouble(), explosionWidth)
+            ground.destroy(position.x, explosionWidth)
         }
     }
 

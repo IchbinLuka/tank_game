@@ -9,7 +9,8 @@ import kotlinx.browser.window
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
-import util.*
+import util.EventManager
+import util.ResourceManager
 
 class MainScene : GameScene() {
 
@@ -32,8 +33,8 @@ class MainScene : GameScene() {
         //rotation.x = 0.3
     }
 
-    override val objects: MutableList<GameObject> by lazy {
-        mutableListOf<GameObject>(
+    override val objects: MutableSet<GameObject> by lazy {
+        hashSetOf<GameObject>(
             ground
         ).apply {
             addAll(tanks)
@@ -106,17 +107,18 @@ class MainScene : GameScene() {
     }
 
     override fun update(delta: Double) {
-        objects.forEachIndexed {
-            i, o ->
-            o.update(delta)
-            if (!o.alive) {
-                objects.removeAt(i) // TODO: Improve this inefficient approach
+        val iterator = objects.iterator()
+        for (obj in iterator) {
+            obj.update(delta)
+            if (!obj.alive) {
+                iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
+                obj.renderable?.let { scene.remove(it) }
             }
         }
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
-            when(it.keyCode) {
-                97  -> {
+            when (it.keyCode) {
+                97 -> {
                     currentTank?.move(Vector3(-3, 0, 0), delta, ground)
                 }
                 100 -> {
