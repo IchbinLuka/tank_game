@@ -7,7 +7,6 @@ import ext.toFloatList
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.js.*
-import util.Log
 import util.angleFromAscent
 import util.getLinearGradient
 import util.noise.GroundNoise
@@ -144,7 +143,6 @@ class Ground(
             }
         }
         geometry.setAttribute("position", BufferAttribute(Float32Array(positions.toTypedArray()).asDynamic(), 3))
-        Log.v(TAG, "Indices length: ${indices.size}, data: $indices")
         geometry.setIndex(indices.toTypedArray())
         geometry.computeVertexNormals()
     }
