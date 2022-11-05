@@ -1,8 +1,11 @@
 package util
 
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.asDeferred
+import three.GLTF
 import three.GLTFLoader
 import three.js.ImageLoader
+import three.js.Texture
 import three.js.TextureLoader
 
 object ResourceManager {
@@ -10,13 +13,22 @@ object ResourceManager {
     private val textureLoader = TextureLoader()
     private val imageLoader = ImageLoader()
 
-    val suzanne get() = gltfLoader.loadAsync("models/suzanne2.gltf").asDeferred()
-    val tank get() = gltfLoader.loadAsync("models/tank.glb").asDeferred()
-    val cloud get() = gltfLoader.loadAsync("models/cloud.glb").asDeferred()
+    private fun textureAsync(uri: String): Deferred<Texture> {
+        return textureLoader.loadAsync(uri).asDeferred()
+    }
 
-    val sunnySky get() = textureLoader.loadAsync("textures/skies/sky_sunny.jpg").asDeferred()
-    val disc get() = textureLoader.loadAsync("textures/sprites/disc.png").asDeferred()
-    val box get() = textureLoader.loadAsync("textures/sprites/box.png").asDeferred()
+    private fun gltfAsync(uri: String): Deferred<GLTF> {
+        return gltfLoader.loadAsync(uri).asDeferred()
+    }
 
-    val testLandscape get() = gltfLoader.loadAsync("models/test_landscape.glb").asDeferred()
+    val suzanne get() = gltfAsync("models/suzanne2.gltf")
+    val tank get() = gltfAsync("models/tank.glb")
+    val cloud get() = gltfAsync("models/cloud.glb")
+    val skyBox get() = gltfAsync("models/skybox.glb")
+
+    val sunnySky get() = textureAsync("textures/skies/sky_sunny.jpg")
+    val disc get() = textureAsync("textures/sprites/disc.png")
+    val box get() = textureAsync("textures/sprites/box.png")
+
+    val testLandscape get() = gltfAsync("models/test_landscape.glb")
 }

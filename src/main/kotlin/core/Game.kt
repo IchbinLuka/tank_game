@@ -4,7 +4,6 @@ import ext.TAG
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
-import org.w3c.dom.WorkerGlobalScope
 import scenes.GameScene
 import scenes.LoadingScene
 import stats.js.Stats
@@ -13,10 +12,7 @@ import three.js.Clock
 import three.js.Vector2
 import three.js.WebGLRenderer
 import three.js.WebGLRendererParameters
-import three.postprocessing.EffectComposer
-import three.postprocessing.RenderPass
-import three.postprocessing.SSAOPass
-import three.postprocessing.UnrealBloomPass
+import three.postprocessing.*
 import util.EventManager
 import util.GUIHelper
 import util.Log
@@ -65,7 +61,7 @@ class Game(
         setPixelRatio(window.devicePixelRatio)
     }
 
-    private var composer: EffectComposer = EffectComposer(renderer)
+    private var composer: EffectComposer = EffectComposer(OutlineEffect(renderer))
     private fun updateComposer() {
         composer = EffectComposer(renderer)
         val width = window.innerWidth
@@ -102,13 +98,15 @@ class Game(
 
     private var running = true
     fun mainLoop() = launch {
+        val effect = OutlineEffect(renderer)
         val clock = Clock()
         while (running) {
             val delta = clock.getDelta().toDouble()
             stats.begin()
             EventManager.keyboardEvents.switchBatches()
             currentScene.update(delta)
-            composer.render()
+            // composer.render()
+            effect.render(currentScene_.scene, currentScene_.camera)
             stats.update()
             val error = renderer.getContext().getError()
             if (error != 0) {

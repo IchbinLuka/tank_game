@@ -2,25 +2,22 @@ package gameobjects
 
 import core.gameobjects.MovingGameObject
 import ext.set
+import ext.toFloatList
+import kotlinx.coroutines.asPromise
 import org.khronos.webgl.Float32Array
 import three.js.*
+import util.ResourceManager
 
 class Bullet(
     startVelocity: Vector3,
     startPos: Vector3,
     private val ground: Ground
 ) : MovingGameObject() {
-    override val renderable: Object3D
-        get() = Group().apply {
+    override val renderable: Object3D by lazy {
+        Group().apply {
             add(bulletMesh)
-            val geometry = BufferGeometry()
-            geometry.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
-            add(Points(geometry,
-                PointsMaterial().apply {
-                    color = Color(0xcccccc)
-                }
-            ))
         }
+    }
 
     override var position: Vector3
         get() = bulletMesh.position
@@ -28,7 +25,9 @@ class Bullet(
             bulletMesh.position.set(value)
         }
 
+    private val dots = BufferGeometry()
     private val vertices = ArrayDeque<Float>()
+    private var dotTimer: Double = 0.0
 
     private val bulletMesh = Mesh(
         SphereGeometry(radius = bulletRadius),
@@ -37,26 +36,47 @@ class Bullet(
         }
     ).apply { this@apply.position.set(startPos) }
 
+    init {
+        ResourceManager.disc.asPromise().then {
+            renderable.add(Points(dots,
+                PointsMaterial().apply {
+                    color = Color(0xcccccc)
+                    size = 3
+                    alphaMap = it
+                    map = it
+                    alphaTest = 0.5
+                }
+            ))
+        }
+    }
+
     override suspend fun initVisual() {}
 
     override var velocity: Vector3 = startVelocity
     override var acceleration: Vector3 = Vector3(0, g, 0)
 
+    private fun updateGeometry() {
+        dots.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
+    }
+
     override fun update(deltaTime: Double) {
         super.update(deltaTime)
-        /*val length = vertices.lastIndex
-        if (position.distanceTo(Vector2(vertices[length - 2], vertices[length - 1])).toFloat() > 4) {
+        dotTimer += deltaTime
+        if (dotTimer > 0.5) {
+            dotTimer = 0.0
             vertices.apply {
-                addFirst(0f)
-                addFirst(position.y.toFloat())
-                addFirst(position.x.toFloat())
+                position.toFloatList().reversed().forEach {
+                    addFirst(it)
+                }
             }
+            updateGeometry()
         }
         if (vertices.size > 3 * 10) {
             for (i in 1..3) {
                 vertices.removeLast()
             }
-        }*/
+            updateGeometry()
+        }
         if (ground.heightAt(position.x) > position.y.toFloat()) {
             alive = false
             ground.destroy(position.x, explosionWidth)
@@ -66,6 +86,6 @@ class Bullet(
     companion object {
         const val g = -20
         const val bulletRadius = 0.5f
-        const val explosionWidth = 15.0
+        const val explosionWidth = 5.0
     }
 }

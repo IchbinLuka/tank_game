@@ -2,12 +2,14 @@
 @file:JsNonModule
 package three.postprocessing
 
+import three.js.RenderTarget
+import three.js.Renderer
 import three.js.WebGLRenderTarget
 import three.js.WebGLRenderer
 
 open external class EffectComposer(
-    renderer: WebGLRenderer,
-    renderTarget: WebGLRenderTarget = definedExternally
+    renderer: Renderer,
+    renderTarget: RenderTarget = definedExternally
 ) {
     open var passes: Array<Pass>
     open var readBuffer: dynamic

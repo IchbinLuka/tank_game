@@ -1,15 +1,16 @@
 package scenes
 
 import core.gameobjects.GameObject
-import ext.aspectRatio
-import ext.enableShadows
+import ext.*
 import gameobjects.Ground
 import gameobjects.Tank
 import kotlinx.browser.window
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
+import three.DoubleSide
 import three.js.*
 import util.EventManager
+import util.Log
 import util.ResourceManager
 
 class MainScene : GameScene() {
@@ -23,14 +24,14 @@ class MainScene : GameScene() {
         }
         add(light)
         add(DirectionalLightHelper(light, size = 10, color = 0xFDFFD9))
-        fog = FogExp2(0x5f9be5, 0.005)
+        // fog = FogExp2(0x5f9be5, 0.005)
         //add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5).apply {})
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 50.0
-        position.y = 3.0
-        //rotation.x = 0.3
+        position.z = 100.0
+        position.y = 30.0
+        rotation.x = -0.3
     }
 
     override val objects: MutableSet<GameObject> by lazy {
@@ -46,7 +47,7 @@ class MainScene : GameScene() {
     private var aimIntersection = Vector3()
     private var aiming = true
 
-    private val ground = Ground(offset = Vector3(x = -100, y = 40), pointDistance = 3.0)
+    private val ground = Ground(offset = Vector3(x = -100), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(
@@ -97,6 +98,18 @@ class MainScene : GameScene() {
             enableShadows()
         })
         objects.forEach { o -> o.renderable?.let { scene.add(it) } }
+        scene.add(ResourceManager.skyBox.await().scene.apply {
+            receiveShadow = false
+            castShadow = false
+            applyCustomMat(MeshToonMaterial().apply {
+                color = Color(0x64DBFF)
+                side = DoubleSide
+                receiveShadow = false
+                castShadow = false
+                shadowSide
+                flatShading = true
+            })
+        })
         scene.add(aimingAidPlane)
         scene.add(groundRenderable)
     }
@@ -122,6 +135,7 @@ class MainScene : GameScene() {
                     currentTank?.move(Vector3(-3, 0, 0), delta, ground)
                 }
                 100 -> {
+                    Log.d(TAG, camera.rotation.toVector3().toFloatList())
                     currentTank?.move(Vector3(3, 0, 0), delta, ground)
                 }
             }

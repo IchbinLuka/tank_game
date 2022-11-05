@@ -10,7 +10,7 @@ abstract class GameScene {
     open val scene: Scene = Scene()
     open val camera: Camera = Camera()
 
-    /** [Collection] containing the relevant GameObjects */
+    /** [MutableSet] containing the relevant GameObjects */
     abstract val objects: MutableSet<GameObject>
 
     /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */

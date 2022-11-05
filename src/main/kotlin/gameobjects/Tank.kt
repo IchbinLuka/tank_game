@@ -4,7 +4,10 @@ import core.gameobjects.GameObject
 import ext.*
 import three.GLTF
 import three.js.*
-import util.*
+import util.Direction
+import util.Log
+import util.ResourceManager
+import util.toUnitCircle
 import kotlin.math.*
 
 class Tank(
@@ -24,7 +27,9 @@ class Tank(
         gltf = ResourceManager.tank.await()
         gltf?.scene?.apply {
             enableShadows()
-            applyCustomMat(MeshPhongMaterial().apply { color = this@Tank.color })
+            applyCustomMat(MeshToonMaterial().apply {
+                color = this@Tank.color
+            })
         }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
         mainBone?.position?.y = 0.0
