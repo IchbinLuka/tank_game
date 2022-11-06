@@ -1,13 +1,16 @@
 package scenes
 
 import core.gameobjects.GameObject
-import ext.*
+import ext.TAG
+import ext.aspectRatio
+import ext.enableShadows
+import ext.toFloatList
+import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import kotlinx.browser.window
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
-import three.DoubleSide
 import three.js.*
 import util.EventManager
 import util.Log
@@ -23,7 +26,7 @@ class MainScene : GameScene() {
             enableShadows()
         }
         add(light)
-        add(DirectionalLightHelper(light, size = 10, color = 0xFDFFD9))
+        // add(DirectionalLightHelper(light, size = 10, color = 0xFDFFD9))
         // fog = FogExp2(0x5f9be5, 0.005)
         //add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5).apply {})
@@ -36,7 +39,8 @@ class MainScene : GameScene() {
 
     override val objects: MutableSet<GameObject> by lazy {
         hashSetOf<GameObject>(
-            ground
+            ground,
+            Background()
         ).apply {
             addAll(tanks)
         }
@@ -98,25 +102,12 @@ class MainScene : GameScene() {
             enableShadows()
         })
         objects.forEach { o -> o.renderable?.let { scene.add(it) } }
-        scene.add(ResourceManager.skyBox.await().scene.apply {
-            receiveShadow = false
-            castShadow = false
-            applyCustomMat(MeshToonMaterial().apply {
-                color = Color(0x64DBFF)
-                side = DoubleSide
-                receiveShadow = false
-                castShadow = false
-                shadowSide
-                flatShading = true
-            })
-        })
-        scene.add(aimingAidPlane)
-        scene.add(groundRenderable)
+        scene.add(groundRenderable, aimingAidPlane)
     }
 
     override suspend fun loadAssets() {
         super.loadAssets()
-        scene.background = ResourceManager.sunnySky.await()
+        scene.background = Color(0x64DBFF)
     }
 
     override fun update(delta: Double) {

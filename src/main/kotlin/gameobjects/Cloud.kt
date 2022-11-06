@@ -1,8 +1,10 @@
 package gameobjects
 
 import core.gameobjects.GameObject
+import ext.applyCustomMat
 import ext.set
-import three.GLTF
+import three.js.Color
+import three.js.MeshToonMaterial
 import three.js.Object3D
 import three.js.Vector3
 import util.Direction
@@ -15,17 +17,23 @@ class Cloud(
     private val max: Double,
     private val startPos: Vector3
 ) : GameObject() {
-    override val renderable: Object3D?
-        get() = gltf?.scene
-
-    private var gltf: GLTF? = null
+    override var renderable: Object3D? = null
 
     override suspend fun initVisual() {
-        gltf = ResourceManager.cloud.await()
-        gltf?.scene?.position?.set(startPos)
+        renderable = ResourceManager.cloud.await().scene.clone(true).apply {
+            applyCustomMat(MeshToonMaterial().apply {
+                color = Color(0xffffff)
+            })
+        }
+        renderable!!.position.set(startPos)
     }
 
     override fun update(deltaTime: Double) {
-        gltf?.scene?.position?.addScaledVector(startDirection.vector3, speed * deltaTime)
+        renderable?.position?.addScaledVector(startDirection.vector3, speed * deltaTime)
+        if (position.x > max) {
+            position.x = min
+        } else if (position.x < min) {
+            position.x = max
+        }
     }
 }

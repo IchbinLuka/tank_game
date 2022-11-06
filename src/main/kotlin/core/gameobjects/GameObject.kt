@@ -12,7 +12,7 @@ abstract class GameObject {
     val uuid = Uuid.next()
 
     open var position: Vector3
-        get() = renderable?.position ?: TODO()
+        get() = renderable?.position ?: Vector3()
         set(value) {
             renderable?.position?.set(*value.toFloatArray())
         }
