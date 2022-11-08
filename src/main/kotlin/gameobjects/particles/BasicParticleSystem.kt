@@ -1,12 +1,12 @@
-package particles
+package gameobjects.particles
 
 import core.gameobjects.GameObject
 import ext.plusAssign
 import ext.times
 import ext.toDoubleList
 import ext.toFloatList
+import gameobjects.particles.emitter.ParticleEmitter
 import org.khronos.webgl.Float32Array
-import particles.emitter.ParticleEmitter
 import three.LessEqualDepth
 import three.js.*
 import util.FileHelper
@@ -21,7 +21,7 @@ import kotlin.random.Random
 /**
  * Class for creating particle systems, inspired by blender's particle systems
  */
-class BasicParticleSystem(
+open class BasicParticleSystem(
     val particleLifetime: Double,
     val particleLifetimeRandomness: Double = 0.0,
     val totalLifetime: Double = Double.POSITIVE_INFINITY,
@@ -142,13 +142,15 @@ class BasicParticleSystem(
         for (i in 1 .. number) {
             val deltaTime = particleLifetimeRandomness * particleLifetime * (2 * Random.nextFloat() - 1)
             val deltaVelocity = velocityRandomness * startVelocity * (2 * Random.nextFloat() - 1)
-            particles.addFirst(Particle(
-                velocity = emitter.normal.clone() * (startVelocity + deltaVelocity),
-                birthTime = time + deltaTime,
-                size = startSize,
-                color = startColList,
-                position = emitter.randomPoint()
-            ))
+            particles.addFirst(
+                Particle(
+                    velocity = emitter.normal.clone() * (startVelocity + deltaVelocity),
+                    birthTime = time + deltaTime,
+                    size = startSize,
+                    color = startColList,
+                    position = emitter.randomPoint()
+                )
+            )
         }
         lastBirth = time
     }

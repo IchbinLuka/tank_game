@@ -1,4 +1,4 @@
-package particles.emitter
+package gameobjects.particles.emitter
 
 import ext.plus
 import ext.times
@@ -8,7 +8,7 @@ import kotlin.random.Random
 
 class CircleEmitter(
     var position: Vector3,
-    var radius: Float,
+    var radius: Double,
     override var normal: Vector3
 ): ParticleEmitter {
 

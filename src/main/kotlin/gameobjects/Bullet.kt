@@ -11,7 +11,8 @@ import util.ResourceManager
 class Bullet(
     startVelocity: Vector3,
     startPos: Vector3,
-    private val ground: Ground
+    private val ground: Ground,
+    private val onImpact: (Vector3) -> Unit = {}
 ) : MovingGameObject() {
     override val renderable: Object3D by lazy {
         Group().apply {
@@ -80,6 +81,7 @@ class Bullet(
         if (ground.heightAt(position.x) > position.y.toFloat()) {
             alive = false
             ground.destroy(position.x, explosionWidth)
+            onImpact(position)
         }
     }
 

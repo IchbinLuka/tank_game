@@ -11,7 +11,8 @@ import util.toUnitCircle
 import kotlin.math.*
 
 class Tank(
-    val color: Color = Color(0x338530)
+    val color: Color = Color(0x338530),
+    val startPosition: Vector3
 ) : GameObject() {
     override val renderable: Object3D? get() = gltf?.scene
 
@@ -21,6 +22,8 @@ class Tank(
     private var direction = Direction.Right
 
     private var cannon: Object3D? = null
+
+    var health: Float = 1f
 
     override suspend fun initVisual() {
         Log.v(TAG, "Loading tank")
@@ -32,7 +35,7 @@ class Tank(
             })
         }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
-        mainBone?.position?.y = 0.0
+        mainBone?.position?.set(startPosition)
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
         if (mainBone == null || cannon == null) {
             Log.e(TAG, "Failed to identify mainBone and cannon")
@@ -64,7 +67,7 @@ class Tank(
         }
     }
 
-    fun shoot(velocity: Double, ground: Ground): Bullet? {
+    fun shoot(velocity: Double, ground: Ground, onImpact: (Vector3) -> Unit): Bullet? {
         if (cannon == null) return null
         val worldPosition = cannon!!.getWorldPosition(Vector3())
         val worldRotation = cannon!!.getWorldEuler(Euler())
@@ -75,14 +78,19 @@ class Tank(
                 -sin(worldRotation.z.toDouble()) * velocity,
                 cos(worldRotation.z.toDouble()) * velocity * direction.vector3.x.toDouble(),
             ),
-            ground = ground
+            ground = ground,
+            onImpact = onImpact
         )
     }
 
     fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
         mainBone?.position?.addScaledVector(vector3, deltaTime)
+        adjustTransformToGround(ground)
+    }
+
+    fun adjustTransformToGround(ground: Ground) {
         mainBone?.position?.let {
-            val pos = mainBone!!.position.x.toDouble()
+            val pos = mainBone!!.position.x
             it.y = ground.heightAt(pos)
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()

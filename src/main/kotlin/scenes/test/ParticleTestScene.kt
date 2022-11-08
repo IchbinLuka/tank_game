@@ -2,9 +2,9 @@ package scenes.test
 
 import core.gameobjects.GameObject
 import ext.aspectRatio
+import gameobjects.particles.BasicParticleSystem
+import gameobjects.particles.emitter.CircleEmitter
 import kotlinx.browser.window
-import particles.BasicParticleSystem
-import particles.emitter.CircleEmitter
 import scenes.GameScene
 import three.js.*
 

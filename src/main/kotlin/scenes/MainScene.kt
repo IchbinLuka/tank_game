@@ -1,10 +1,7 @@
 package scenes
 
 import core.gameobjects.GameObject
-import ext.TAG
-import ext.aspectRatio
-import ext.enableShadows
-import ext.toFloatList
+import ext.*
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
@@ -55,7 +52,8 @@ class MainScene : GameScene() {
     private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(
-        Tank()
+        Tank(startPosition = Vector3(x = 20, z = 1.5)),
+        Tank(color = Color(0xfc522f), startPosition = Vector3(x = -20, z = 1.5))
     )
 
     private var currentTankIndex: Int = 0
@@ -65,6 +63,9 @@ class MainScene : GameScene() {
 
     init {
         initListeners()
+        for (tank in tanks) {
+            tank.adjustTransformToGround(ground)
+        }
     }
 
     private fun initListeners() {
@@ -83,11 +84,12 @@ class MainScene : GameScene() {
                 }
             }
         })
-        window.addEventListener("click", {
-            it as MouseEvent
+        window.addEventListener("click", { event ->
+            event as MouseEvent
             if (!awaitingShot) {
                 val distance = aimIntersection.distanceTo(currentTank.position)
-                val bullet = currentTank.shoot(distance.toDouble() / 2, ground)
+                awaitingShot = true
+                val bullet = currentTank.shoot(distance.toDouble() / 2, ground) { onImpact(it) }
                 bullet?.run {
                     objects.add(bullet)
                     scene.add(bullet.renderable)
@@ -96,10 +98,19 @@ class MainScene : GameScene() {
         })
     }
 
+    private fun onImpact(vector3: Vector3) {
+        for (tank in tanks) {
+            tank.adjustTransformToGround(ground)
+        }
+        awaitingShot = false
+        currentTankIndex = (currentTankIndex + 1) % tanks.size
+    }
+
     override suspend fun preloadAssets() {
         super.preloadAssets()
         scene.add(ResourceManager.testLandscape.await().scene.apply {
             enableShadows()
+            applyCustomMat(MeshToonMaterial().apply { color = Color(0x195917) })
         })
         objects.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
@@ -121,6 +132,7 @@ class MainScene : GameScene() {
         }
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
+            if (awaitingShot) return@forEach
             when (it.keyCode) {
                 97 -> {
                     currentTank?.move(Vector3(-3, 0, 0), delta, ground)

@@ -1,4 +1,4 @@
-package particles.emitter
+package gameobjects.particles.emitter
 
 import three.js.Vector3
 
