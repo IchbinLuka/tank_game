@@ -5,6 +5,7 @@ import ext.*
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
+import gameobjects.particles.Explosion
 import kotlinx.browser.window
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
@@ -102,6 +103,7 @@ class MainScene : GameScene() {
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
         }
+        addGameObject(Explosion(position = vector3))
         awaitingShot = false
         currentTankIndex = (currentTankIndex + 1) % tanks.size
     }

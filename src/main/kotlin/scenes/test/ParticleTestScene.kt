@@ -3,32 +3,37 @@ package scenes.test
 import core.gameobjects.GameObject
 import ext.aspectRatio
 import gameobjects.particles.BasicParticleSystem
-import gameobjects.particles.emitter.CircleEmitter
+import gameobjects.particles.emitter.SphereEmitter
 import kotlinx.browser.window
 import scenes.GameScene
 import three.js.*
 
 class ParticleTestScene: GameScene() {
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 4.0
+        position.z = 20.0
     }
 
     private val particleSystem = BasicParticleSystem(
-        particleLifetime = 700.0,
-        totalLifetime = 1000000.0,
-        spawnBurst = 10,
-        emitter = CircleEmitter(Vector3(), 3f, Vector3(0, 1, 0)),
-        startVelocity = 1.0,
-        gravity = 50.0,
-        spawnDelta = 6.0,
+        particleLifetime = 600.0,
+        spawnBurst = 100,
+        emitter = SphereEmitter(Vector3(z = -50), 2.0, 0),
+        startVelocity = 10.0,
+        // gravity = 50.0,
+        // spawnDelta = 6.0,
         startSize = 2.0,
-        endSize = 0.5,
-        startColor = Color(0xfcecd6),
-        endColor = Color(0xfc5f2f),
+        endSize = 10.0,
+        startColor = Color(0xfcd125),
+        endColor = Color(0xfc3a0f),
         startDirectionRandomness = 0.2,
         particleLifetimeRandomness = 0.3,
         velocityRandomness = 0.3,
-        //material = PointsMaterial().apply { vertexColors = false; size = 0.5; color = Color(0xffffff) }
+        /*material = PointsMaterial().apply {
+            // vertexColors = true
+            size = 2
+            side = DoubleSide
+            // shadowSide = DoubleSide
+            color = Color(0xffffff)
+        }*/
     )
 
     override val objects = hashSetOf<GameObject>(

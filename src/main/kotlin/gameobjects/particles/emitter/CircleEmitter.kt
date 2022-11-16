@@ -9,15 +9,18 @@ import kotlin.random.Random
 class CircleEmitter(
     var position: Vector3,
     var radius: Double,
-    override var normal: Vector3
+    var normal: Vector3
 ): ParticleEmitter {
 
     private val baseVector = Vector3(0, -normal.z.toDouble(), -normal.y.toDouble())//.normalize()
 
-    override fun randomPoint(): Vector3 {
+    override fun randomPoint(): Pair<Position, Normal> {
         val angle = Random.nextFloat() * 2 * PI
         val radius = Random.nextFloat() * radius
 
-        return position + baseVector.clone().applyAxisAngle(normal, angle) * radius
+        return Pair(
+            Position(position + baseVector.clone().applyAxisAngle(normal, angle) * radius),
+            Normal(normal)
+        )
     }
 }

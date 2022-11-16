@@ -7,12 +7,10 @@ import ext.toDoubleList
 import ext.toFloatList
 import gameobjects.particles.emitter.ParticleEmitter
 import org.khronos.webgl.Float32Array
+import three.DoubleSide
 import three.LessEqualDepth
 import three.js.*
-import util.FileHelper
-import util.Log
-import util.ResourceManager
-import util.getLinearGradient
+import util.*
 import kotlin.js.Date
 import kotlin.math.floor
 import kotlin.math.min
@@ -32,7 +30,7 @@ open class BasicParticleSystem(
     val velocityRandomness: Double = 0.0,
     startColor: Color = Color(0xffffff),
     endColor: Color = Color(0xffffff),
-    val spawnDelta: Double = 1.0,
+    val spawnDelta: Double = Double.POSITIVE_INFINITY,
     val spawnBurst: Int = 0,
     val startSize: Double = 1.0,
     val endSize: Double = 1.0,
@@ -71,6 +69,7 @@ open class BasicParticleSystem(
 
         if (material == null) {
             material = ShaderMaterial().apply {
+                side = DoubleSide
                 Log.d(TAG, "Loading shaders")
                 FileHelper.readFile("shaders/customPointsFragment.glsl")?.let {
                     fragmentShader = it
@@ -110,7 +109,7 @@ open class BasicParticleSystem(
             if (lifeProgress > 1) {
                 particles.removeAt(index)
             }
-            particle.velocity.addScaledVector(emitter.normal, gravity * deltaTime)
+            particle.velocity.addScaledVector(Direction.Down.vector3, gravity * deltaTime)
             particle.size = getLinearGradient(startSize, endSize, lifeProgress)
             particle.position += particle.velocity * deltaTime
             particle.color = colors.map { getLinearGradient(it.first, it.second, lifeProgress) }
@@ -142,13 +141,14 @@ open class BasicParticleSystem(
         for (i in 1 .. number) {
             val deltaTime = particleLifetimeRandomness * particleLifetime * (2 * Random.nextFloat() - 1)
             val deltaVelocity = velocityRandomness * startVelocity * (2 * Random.nextFloat() - 1)
+            val point = emitter.randomPoint()
             particles.addFirst(
                 Particle(
-                    velocity = emitter.normal.clone() * (startVelocity + deltaVelocity),
+                    velocity = point.second.vector3 * (startVelocity + deltaVelocity),
                     birthTime = time + deltaTime,
                     size = startSize,
                     color = startColList,
-                    position = emitter.randomPoint()
+                    position = point.first.vector3
                 )
             )
         }
