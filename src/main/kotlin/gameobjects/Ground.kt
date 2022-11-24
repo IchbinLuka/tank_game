@@ -72,9 +72,15 @@ class Ground(
                 min(height - sqrt(strength.pow(2) - distance.pow(2)), it.y) //- abs((offset.y - it.z) * 0.0005).pow(2)
             }
         }
-
-        for (row in vertices) {
-            for (vertex in row) {
+        val nearestVertex = floor(normalizePos(position)).toInt()
+        val maxDistance = strength / pointDistance
+        for (i in max(
+            0.0, nearestVertex - maxDistance
+        ).toInt()..min(
+            vertices.size.toDouble(),
+            nearestVertex + maxDistance
+        ).toInt()) {
+            for (vertex in vertices[i]) {
                 vertex.y = function2(vertex)
             }
         }
@@ -84,7 +90,11 @@ class Ground(
     fun heightAt(position: Double): Double {
         val normPos = normalizePos(position)
         if (position !in vertices.first().first().x..vertices.last().first().x)
-            throw IndexOutOfBoundsException("$position is not in Bounds ${vertices.first().first().x} - ${vertices.last().first().x}")
+            throw IndexOutOfBoundsException(
+                "$position is not in Bounds ${
+                    vertices.first().first().x
+                } - ${vertices.last().first().x}"
+            )
         val previous = vertices[floor(normPos).toInt()].first()
         val next = vertices[ceil(normPos).toInt()].first()
         val progress = (position - previous.x) / pointDistance
