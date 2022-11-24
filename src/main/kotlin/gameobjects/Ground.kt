@@ -2,6 +2,7 @@ package gameobjects
 
 import core.HeightMap
 import core.gameobjects.GameObject
+import ext.minus
 import ext.plus
 import ext.toFloatList
 import org.khronos.webgl.Float32Array
@@ -125,6 +126,10 @@ class Ground(
     private fun updateMesh() {
         val positions = mutableListOf<Float>()
         val indices = mutableListOf<Int>()
+
+        val vertices = vertices.map {
+            arrayOf(it.first() - Vector3(y = 1, z = pointDistance)).asSequence().plus(it).toList()
+        }
         for (row in vertices) {
             for (vertex in row) {
                 positions.addAll(vertex.toFloatList())
