@@ -77,7 +77,7 @@ open class BasicParticleSystem(
                 FileHelper.readFile("shaders/customPointsVertex.glsl")?.let {
                     vertexShader = it
                 }
-                val texture = ResourceManager.box.await()
+                val texture = ResourceManager.disc.await()
                 uniforms = object {
                     @property:JsName("color") val color = Uniform(Color(0xffffff))
                     @property:JsName("pointTexture") val pointTexture = Uniform(texture)
