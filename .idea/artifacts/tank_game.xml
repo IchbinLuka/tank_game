@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="tank_game">
+    <output-path>$PROJECT_DIR$/build/libs</output-path>
+    <root id="archive" name="tank_game.jar">
+      <element id="module-output" name="kotlin_game.tank_game.main" />
+    </root>
+  </artifact>
+</component>
