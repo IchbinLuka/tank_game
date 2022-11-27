@@ -23,7 +23,7 @@ matrix:
       # in any of our parent dirs is problematic.
       - mv Cargo.toml Cargo.toml.tmpl
       - cd testing
-      - wasm-pack build
+      - wasm-pack build --out-dir "../rust_js/"
       - wasm-pack test --chrome --firefox --headless
 
   # Builds on nightly.

@@ -2,7 +2,7 @@
   <artifact type="jar" name="threejs_kt-1.0-SNAPSHOT">
     <output-path>$PROJECT_DIR$/threejs_kt/build/libs</output-path>
     <root id="archive" name="threejs_kt-1.0-SNAPSHOT.jar">
-      <element id="module-output" name="com.liorgonnen.tank_game.threejs_kt.main" />
+      <element id="module-output" name="threejs_kt.tank_game.threejs_kt.main" />
     </root>
   </artifact>
 </component>

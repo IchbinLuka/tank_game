@@ -1,6 +1,6 @@
-mod utils;
-
 use wasm_bindgen::prelude::*;
+
+mod utils;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -16,4 +16,9 @@ extern {
 #[wasm_bindgen]
 pub fn greet() {
     alert("Hello, tank_game!");
+}
+
+#[wasm_bindgen]
+pub fn value_noise(a: u8, b: u8) -> Box<[f32]> {
+    Box::new([1.0, 2.0, 3.0])
 }

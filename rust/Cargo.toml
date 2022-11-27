@@ -1,5 +1,5 @@
 [package]
-name = "tank_game"
+name = "rust_js"
 version = "0.1.0"
 authors = ["Luka Born <lukaborn@duck.com>"]
 edition = "2018"

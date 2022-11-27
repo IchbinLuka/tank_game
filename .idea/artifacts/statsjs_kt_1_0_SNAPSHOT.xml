@@ -2,7 +2,7 @@
   <artifact type="jar" name="statsjs_kt-1.0-SNAPSHOT">
     <output-path>$PROJECT_DIR$/statsjs_kt/build/libs</output-path>
     <root id="archive" name="statsjs_kt-1.0-SNAPSHOT.jar">
-      <element id="module-output" name="com.liorgonnen.tank_game.statsjs_kt.main" />
+      <element id="module-output" name="statsjs_kt.tank_game.statsjs_kt.main" />
     </root>
   </artifact>
 </component>
