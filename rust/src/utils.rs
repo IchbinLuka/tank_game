@@ -8,3 +8,17 @@ pub fn set_panic_hook() {
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
 }
+
+pub fn empty_vec_2d<T: Copy>(width: usize, height: usize, default: T) -> Box<Vec<Vec<T>>> {
+    let mut temp_data = Vec::with_capacity(width);
+    for _ in 0..width {
+        let mut current: Vec<T> = Vec::with_capacity(height);
+        current.fill(default);
+        temp_data.push(current);
+    }
+    Box::new(temp_data)
+}
+
+pub fn linear_gradient(start: f32, end: f32, progress: f32) -> f32 {
+    start + (end - start) * progress
+}
