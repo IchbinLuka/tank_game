@@ -33,7 +33,7 @@ kotlin {
     sourceSets {
         dependencies {
             val pathToLocalNpmModule = rootProject.projectDir.resolve("rust/pkg").canonicalPath
-            implementation(npm("rust_js", "file:$pathToLocalNpmModule"))
+            implementation(npm("rust_js", "file:$pathToLocalNpmModule", generateExternals = false))
         }
         test {
             dependencies {
@@ -46,6 +46,7 @@ kotlin {
 }
 
 tasks.create("fixExternals") {
+    dependsOn("generateExternalsIntegrated")
     val file = file("./build/externals/tank_game/src/lib.dom.kt")
     if (file.exists()) {
         val parent = file.parentFile
@@ -77,7 +78,6 @@ tasks.create("fixExternals") {
             reader.close()
 
             if (modifiedFile) {
-                System.out.print(lines.toString())
                 val out = FileOutputStream(child)
                 out.bufferedWriter().write(lines.joinToString("\n"))
                 out.close()
@@ -90,15 +90,6 @@ tasks.create("fixExternals") {
     outputs.upToDateWhen { false }
     outputs.cacheIf { false }
 }
-
-tasks.getByName("fixExternals").apply {
-    mustRunAfter(
-        "generateExternals",
-        "generateExternalsIntegrated"
-    )
-}
-
-tasks.getByName("compileKotlinJs").dependsOn("fixExternals")
 
 
 tasks.create("debug") {

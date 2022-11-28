@@ -1,11 +1,5 @@
 @file:JsQualifier("tsstdlib.WebAssembly")
-@file:Suppress(
-    "INTERFACE_WITH_SUPERCLASS",
-    "OVERRIDING_FINAL_MEMBER",
-    "RETURN_TYPE_MISMATCH_ON_OVERRIDE",
-    "CONFLICTING_OVERLOADS"
-)
-
+@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS")
 package types.rust
 
 import org.khronos.webgl.ArrayBuffer
@@ -131,17 +125,11 @@ external fun compileStreaming(source: Response): Promise<Module>
 
 external fun compileStreaming(source: Promise<Response>): Promise<Module>
 
-external fun instantiate(
-    bytes: ArrayBufferView,
-    importObject: Imports = definedExternally
-): Promise<WebAssemblyInstantiatedSource>
+external fun instantiate(bytes: ArrayBufferView, importObject: Imports = definedExternally): Promise<WebAssemblyInstantiatedSource>
 
 external fun instantiate(bytes: ArrayBufferView): Promise<WebAssemblyInstantiatedSource>
 
-external fun instantiate(
-    bytes: ArrayBuffer,
-    importObject: Imports = definedExternally
-): Promise<WebAssemblyInstantiatedSource>
+external fun instantiate(bytes: ArrayBuffer, importObject: Imports = definedExternally): Promise<WebAssemblyInstantiatedSource>
 
 external fun instantiate(bytes: ArrayBuffer): Promise<WebAssemblyInstantiatedSource>
 
@@ -149,17 +137,11 @@ external fun instantiate(moduleObject: Module, importObject: Imports = definedEx
 
 external fun instantiate(moduleObject: Module): Promise<Instance>
 
-external fun instantiateStreaming(
-    response: Response,
-    importObject: Imports = definedExternally
-): Promise<WebAssemblyInstantiatedSource>
+external fun instantiateStreaming(response: Response, importObject: Imports = definedExternally): Promise<WebAssemblyInstantiatedSource>
 
 external fun instantiateStreaming(response: Response): Promise<WebAssemblyInstantiatedSource>
 
-external fun instantiateStreaming(
-    response: PromiseLike<Response>,
-    importObject: Imports = definedExternally
-): Promise<WebAssemblyInstantiatedSource>
+external fun instantiateStreaming(response: PromiseLike<Response>, importObject: Imports = definedExternally): Promise<WebAssemblyInstantiatedSource>
 
 external fun instantiateStreaming(response: PromiseLike<Response>): Promise<WebAssemblyInstantiatedSource>
 

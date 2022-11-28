@@ -12,8 +12,7 @@ pub fn set_panic_hook() {
 pub fn empty_vec_2d<T: Copy>(width: usize, height: usize, default: T) -> Box<Vec<Vec<T>>> {
     let mut temp_data = Vec::with_capacity(width);
     for _ in 0..width {
-        let mut current: Vec<T> = Vec::with_capacity(height);
-        current.fill(default);
+        let mut current: Vec<T> = std::iter::repeat(default).take(height).collect();
         temp_data.push(current);
     }
     Box::new(temp_data)
