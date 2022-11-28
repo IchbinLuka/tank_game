@@ -75,6 +75,7 @@ pub fn value_noise(width: usize, height: usize, octaves: u16) -> Box<[Float32Arr
                     y_distance as f32 / delta_y as f32
                 );
             }
+        }
 
         data = Box::new(
             data.iter().enumerate().map(|(i, x)| {
