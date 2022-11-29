@@ -34,7 +34,6 @@ class ValueNoise(
                     tempData[k * deltaX][m * deltaY] = (random.nextDouble() - 0.5).pow(2) * 4 * maxHeight
                 }
             }
-            // Log.v(TAG, "DeltaX: $deltaX")
             // Interpolation
             for (k in 0 until width) {
                 val xDistance = (k % deltaX)

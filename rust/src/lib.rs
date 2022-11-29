@@ -33,14 +33,16 @@ pub fn init_panic_hook() {
 
 #[wasm_bindgen]
 pub fn value_noise(width: usize, height: usize, octaves: u16) -> Box<[Float32Array]> {
-    let mut x_frequency: usize = 20;
-    let mut y_frequency: usize = 20;
+    let mut x_frequency: usize = 5;
+    let mut y_frequency: usize = 5;
+
+    let empty = empty_vec_2d(width, height, 0 as f32);
 
     let mut max_height = 20 as f32;
 
-    let mut data = empty_vec_2d(width, height, 0 as f32);
+    let mut data = empty.clone();
     for _ in 0..octaves {
-        let mut temp_data = empty_vec_2d(width, height, 0 as f32);
+        let mut temp_data = empty.clone();
 
         let delta_x = max(width / x_frequency, 1);
         let delta_y = max(height / y_frequency, 1);
@@ -86,8 +88,8 @@ pub fn value_noise(width: usize, height: usize, octaves: u16) -> Box<[Float32Arr
         );
         max_height /= 2.0;
 
-        y_frequency = min(y_frequency << 1, width);
-        x_frequency = min(x_frequency << 1, height);
+        y_frequency = min(y_frequency << 1, height);
+        x_frequency = min(x_frequency << 1, width);
     }
     data.iter().map(|x| x[..].into()).collect()
 }
