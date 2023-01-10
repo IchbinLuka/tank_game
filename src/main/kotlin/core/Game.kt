@@ -25,19 +25,19 @@ class Game(
     override val coroutineContext: CoroutineContext = MainScope().coroutineContext
 
     private val clock = Clock()
-    private lateinit var currentScene_: GameScene
+    private lateinit var _currentScene: GameScene
     var currentScene: GameScene
-        get() = currentScene_
+        get() = _currentScene
         set(value) {
-            currentScene_ = LoadingScene()
-            launch { currentScene_.loadAssets() }
+            _currentScene = LoadingScene()
+            launch { _currentScene.loadAssets() }
             updateComposer()
             launch(Dispatchers.Unconfined) {
                 value.preloadAssets()
                 GUIHelper.resetGUI()
-                currentScene_ = value
+                _currentScene = value
                 updateComposer()
-                currentScene_.loadAssets()
+                _currentScene.loadAssets()
             }
             Log.d("Game", "Loading assets")
         }
@@ -54,10 +54,10 @@ class Game(
 
     private val renderer = WebGLRenderer(object : WebGLRendererParameters {
         override var antialias: Boolean? = true
+        override var canvas: dynamic = document.getElementById("gameContainer")
     }).apply {
-        document.body?.appendChild(domElement)
-        //shadowMap.enabled = true
-        setSize(window.innerWidth, window.innerHeight)
+        val size = document.getElementById("gameContainer")?.getBoundingClientRect()!!
+        // setSize(size.width, size.height)
         setPixelRatio(window.devicePixelRatio)
     }
 
@@ -67,7 +67,6 @@ class Game(
         val width = window.innerWidth
         val height = window.innerHeight
         OrbitControls(currentScene.camera, renderer.domElement)
-        //renderer.toneMappingExposure = 1
         val bloomPass = UnrealBloomPass(Vector2(window.innerWidth, window.innerHeight), 0.75, 0.2, 0.3)
         val ssaoPass = SSAOPass(currentScene.scene, currentScene.camera, width, height).apply {
             kernelRadius = 5
@@ -87,13 +86,6 @@ class Game(
         }
         stats.begin()
         currentScene = initialScene
-        window.onresize = {
-            renderer.apply {
-                setSize(window.innerWidth, window.innerHeight)
-                setPixelRatio(window.devicePixelRatio)
-                currentScene.camera.asDynamic().aspect = window.innerWidth / window.innerHeight
-            }
-        }
     }
 
     private var running = true
@@ -106,7 +98,7 @@ class Game(
             EventManager.keyboardEvents.switchBatches()
             currentScene.update(delta)
             // composer.render()
-            effect.render(currentScene_.scene, currentScene_.camera)
+            effect.render(_currentScene.scene, _currentScene.camera)
             stats.update()
             val error = renderer.getContext().getError()
             if (error != 0) {

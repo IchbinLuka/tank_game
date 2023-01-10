@@ -64,7 +64,7 @@ class Ground(
                 0.0
             }
         }
-        val height = heightAt(position)
+        val height = heightAt(position) ?: return
         val function2: (Vector3) -> Double = {
             val distance = abs(position - it.x)
             if (distance > strength) {
@@ -88,14 +88,10 @@ class Ground(
         updateMesh()
     }
 
-    fun heightAt(position: Double): Double {
+    fun heightAt(position: Double): Double? {
         val normPos = normalizePos(position)
         if (position !in vertices.first().first().x..vertices.last().first().x)
-            throw IndexOutOfBoundsException(
-                "$position is not in Bounds ${
-                    vertices.first().first().x
-                } - ${vertices.last().first().x}"
-            )
+            return null
         val previous = vertices[floor(normPos).toInt()].first()
         val next = vertices[ceil(normPos).toInt()].first()
         val progress = (position - previous.x) / pointDistance

@@ -9,9 +9,9 @@ import three.js.Texture
 import three.js.TextureLoader
 
 object ResourceManager {
-    private val gltfLoader = GLTFLoader()
-    private val textureLoader = TextureLoader()
-    private val imageLoader = ImageLoader()
+    val gltfLoader = GLTFLoader()
+    val textureLoader = TextureLoader()
+    val imageLoader = ImageLoader()
 
     private fun textureAsync(uri: String): Deferred<Texture> {
         return textureLoader.loadAsync(uri).asDeferred()

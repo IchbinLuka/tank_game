@@ -91,7 +91,7 @@ class Tank(
     fun adjustTransformToGround(ground: Ground) {
         mainBone?.position?.let {
             val pos = mainBone!!.position.x
-            it.y = ground.heightAt(pos)
+            it.y = ground.heightAt(pos) ?: 0.0
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
         }

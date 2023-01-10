@@ -36,4 +36,12 @@ class Cloud(
             position.x = max
         }
     }
+
+    companion object {
+
+        suspend fun initAssets() {
+            ResourceManager.cloud.await()
+        }
+
+    }
 }
