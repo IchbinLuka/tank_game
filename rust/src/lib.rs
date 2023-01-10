@@ -9,6 +9,7 @@ use wasm_bindgen::prelude::*;
 use crate::utils::{empty_vec_2d, linear_gradient, set_panic_hook};
 
 mod utils;
+mod particle_system;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -38,7 +39,7 @@ pub fn value_noise(width: usize, height: usize, octaves: u16) -> Box<[Float32Arr
 
     let empty = empty_vec_2d(width, height, 0 as f32);
 
-    let mut max_height = 20 as f32;
+    let mut max_height = 20_f32;
 
     let mut data = empty.clone();
     for _ in 0..octaves {
@@ -79,17 +80,20 @@ pub fn value_noise(width: usize, height: usize, octaves: u16) -> Box<[Float32Arr
             }
         }
 
-        data = Box::new(
-            data.iter().enumerate().map(|(i, x)| {
-                x.iter().enumerate().map(|(j, y)| {
-                    (y + temp_data[i][j]) as f32
-                }).collect::<Vec<f32>>()
-            }).collect()
-        );
+        data = data.iter().enumerate().map(|(i, x)| {
+            x.iter().enumerate().map(|(j, y)| {
+                (y + temp_data[i][j]) as f32
+            }).collect::<Vec<f32>>()
+        }).collect();
         max_height /= 2.0;
 
         y_frequency = min(y_frequency << 1, height);
         x_frequency = min(x_frequency << 1, width);
     }
     data.iter().map(|x| x[..].into()).collect()
+}
+
+#[wasm_bindgen]
+pub fn do_particle_step(positions: &Float32Array,  delta_time: f32) {
+    // let iterator = positions.into;
 }

@@ -9,13 +9,13 @@ pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
-pub fn empty_vec_2d<T: Copy>(width: usize, height: usize, default: T) -> Box<Vec<Vec<T>>> {
+pub fn empty_vec_2d<T: Copy>(width: usize, height: usize, default: T) -> Vec<Vec<T>> {
     let mut temp_data = Vec::with_capacity(width);
     for _ in 0..width {
-        let mut current: Vec<T> = std::iter::repeat(default).take(height).collect();
+        let current: Vec<T> = std::iter::repeat(default).take(height).collect();
         temp_data.push(current);
     }
-    Box::new(temp_data)
+    temp_data
 }
 
 pub fn linear_gradient(start: f32, end: f32, progress: f32) -> f32 {
