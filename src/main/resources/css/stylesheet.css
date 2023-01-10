@@ -8,3 +8,16 @@
 body {
     font-family: 'Mouse Memoirs', sans-serif;
 }
+
+html, body, #full {
+    height: 100%;
+}
+
+#full {
+    display: flex;
+    flex-direction: column;
+}
+
+.expand {
+    flex-grow: 1;
+}

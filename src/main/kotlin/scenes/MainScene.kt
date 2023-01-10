@@ -7,10 +7,12 @@ import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.particles.Explosion
 import kotlinx.browser.window
+import org.w3c.dom.Element
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import util.EventManager
+import util.GUIHelper
 import util.Log
 import util.ResourceManager
 
@@ -73,8 +75,11 @@ class MainScene : GameScene() {
         window.addEventListener("pointermove", {
             it as PointerEvent
             val aimingPoint = Vector2()
-            aimingPoint.x = ( it.clientX.toDouble() / window.innerWidth ) * 2 - 1
-            aimingPoint.y = - ( it.clientY.toDouble() / window.innerHeight ) * 2 + 1
+            val rect = (it.target as Element).getBoundingClientRect()
+            val x = it.clientX.toDouble() - rect.left
+            val y = it.clientY.toDouble() - rect.right
+            aimingPoint.x = ( x / window.innerWidth ) * 2 - 1
+            aimingPoint.y = - ( y / window.innerHeight ) * 2 + 1
 
             if (aiming) {
                 aimingCaster.setFromCamera(aimingPoint, camera)
@@ -120,6 +125,7 @@ class MainScene : GameScene() {
 
     override suspend fun loadAssets() {
         super.loadAssets()
+        GUIHelper.loadTopBar("tool_bar")
         scene.background = Color(0x64DBFF)
     }
 

@@ -6,6 +6,7 @@ import ext.toFloatList
 import kotlinx.coroutines.asPromise
 import org.khronos.webgl.Float32Array
 import three.js.*
+import util.AssetInitializer
 import util.ResourceManager
 
 class Bullet(
@@ -78,16 +79,23 @@ class Bullet(
             }
             updateGeometry()
         }
-        if (ground.heightAt(position.x) > position.y.toFloat()) {
+        val height = ground.heightAt(position.x)
+        if (height == null) {
+            alive = false
+        } else if (height > position.y.toFloat()) {
             alive = false
             ground.destroy(position.x, explosionWidth)
             onImpact(position)
         }
     }
 
-    companion object {
+    companion object: AssetInitializer {
         const val g = -20
         const val bulletRadius = 0.5f
         const val explosionWidth = 5.0
+
+        override suspend fun initAssets() {
+            ResourceManager.disc.await()
+        }
     }
 }
