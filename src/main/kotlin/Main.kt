@@ -1,10 +1,14 @@
 import core.Game
+import ext.TAG
+import kotlinx.browser.document
+import kotlinx.browser.window
 import scenes.HeightmapVisualizer
 import scenes.MainScene
 import types.rust.init
 import types.rust.init_panic_hook
 import types.rust.value_noise
 import util.GUIHelper
+import util.Log
 import util.noise.ValueNoise
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime

@@ -1,11 +1,13 @@
 package scenes
 
+import core.Game
 import core.gameobjects.GameObject
 import ext.*
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.particles.Explosion
+import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.Element
 import org.w3c.dom.events.MouseEvent
@@ -76,16 +78,19 @@ class MainScene : GameScene() {
             it as PointerEvent
             val aimingPoint = Vector2()
             val rect = (it.target as Element).getBoundingClientRect()
-            val x = it.clientX.toDouble() - rect.left
-            val y = it.clientY.toDouble() - rect.right
-            aimingPoint.x = ( x / window.innerWidth ) * 2 - 1
-            aimingPoint.y = - ( y / window.innerHeight ) * 2 + 1
+            val containerBox = Game.instance.gameContainer.getBoundingClientRect()
+            val x = it.clientX.toDouble() - containerBox.left
+            val y = it.clientY.toDouble() - containerBox.top
+            aimingPoint.x = ( x / containerBox.width ) * 2 - 1
+            aimingPoint.y = - ( y / containerBox.height ) * 2 + 1
 
             if (aiming) {
                 aimingCaster.setFromCamera(aimingPoint, camera)
                 val intersection = aimingCaster.intersectObject(aimingAidPlane)
                 if (intersection.isNotEmpty()) {
                     aimIntersection = intersection.first().point
+                    camera.position.x = aimingPoint.x * 200
+                    camera.lookAt(Vector3())
                     currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
                 }
             }

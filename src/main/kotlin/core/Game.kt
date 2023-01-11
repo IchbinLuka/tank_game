@@ -4,6 +4,7 @@ import ext.TAG
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
+import org.w3c.dom.HTMLCanvasElement
 import scenes.GameScene
 import scenes.LoadingScene
 import stats.js.Stats
@@ -25,6 +26,10 @@ class Game(
     override val coroutineContext: CoroutineContext = MainScope().coroutineContext
 
     private val clock = Clock()
+
+    val gameContainer: HTMLCanvasElement
+        get() = document.getElementById("gameContainer") as HTMLCanvasElement
+
     private lateinit var _currentScene: GameScene
     var currentScene: GameScene
         get() = _currentScene
@@ -38,6 +43,7 @@ class Game(
                 _currentScene = value
                 updateComposer()
                 _currentScene.loadAssets()
+                updateRenderer()
             }
             Log.d("Game", "Loading assets")
         }
@@ -54,11 +60,13 @@ class Game(
 
     private val renderer = WebGLRenderer(object : WebGLRendererParameters {
         override var antialias: Boolean? = true
-        override var canvas: dynamic = document.getElementById("gameContainer")
-    }).apply {
-        val size = document.getElementById("gameContainer")?.getBoundingClientRect()!!
-        // setSize(size.width, size.height)
-        setPixelRatio(window.devicePixelRatio)
+        override var canvas: dynamic = document.getElementById("gameContainer")!!
+    })
+
+    private fun updateRenderer() {
+        val topBar = document.getElementById("topBar")!!
+        renderer.setPixelRatio(window.devicePixelRatio)
+        renderer.setSize(window.innerWidth, window.innerHeight - topBar.getBoundingClientRect().height)
     }
 
     private var composer: EffectComposer = EffectComposer(OutlineEffect(renderer))
@@ -86,6 +94,7 @@ class Game(
         }
         stats.begin()
         currentScene = initialScene
+        _instance = this
     }
 
     private var running = true
@@ -106,5 +115,11 @@ class Game(
             }
             window.awaitAnimationFrame()
         }
+    }
+
+    companion object {
+        val instance: Game
+            get() = _instance!!
+        var _instance: Game? = null
     }
 }
