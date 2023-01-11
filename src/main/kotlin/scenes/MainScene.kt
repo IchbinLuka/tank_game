@@ -13,12 +13,13 @@ import org.w3c.dom.Element
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
-import util.EventManager
-import util.GUIHelper
-import util.Log
-import util.ResourceManager
+import util.*
+import kotlin.properties.Delegates
+import kotlin.reflect.KProperty
 
-class MainScene : GameScene() {
+data class GameState(val currentTank: Tank)
+
+class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
 
     override val scene: Scene = Scene().apply {
         background = Color(0x3333ff)
@@ -27,7 +28,6 @@ class MainScene : GameScene() {
             castShadow = true
             enableShadows()
         }
-        add(light)
         // add(DirectionalLightHelper(light, size = 10, color = 0xFDFFD9))
         // fog = FogExp2(0x5f9be5, 0.005)
         //add(AmbientLight(0x404040, 0.1))
@@ -61,8 +61,12 @@ class MainScene : GameScene() {
         Tank(color = Color(0xfc522f), startPosition = Vector3(x = -20, z = 1.5))
     )
 
+
+
     private var currentTankIndex: Int = 0
     private val currentTank get() = tanks[currentTankIndex]
+
+    var currentState: GameState by Delegates.observable(GameState(currentTank), notifyObservers)
 
     private var awaitingShot = false
 

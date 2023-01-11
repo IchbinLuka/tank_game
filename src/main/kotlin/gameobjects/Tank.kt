@@ -23,7 +23,9 @@ class Tank(
 
     private var cannon: Object3D? = null
 
-    var health: Float = 1f
+    val health: Float
+        get() = _health
+    private var _health: Float = 1f
 
     override suspend fun initVisual() {
         Log.v(TAG, "Loading tank")
