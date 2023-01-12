@@ -7,7 +7,6 @@ import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.particles.Explosion
-import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.Element
 import org.w3c.dom.events.MouseEvent
@@ -16,7 +15,6 @@ import three.js.*
 import ui.MainTopBar
 import util.*
 import kotlin.properties.Delegates
-import kotlin.reflect.KProperty
 
 data class GameState(val currentTank: Tank)
 
@@ -78,9 +76,6 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
 
     init {
         initListeners()
-        for (tank in tanks) {
-            tank.adjustTransformToGround(ground)
-        }
     }
 
     private fun initListeners() {
@@ -145,6 +140,9 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         super.loadAssets()
         topBar.init()
         scene.background = Color(0x64DBFF)
+        for (tank in tanks) {
+            tank.adjustTransformToGround(ground)
+        }
     }
 
     override fun update(delta: Double) {
