@@ -14,7 +14,6 @@ import util.getLinearGradient
 import util.noise.GroundNoise
 import kotlin.math.*
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 class Ground(
     private val offset: Vector3 = Vector3(0, 0, 0),
@@ -102,11 +101,6 @@ class Ground(
         attribute.needsUpdate = true
         geometry.setAttribute("position", attribute)
         geometry.computeVertexNormals()
-
-        /*val updateMeshTime = measureTime {
-            updateMesh()
-        }
-        Log.d(TAG, "destroy time: $destroyTime, update time: $updateMeshTime")*/
     }
 
     fun heightAt(position: Double): Double? {
@@ -122,7 +116,6 @@ class Ground(
     }
 
     fun rotationAt(position: Double): Double {
-        // TODO: adapt to new heightAt
         val normPos = normalizePos(position)
         if (normPos < 0 || normPos > vertices.size - 1) return 0.0
         val previous = floor(normPos).toInt()
@@ -150,17 +143,13 @@ class Ground(
     }
 
     private fun averageAscent(start: Int, end: Int): Double {
-
-        return (heightAt(end.toDouble())!! - heightAt(start.toDouble())!!) / ((end - start) * pointDistance)
+        return (positionAttribute.getY(getIndex(end, 0)) - positionAttribute.getY(getIndex(start, 0))).toDouble() / ((end - start) * pointDistance)
     }
 
     private fun updateMesh() {
         val positions = mutableListOf<Float>()
         val indices = mutableListOf<Int>()
 
-        /* val vertices = vertices.map {
-            arrayOf(it.first() - Vector3(y = 1, z = pointDistance)).asSequence().plus(it).toList()
-        }*/
         for (row in vertices) {
             for (vertex in row) {
                 positions.addAll(vertex.toFloatList())
