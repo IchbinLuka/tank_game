@@ -12,7 +12,8 @@ import kotlin.math.*
 
 class Tank(
     val color: Color = Color(0x338530),
-    val startPosition: Vector3
+    val startPosition: Vector3,
+    val name: String = "Unknown"
 ) : GameObject() {
     override val renderable: Object3D? get() = gltf?.scene
 

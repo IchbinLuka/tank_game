@@ -1,9 +1,13 @@
 package util
 
 import ext.TAG
+import org.w3c.files.FileReader
 import org.w3c.xhr.XMLHttpRequest
 
 object FileHelper {
+
+    private val reader = FileReader()
+
     /**
      * Reads file at [path] and returns a Promise containing the file
      *

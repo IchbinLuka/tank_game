@@ -8,17 +8,20 @@ import ext.toFloatList
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.js.*
+import util.Log
 import util.angleFromAscent
 import util.getLinearGradient
 import util.noise.GroundNoise
 import kotlin.math.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 class Ground(
     private val offset: Vector3 = Vector3(0, 0, 0),
     showVertex: Boolean = false,
     private val heightScale: Double = 1.0,
     private val pointDistance: Double = 1.0,
-    data: HeightMap = GroundNoise(width = 75, depth = 20, min = -40.0).allValues()
+    data: HeightMap = GroundNoise(width = 150, depth = 20, min = -40.0).allValues()
 ) : GameObject() {
 
     override val renderable: Object3D by lazy {
@@ -38,6 +41,8 @@ class Ground(
         }
     }
     private val geometry = BufferGeometry()
+    private val positionAttribute: BufferAttribute
+        get() = geometry.getAttribute("position") as BufferAttribute
 
     // private val heightData: Array<Double> = Array(res) { (height * 0.2 * (1 - sin(0.5 * it))) + height / 2 }
     private var vertices = Array<Array<Vector3>>(data.size) { i ->
@@ -54,18 +59,18 @@ class Ground(
         updateMesh()
     }
 
+    private fun getIndex(x: Int, y: Int): Int = x * vertices.first().size + y
+
     //region PUBLIC
+    @OptIn(ExperimentalTime::class)
     fun destroy(position: Double, strength: Double) {
         // TODO
-        val function: (Double) -> Double = {
-            if (it in 0.0..PI) {
-                -1 * (cos(it) + 1) * strength
-            } else {
-                0.0
-            }
+        val function: (Vector3) -> Double = {
+            it.y - 20
         }
         val height = heightAt(position) ?: return
         val function2: (Vector3) -> Double = {
+            Log.d(TAG, it.toFloatList())
             val distance = abs(position - it.x)
             if (distance > strength) {
                 it.y
@@ -73,32 +78,51 @@ class Ground(
                 min(height - sqrt(strength.pow(2) - distance.pow(2)), it.y) //- abs((offset.y - it.z) * 0.0005).pow(2)
             }
         }
+        val attribute = positionAttribute
         val nearestVertex = floor(normalizePos(position)).toInt()
         val maxDistance = strength / pointDistance
-        for (i in max(
+        val range = max(
             0.0, nearestVertex - maxDistance
         ).toInt()..min(
             vertices.size.toDouble(),
             nearestVertex + maxDistance
-        ).toInt()) {
-            for (vertex in vertices[i]) {
-                vertex.y = function2(vertex)
+        ).toInt()
+        for (i in range) {
+            for (j in 0 until vertices[i].size) {
+                val index = getIndex(i, j)
+                attribute.setY(index, function2(
+                    Vector3(
+                        attribute.getX(index),
+                        attribute.getY(index),
+                        attribute.getZ(index)
+                    )
+                ))
             }
         }
-        updateMesh()
+        attribute.needsUpdate = true
+        geometry.setAttribute("position", attribute)
+        geometry.computeVertexNormals()
+
+        /*val updateMeshTime = measureTime {
+            updateMesh()
+        }
+        Log.d(TAG, "destroy time: $destroyTime, update time: $updateMeshTime")*/
     }
 
     fun heightAt(position: Double): Double? {
         val normPos = normalizePos(position)
         if (position !in vertices.first().first().x..vertices.last().first().x)
             return null
-        val previous = vertices[floor(normPos).toInt()].first()
-        val next = vertices[ceil(normPos).toInt()].first()
-        val progress = (position - previous.x) / pointDistance
-        return getLinearGradient(previous.y, next.y, progress)
+        val attribute = positionAttribute
+        val previousIndex = getIndex(floor(normPos).toInt(), 0)
+        val nextIndex = getIndex(ceil(normPos).toInt(), 0)
+
+        val progress = (position - attribute.getX(previousIndex).toDouble()) / pointDistance
+        return getLinearGradient(attribute.getY(previousIndex).toDouble(), attribute.getY(nextIndex).toDouble(), progress)
     }
 
     fun rotationAt(position: Double): Double {
+        // TODO: adapt to new heightAt
         val normPos = normalizePos(position)
         if (normPos < 0 || normPos > vertices.size - 1) return 0.0
         val previous = floor(normPos).toInt()
@@ -126,16 +150,17 @@ class Ground(
     }
 
     private fun averageAscent(start: Int, end: Int): Double {
-        return (vertices[end].first().y - vertices[start].first().y) / ((end - start) * pointDistance)
+
+        return (heightAt(end.toDouble())!! - heightAt(start.toDouble())!!) / ((end - start) * pointDistance)
     }
 
     private fun updateMesh() {
         val positions = mutableListOf<Float>()
         val indices = mutableListOf<Int>()
 
-        val vertices = vertices.map {
+        /* val vertices = vertices.map {
             arrayOf(it.first() - Vector3(y = 1, z = pointDistance)).asSequence().plus(it).toList()
-        }
+        }*/
         for (row in vertices) {
             for (vertex in row) {
                 positions.addAll(vertex.toFloatList())

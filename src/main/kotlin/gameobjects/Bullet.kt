@@ -42,7 +42,7 @@ class Bullet(
         ResourceManager.disc.asPromise().then {
             renderable.add(Points(dots,
                 PointsMaterial().apply {
-                    color = Color(0xcccccc)
+                    color = Color(0xffffff)
                     size = 3
                     alphaMap = it
                     map = it
@@ -92,7 +92,7 @@ class Bullet(
     companion object: AssetInitializer {
         const val g = -20
         const val bulletRadius = 0.5f
-        const val explosionWidth = 5.0
+        const val explosionWidth = 10.0
 
         override suspend fun initAssets() {
             ResourceManager.disc.await()

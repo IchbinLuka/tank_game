@@ -64,6 +64,7 @@ open external class BufferAttribute(array: ArrayLike<Number>, itemSize: Number, 
     open var normalized: Boolean
     open var count: Number
     open var isBufferAttribute: Boolean
+    open var needsUpdate: Boolean
     open var onUploadCallback: () -> Unit
     open fun onUpload(callback: () -> Unit): BufferAttribute /* this */
     open fun setUsage(usage: Usage): BufferAttribute /* this */

@@ -50,7 +50,7 @@ class Game(
 
     private val stats = Stats().apply {
         showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-        document.body?.appendChild(domElement)
+        // document.body?.appendChild(domElement)
         with(domElement.style) {
             position = "fixed"
             top = "0px"

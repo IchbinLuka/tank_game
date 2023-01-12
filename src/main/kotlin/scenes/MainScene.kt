@@ -13,6 +13,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
+import ui.MainTopBar
 import util.*
 import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
@@ -28,14 +29,15 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
             castShadow = true
             enableShadows()
         }
+        add(light)
         // add(DirectionalLightHelper(light, size = 10, color = 0xFDFFD9))
         // fog = FogExp2(0x5f9be5, 0.005)
-        //add(AmbientLight(0x404040, 0.1))
-        add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5).apply {})
+        add(AmbientLight(0x404040, 0.1))
+        add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 100.0
-        position.y = 30.0
+        position.z = 200.0
+        position.y = 60.0
         rotation.x = -0.3
     }
 
@@ -53,12 +55,14 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
     private var aimIntersection = Vector3()
     private var aiming = true
 
-    private val ground = Ground(offset = Vector3(x = -100), pointDistance = 3.0)
+    private var freeCamera = false
+
+    private val ground = Ground(offset = Vector3(x = -200, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
     private val tanks = listOf<Tank>(
-        Tank(startPosition = Vector3(x = 20, z = 1.5)),
-        Tank(color = Color(0xfc522f), startPosition = Vector3(x = -20, z = 1.5))
+        Tank(startPosition = Vector3(x = 20, z = 1.5), name = "Green"),
+        Tank(color = Color(0xfc522f), startPosition = Vector3(x = -20, z = 1.5), name = "Orange")
     )
 
 
@@ -69,6 +73,8 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
     var currentState: GameState by Delegates.observable(GameState(currentTank), notifyObservers)
 
     private var awaitingShot = false
+
+    private val topBar = MainTopBar(this)
 
     init {
         initListeners()
@@ -93,9 +99,11 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
                 val intersection = aimingCaster.intersectObject(aimingAidPlane)
                 if (intersection.isNotEmpty()) {
                     aimIntersection = intersection.first().point
-                    camera.position.x = aimingPoint.x * 200
-                    camera.lookAt(Vector3())
                     currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
+                    if (!freeCamera) {
+                        camera.position.x = aimingPoint.x * 100
+                        camera.lookAt(Vector3())
+                    }
                 }
             }
         })
@@ -120,6 +128,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         addGameObject(Explosion(position = vector3))
         awaitingShot = false
         currentTankIndex = (currentTankIndex + 1) % tanks.size
+        currentState = currentState.copy(currentTank = currentTank)
     }
 
     override suspend fun preloadAssets() {
@@ -134,7 +143,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
 
     override suspend fun loadAssets() {
         super.loadAssets()
-        GUIHelper.loadTopBar("tool_bar")
+        topBar.init()
         scene.background = Color(0x64DBFF)
     }
 
@@ -158,6 +167,10 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
                     Log.d(TAG, camera.rotation.toVector3().toFloatList())
                     currentTank?.move(Vector3(3, 0, 0), delta, ground)
                 }
+                67 -> {
+                    freeCamera = !freeCamera
+                }
+
             }
         }
     }
