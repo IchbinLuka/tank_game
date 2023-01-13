@@ -17,6 +17,12 @@ class Tank(
 ) : GameObject() {
     override val renderable: Object3D? get() = gltf?.scene
 
+    override var position: Vector3
+        get() = mainBone?.position!!
+        set(value) {
+            mainBone?.position?.set(value)
+        }
+
     private var gltf: GLTF? = null
     private var mainBone: Object3D? = null
 
@@ -24,9 +30,12 @@ class Tank(
 
     private var cannon: Object3D? = null
 
-    val health: Float
+    val health: Double
         get() = _health
-    private var _health: Float = 1f
+    private var _health: Double = 1.0
+
+    val active: Boolean
+        get() = health > 0
 
     override suspend fun initVisual() {
         Log.v(TAG, "Loading tank")
@@ -87,8 +96,14 @@ class Tank(
     }
 
     fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
-        mainBone?.position?.addScaledVector(vector3, deltaTime)
+        mainBone?.position?.let {
+            val ascend = abs(ground.rotationAt(it.x))
+            if (ascend > 0.5 * PI) {
+                it.addScaledVector(vector3, deltaTime)
+            }
+        }
         adjustTransformToGround(ground)
+        Log.d(TAG, "Position: ${mainBone?.position?.toFloatList()}")
     }
 
     fun adjustTransformToGround(ground: Ground) {
@@ -97,6 +112,13 @@ class Tank(
             it.y = ground.heightAt(pos) ?: 0.0
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
+        }
+    }
+
+    fun damage(amount: Double) {
+        _health = max(_health - amount, 0.0)
+        if (_health == 0.0) {
+            // TODO: Show fire particles
         }
     }
 

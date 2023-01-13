@@ -4,16 +4,21 @@ import core.Game
 import core.gameobjects.GameObject
 import ext.*
 import gameobjects.Background
+import gameobjects.Bullet
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.particles.Explosion
 import kotlinx.browser.window
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.w3c.dom.Element
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import ui.MainTopBar
 import util.*
+import kotlin.math.max
+import kotlin.math.pow
 import kotlin.properties.Delegates
 
 data class GameState(val currentTank: Tank)
@@ -58,9 +63,10 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
     private val ground = Ground(offset = Vector3(x = -200, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
-    private val tanks = listOf<Tank>(
-        Tank(startPosition = Vector3(x = 20, z = 1.5), name = "Green"),
-        Tank(color = Color(0xfc522f), startPosition = Vector3(x = -20, z = 1.5), name = "Orange")
+    private val tanks = mutableListOf<Tank>(
+        Tank(startPosition = Vector3(x = 0, z = 1.5), name = "Green"),
+        Tank(color = Color(0xfc522f), startPosition = Vector3(x = -60, z = 1.5), name = "Orange"),
+        Tank(color = Color(0xff0000), startPosition = Vector3(x = 60, z = 1.5), name = "Red")
     )
 
 
@@ -68,9 +74,11 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
     private var currentTankIndex: Int = 0
     private val currentTank get() = tanks[currentTankIndex]
 
+    private var currentBullet: Bullet? = null
+
     var currentState: GameState by Delegates.observable(GameState(currentTank), notifyObservers)
 
-    private var awaitingShot = false
+    // private var awaitingShot = false
 
     private val topBar = MainTopBar(this)
 
@@ -104,25 +112,43 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         })
         window.addEventListener("click", { event ->
             event as MouseEvent
-            if (!awaitingShot) {
+            if (currentBullet == null) {
                 val distance = aimIntersection.distanceTo(currentTank.position)
-                awaitingShot = true
-                val bullet = currentTank.shoot(distance.toDouble() / 2, ground) { onImpact(it) }
-                bullet?.run {
-                    objects.add(bullet)
-                    scene.add(bullet.renderable)
+                currentBullet = currentTank.shoot(distance.toDouble() / 2, ground) { onImpact(it) }
+                currentBullet!!.let {
+                    objects.add(it)
+                    scene.add(it.renderable)
                 }
             }
         })
     }
 
     private fun onImpact(vector3: Vector3) {
-        for (tank in tanks) {
+        val iterator = tanks.iterator()
+        iterator.forEach { tank ->
             tank.adjustTransformToGround(ground)
+            val distance = tank.position.distanceTo(vector3).toDouble()
+            Log.d(TAG, distance)
+            if (distance < currentBullet!!.explosionWidth) {
+                tank.damage(max(1 / distance.pow(2), 1.0) * currentBullet!!.damage)
+            }
+            if (!tank.active) {
+                iterator.remove()
+            }
         }
         addGameObject(Explosion(position = vector3))
-        awaitingShot = false
-        currentTankIndex = (currentTankIndex + 1) % tanks.size
+        currentBullet = null
+        nextTank()
+    }
+
+    private fun nextTank() {
+        if (tanks.size <= 1) {
+            MainScope().launch {
+                GUIHelper.loadGUI("game_over")
+            }
+        } else {
+            currentTankIndex = (currentTankIndex + 1) % tanks.size
+        }
         currentState = currentState.copy(currentTank = currentTank)
     }
 
@@ -156,7 +182,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         }
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
-            if (awaitingShot) return@forEach
+            if (currentBullet != null) return@forEach
             when (it.keyCode) {
                 97 -> {
                     currentTank?.move(Vector3(-3, 0, 0), delta, ground)
@@ -166,7 +192,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
                     currentTank?.move(Vector3(3, 0, 0), delta, ground)
                 }
                 67 -> {
-                    freeCamera = !freeCamera
+                    freeCamera = true
                 }
 
             }

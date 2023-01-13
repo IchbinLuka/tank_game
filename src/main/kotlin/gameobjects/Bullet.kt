@@ -15,6 +15,10 @@ class Bullet(
     private val ground: Ground,
     private val onImpact: (Vector3) -> Unit = {}
 ) : MovingGameObject() {
+
+    val explosionWidth = 10.0
+    val damage: Double = 0.5
+
     override val renderable: Object3D by lazy {
         Group().apply {
             add(bulletMesh)
@@ -80,19 +84,16 @@ class Bullet(
             updateGeometry()
         }
         val height = ground.heightAt(position.x)
-        if (height == null) {
-            alive = false
-        } else if (height > position.y.toFloat()) {
+        if (height == null || height > position.y.toFloat()) {
             alive = false
             ground.destroy(position.x, explosionWidth)
-            onImpact(position)
+            onImpact(position.clone().apply { y = height ?: y })
         }
     }
 
     companion object: AssetInitializer {
         const val g = -20
         const val bulletRadius = 0.5f
-        const val explosionWidth = 10.0
 
         override suspend fun initAssets() {
             ResourceManager.disc.await()

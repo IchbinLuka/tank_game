@@ -8,7 +8,6 @@ import ext.toFloatList
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.js.*
-import util.Log
 import util.angleFromAscent
 import util.getLinearGradient
 import util.noise.GroundNoise
@@ -69,7 +68,6 @@ class Ground(
         }
         val height = heightAt(position) ?: return
         val function2: (Vector3) -> Double = {
-            Log.d(TAG, it.toFloatList())
             val distance = abs(position - it.x)
             if (distance > strength) {
                 it.y
