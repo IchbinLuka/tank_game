@@ -40,7 +40,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 200.0
-        position.y = 60.0
+        position.y = 120.0
         rotation.x = -0.3
     }
 
@@ -105,7 +105,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
                     currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
                     if (!freeCamera) {
                         camera.position.x = aimingPoint.x * 100
-                        camera.lookAt(Vector3())
+                        camera.lookAt(Vector3(y = 100))
                     }
                 }
             }
