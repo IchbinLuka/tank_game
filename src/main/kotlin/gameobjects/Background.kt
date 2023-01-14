@@ -1,12 +1,17 @@
 package gameobjects
 
 import core.gameobjects.GameObject
+import ext.set
 import three.js.*
 import util.Direction
 import kotlin.random.Random
 
-class Background : GameObject() {
-    override val renderable: Object3D = Scene()
+class Background(
+    private val offset: Vector3 = Vector3()
+) : GameObject() {
+    override val renderable: Object3D = Scene().apply {
+        position.set(offset)
+    }
 
     private val cloudSpeed = 1f
     private val random = Random(1)
@@ -18,7 +23,7 @@ class Background : GameObject() {
             min = -300.0,
             max = 300.0,
             startPos = Vector3(
-                x = 400 * random.nextDouble() - 200,
+                x = 600 * random.nextDouble() - 300,
                 y = 45 * random.nextDouble() + 130,
                 z = 30 * random.nextDouble() - 100
             )

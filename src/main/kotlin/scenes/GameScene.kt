@@ -5,7 +5,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import three.js.Camera
 import three.js.Scene
-import util.Log
 
 abstract class GameScene {
 
@@ -25,7 +24,6 @@ abstract class GameScene {
 
     /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
     open suspend fun preloadAssets() {
-        Log.d("GameScene", objects.toString())
         objects.forEach { it.initVisual() }
     }
 

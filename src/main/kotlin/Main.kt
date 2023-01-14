@@ -1,22 +1,11 @@
 import core.Game
-import ext.TAG
-import kotlinx.browser.document
-import kotlinx.browser.window
-import scenes.HeightmapVisualizer
-import scenes.MainScene
-import types.rust.init
-import types.rust.init_panic_hook
-import types.rust.value_noise
-import util.GUIHelper
-import util.Log
-import util.noise.ValueNoise
+import scenes.StartScene
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 @OptIn(ExperimentalTime::class)
 suspend fun main() {
     // val game = Game(HeightmapVisualizer(heightMap = GroundNoise(300, 20).allValues(), heightScale = 3f))
-    val game = Game(MainScene())
+    val game = Game(StartScene())
     game.mainLoop()
     /*init().then {
         init_panic_hook()

@@ -13,6 +13,7 @@ import kotlin.math.*
 class Tank(
     val color: Color = Color(0x338530),
     val startPosition: Vector3,
+    val startRotation: Euler = Euler(),
     val name: String = "Unknown"
 ) : GameObject() {
     override val renderable: Object3D? get() = gltf?.scene
@@ -29,6 +30,12 @@ class Tank(
     private var direction = Direction.Right
 
     private var cannon: Object3D? = null
+
+    var rotation: Euler
+        set(value) {
+            mainBone?.setRotationFromEuler(value)
+        }
+        get() = mainBone!!.rotation
 
     val health: Double
         get() = _health
@@ -48,6 +55,8 @@ class Tank(
         }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
         mainBone?.position?.set(startPosition)
+        rotation = startRotation
+        Log.d(TAG, "Tank rotation ${rotation.toVector3().toFloatList()}, position: ${position.toFloatList()}")
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
         if (mainBone == null || cannon == null) {
             Log.e(TAG, "Failed to identify mainBone and cannon")
@@ -112,8 +121,6 @@ class Tank(
             it.y = ground.heightAt(pos)!!
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
-            Log.d(TAG, "position: ${position.toFloatList()}")
-            Log.d(TAG, "rotation: ${mainBone?.rotation?.toVector3()?.toFloatList()}")
         }
     }
 

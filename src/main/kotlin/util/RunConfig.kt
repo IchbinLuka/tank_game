@@ -1,10 +1,10 @@
 package util
 
-val debugLevel = RunConfig.Verbose
+val debugLevel = RunConfig.Debug
 
 enum class RunConfig() {
-    Verbose,
     Debug,
+    Verbose,
     Warning,
     Info,
     Error;
