@@ -16,7 +16,7 @@ class Bullet(
     private val onImpact: (Vector3) -> Unit = {}
 ) : MovingGameObject() {
 
-    val explosionWidth = 10.0
+    val explosionWidth = 30.0
     val damage: Double = 0.5
 
     override val renderable: Object3D by lazy {

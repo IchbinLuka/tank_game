@@ -46,7 +46,6 @@ kotlin {
 }
 
 tasks.create("fixExternals") {
-    dependsOn("generateExternalsIntegrated")
     val file = file("./build/externals/tank_game/src/lib.dom.kt")
     if (file.exists()) {
         val parent = file.parentFile

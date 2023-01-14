@@ -19,3 +19,5 @@ kotlin {
         binaries.executable()
     }
 }
+
+tasks.findByName("browserDevelopmentRun")!!.dependsOn("developmentExecutableCompileSync")

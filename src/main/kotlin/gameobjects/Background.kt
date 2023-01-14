@@ -11,15 +11,15 @@ class Background : GameObject() {
     private val cloudSpeed = 1f
     private val random = Random(1)
 
-    private val clouds = Array<Cloud>(10) {
+    private val clouds = Array<Cloud>(20) {
         Cloud(
             speed = cloudSpeed,
             startDirection = Direction.Left,
-            min = -200.0,
-            max = 200.0,
+            min = -300.0,
+            max = 300.0,
             startPos = Vector3(
                 x = 400 * random.nextDouble() - 200,
-                y = 45 * random.nextDouble() + 85,
+                y = 45 * random.nextDouble() + 130,
                 z = 30 * random.nextDouble() - 100
             )
         )
@@ -32,7 +32,7 @@ class Background : GameObject() {
         }).apply {
             position.apply {
                 x = 50.0
-                y = 140.0
+                y = 250.0
                 z = -200.0
             }
         }

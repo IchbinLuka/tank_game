@@ -11,7 +11,6 @@ import gameobjects.particles.Explosion
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.w3c.dom.Element
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
@@ -39,7 +38,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 200.0
+        position.z = 150.0
         position.y = 120.0
         rotation.x = -0.3
     }
@@ -60,7 +59,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
 
     private var freeCamera = false
 
-    private val ground = Ground(offset = Vector3(x = -200, y = 40), pointDistance = 3.0)
+    private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
     private val tanks = mutableListOf<Tank>(
@@ -90,7 +89,6 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         window.addEventListener("pointermove", {
             it as PointerEvent
             val aimingPoint = Vector2()
-            val rect = (it.target as Element).getBoundingClientRect()
             val containerBox = Game.instance.gameContainer.getBoundingClientRect()
             val x = it.clientX.toDouble() - containerBox.left
             val y = it.clientY.toDouble() - containerBox.top
@@ -104,7 +102,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
                     aimIntersection = intersection.first().point
                     currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
                     if (!freeCamera) {
-                        camera.position.x = aimingPoint.x * 100
+                        camera.position.x = aimingPoint.x * 50
                         camera.lookAt(Vector3(y = 100))
                     }
                 }
@@ -126,15 +124,15 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
     private fun onImpact(vector3: Vector3) {
         val iterator = tanks.iterator()
         iterator.forEach { tank ->
-            tank.adjustTransformToGround(ground)
             val distance = tank.position.distanceTo(vector3).toDouble()
-            Log.d(TAG, distance)
             if (distance < currentBullet!!.explosionWidth) {
-                tank.damage(max(1 / distance.pow(2), 1.0) * currentBullet!!.damage)
+                tank.damage((1 / max(distance.pow(2), 1.0)) * currentBullet!!.damage)
             }
+            Log.d(TAG, "distance: $distance")
             if (!tank.active) {
                 iterator.remove()
             }
+            tank.adjustTransformToGround(ground)
         }
         addGameObject(Explosion(position = vector3))
         currentBullet = null
@@ -157,6 +155,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         scene.add(ResourceManager.testLandscape.await().scene.apply {
             enableShadows()
             applyCustomMat(MeshToonMaterial().apply { color = Color(0x195917) })
+            scale.set(Vector3(2, 2, 2))
         })
         objects.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
@@ -185,11 +184,10 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
             if (currentBullet != null) return@forEach
             when (it.keyCode) {
                 97 -> {
-                    currentTank?.move(Vector3(-3, 0, 0), delta, ground)
+                    currentTank?.move(Vector3(-6, 0, 0), delta, ground)
                 }
                 100 -> {
-                    Log.d(TAG, camera.rotation.toVector3().toFloatList())
-                    currentTank?.move(Vector3(3, 0, 0), delta, ground)
+                    currentTank?.move(Vector3(6, 0, 0), delta, ground)
                 }
                 67 -> {
                     freeCamera = true

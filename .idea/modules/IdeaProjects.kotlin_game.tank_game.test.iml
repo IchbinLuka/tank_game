@@ -9,7 +9,7 @@
         </externalSystemTestTasks>
         <testOutputPath>$MODULE_DIR$/../../build/classes/kotlin/test</testOutputPath>
         <compilerSettings>
-          <option name="additionalArguments" value="-Xir-module-name=tank_game_test -Xir-only -Xir-per-module-output-name=tank_game-test -Xir-produce-klib-dir" />
+          <option name="additionalArguments" value="-Xir-only -Xir-per-module-output-name=tank_game-test -Xir-produce-klib-dir -Xir-module-name=tank_game_test" />
         </compilerSettings>
         <compilerArguments>
           <flagArguments>

@@ -1,8 +1,8 @@
-mod emitter;
-
 use crate::wasm_bindgen;
 
 use self::emitter::emitter::Emitter;
+
+mod emitter;
 
 #[wasm_bindgen]
 pub struct ParticleHelper {
@@ -28,7 +28,7 @@ impl Into<(f32, f32, f32)> for Vect3 {
 impl ParticleHelper {
 
     pub fn new(gravity: Vect3, particle_lifetime: f32, emitter: Emitter) -> Self {
-        ParticleHelper { gravity, particle_lifetime , emitter}
+        ParticleHelper { gravity, particle_lifetime, emitter }
     }
 
     pub fn step(&self, positions: &mut [f32], velocities: &mut [f32], colors: &mut [f32], sizes: &mut [f32], delta_time: f32) {

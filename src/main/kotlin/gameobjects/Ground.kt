@@ -8,6 +8,7 @@ import ext.toFloatList
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.js.*
+import util.Log
 import util.angleFromAscent
 import util.getLinearGradient
 import util.noise.GroundNoise
@@ -66,18 +67,18 @@ class Ground(
         val function: (Vector3) -> Double = {
             it.y - 20
         }
+        val maxDistance = strength / pointDistance
         val height = heightAt(position) ?: return
         val function2: (Vector3) -> Double = {
             val distance = abs(position - it.x)
-            if (distance > strength) {
+            if (distance > maxDistance) {
                 it.y
             } else {
-                min(height - sqrt(strength.pow(2) - distance.pow(2)), it.y) //- abs((offset.y - it.z) * 0.0005).pow(2)
+                min(height - sqrt(maxDistance.pow(2) - distance.pow(2)), it.y) //- abs((offset.y - it.z) * 0.0005).pow(2)
             }
         }
         val attribute = positionAttribute
         val nearestVertex = floor(normalizePos(position)).toInt()
-        val maxDistance = strength / pointDistance
         val range = max(
             0.0, nearestVertex - maxDistance
         ).toInt()..min(
@@ -103,8 +104,10 @@ class Ground(
 
     fun heightAt(position: Double): Double? {
         val normPos = normalizePos(position)
-        if (position !in vertices.first().first().x..vertices.last().first().x)
+        if (position !in vertices.first().first().x..vertices.last().first().x) {
+            Log.d(TAG, "Position $position not in range")
             return null
+        }
         val attribute = positionAttribute
         val previousIndex = getIndex(floor(normPos).toInt(), 0)
         val nextIndex = getIndex(ceil(normPos).toInt(), 0)
@@ -117,7 +120,7 @@ class Ground(
         val normPos = normalizePos(position)
         if (normPos < 0 || normPos > vertices.size - 1) return 0.0
         val previous = floor(normPos).toInt()
-        val next = ceil(normPos).toInt()
+        val next = floor(normPos + 1).toInt()
         val nearest = normPos.roundToInt()
         val currentAngle = angleFromAscent(averageAscent(previous, next))
         val nearestAsc = if (nearest == previous) {

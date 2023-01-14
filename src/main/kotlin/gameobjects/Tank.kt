@@ -70,7 +70,7 @@ class Tank(
             rotation += PI.toFloat()
         }
         val angle = rotation - globalRot.z - 0.5 * PI
-        if (toUnitCircle(cannon!!.rotation.z.toDouble() + angle.toDouble()) < 2.8) {
+        if (toUnitCircle(cannon!!.rotation.z.toDouble() + angle) < 2.8) {
             cannon?.rotateOnWorldAxis(Vector3(0, 0, 1), angle)
         }
         if (cannon!!.rotation.z.toFloat() > 2.3f) {
@@ -88,7 +88,7 @@ class Tank(
             startPos = Vector3(worldPosition.x, worldPosition.y),
             startVelocity = Vector3(
                 -sin(worldRotation.z.toDouble()) * velocity,
-                cos(worldRotation.z.toDouble()) * velocity * direction.vector3.x.toDouble(),
+                cos(worldRotation.z.toDouble()) * velocity * direction.vector3.x,
             ),
             ground = ground,
             onImpact = onImpact
@@ -98,7 +98,7 @@ class Tank(
     fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
         mainBone?.position?.let {
             val ascend = abs(ground.rotationAt(it.x))
-            if (ascend > 0.5 * PI) {
+            if (true || ascend > 0.5 * PI) {
                 it.addScaledVector(vector3, deltaTime)
             }
         }
@@ -109,9 +109,11 @@ class Tank(
     fun adjustTransformToGround(ground: Ground) {
         mainBone?.position?.let {
             val pos = mainBone!!.position.x
-            it.y = ground.heightAt(pos) ?: 0.0
+            it.y = ground.heightAt(pos)!!
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
+            Log.d(TAG, "position: ${position.toFloatList()}")
+            Log.d(TAG, "rotation: ${mainBone?.rotation?.toVector3()?.toFloatList()}")
         }
     }
 
