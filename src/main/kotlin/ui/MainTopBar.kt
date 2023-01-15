@@ -5,12 +5,13 @@ import org.w3c.dom.Element
 import scenes.GameState
 import scenes.MainScene
 import util.GUIHelper
+import kotlin.math.roundToInt
 
 class MainTopBar(
     private val scene: MainScene
 ) {
     private val healthElement by lazy { Element.fromId("health") }
-    private val nameElement by lazy { Element.fromId("name") }
+    private val nameElement by lazy { Element.fromId("player_name") }
 
     init {
         scene.addListener { _, _, new ->
@@ -24,7 +25,7 @@ class MainTopBar(
     }
 
     private fun updateUI(state: GameState = scene.currentState) {
-        healthElement?.innerHTML = state.currentTank.health.toString()
+        healthElement?.innerHTML = "${(state.currentTank.health * 100).roundToInt()}%"
         nameElement?.innerHTML = state.currentTank.name
     }
 

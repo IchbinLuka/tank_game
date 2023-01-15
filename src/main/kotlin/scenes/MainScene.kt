@@ -22,7 +22,9 @@ import kotlin.properties.Delegates
 
 data class GameState(val currentTank: Tank)
 
-class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
+class MainScene(
+    private val numPlayers: Int = 3
+) : GameScene(), Observable<GameState> by DefaultObservable() {
 
     override val scene: Scene = Scene().apply {
         background = Color(0x3333ff)
@@ -62,11 +64,20 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
     private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
-    private val tanks = mutableListOf<Tank>(
+    /*private val tanks = mutableListOf<Tank>(
         Tank(startPosition = Vector3(x = 0, z = 1.5), name = "Green"),
         Tank(color = Color(0xfc522f), startPosition = Vector3(x = -60, z = 1.5), name = "Orange"),
         Tank(color = Color(0xff0000), startPosition = Vector3(x = 60, z = 1.5), name = "Red")
-    )
+    )*/
+
+    private val tanks = MutableList(numPlayers) {
+        val data = tankColors[it]
+        Tank(
+            color = data.second,
+            startPosition = Vector3(x = (200 / (numPlayers - 1)) * it - 100, z = 1.5),
+            name = data.first
+        )
+    }
 
 
 
@@ -103,7 +114,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
                     currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
                     if (!freeCamera) {
                         camera.position.x = aimingPoint.x * 50
-                        camera.lookAt(Vector3(y = 100))
+                        centerCamera()
                     }
                 }
             }
@@ -121,12 +132,16 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         })
     }
 
+    private fun centerCamera() {
+        camera.lookAt(Vector3(y = 100))
+    }
+
     private fun onImpact(vector3: Vector3) {
         val iterator = tanks.iterator()
         iterator.forEach { tank ->
             val distance = tank.position.distanceTo(vector3).toDouble()
             if (distance < currentBullet!!.explosionWidth) {
-                tank.damage((1 / max(distance.pow(2), 1.0)) * currentBullet!!.damage)
+                tank.damage((1 / max(distance.pow(2) * .05, 1.0)) * currentBullet!!.damage)
             }
             Log.d(TAG, "distance: $distance")
             if (!tank.active) {
@@ -159,6 +174,7 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
         })
         objects.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
+        centerCamera()
     }
 
     override suspend fun loadAssets() {
@@ -195,5 +211,15 @@ class MainScene : GameScene(), Observable<GameState> by DefaultObservable() {
 
             }
         }
+    }
+
+    companion object {
+        val tankColors = listOf(
+            "Green" to Color(0x11710F),
+            "Orange" to Color(0xfc522f),
+            "Red" to Color(0xef3434),
+            "Blue" to Color(0x323cfc),
+            "Pink" to Color(0xde43f9)
+        )
     }
 }

@@ -3,6 +3,13 @@
         <h1 class="menu-element" style="background: whitesmoke; margin-bottom: 200px; font-size: 100px">
             Tanks 3D
         </h1>
-        <button id="startButton" class="menu-element">Start the game</button>
+        <div class="menu-element" style="display: flex; align-items: center">
+            <label for="num_players_slider" style="margin-right: 10px">
+                <span>Players: </span>
+                <span id="num_players_display"></span>
+            </label>
+            <input class="slider" type="range" min="2" max="5" value="3" id="num_players_slider">
+        </div>
+        <button id="startButton" class="menu-element" style="cursor: pointer;">Start the game</button>
     </div>
 </div>

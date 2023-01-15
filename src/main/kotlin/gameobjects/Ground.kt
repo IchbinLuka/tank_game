@@ -26,7 +26,7 @@ class Ground(
     override val renderable: Object3D by lazy {
         Group().apply {
             add(Mesh(geometry, MeshPhongMaterial().apply {
-                color = Color(0x195917)
+                color = Color(0x156812)
                 side = DoubleSide
                 shininess = 30
                 flatShading = true

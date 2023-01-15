@@ -23,10 +23,13 @@ html, body, #full {
 }
 
 .menu-element {
+    font-size: 30px;
+    background: whitesmoke;
     border: 4px solid black;
     border-radius: 5px;
     text-align: center;
     padding: 10px;
+    margin: 30px;
 }
 
 .center {
@@ -35,4 +38,44 @@ html, body, #full {
     transform: translate(-50%, -50%);
     top: 50%;
     left: 50%;
+}
+
+.topbar-menu-item {
+    font-size: 50px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    outline: none;
+    background: black;
+    height: 6px;
+    border-radius: 3px;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    outline: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: black;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    border-width: 0;
+    outline: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: black;
+    cursor: pointer;
+}
+
+.button {
+    cursor: pointer;
+
 }

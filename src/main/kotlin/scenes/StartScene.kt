@@ -10,6 +10,7 @@ import gameobjects.Background
 import gameobjects.Tank
 import kotlinx.browser.window
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLInputElement
 import three.js.*
 import util.GUIHelper
 import util.ResourceManager
@@ -72,9 +73,27 @@ class StartScene: GameScene() {
         initListeners()
     }
 
+    private var playersSlider: HTMLInputElement? = null
+    private var playersDisplay: Element? = null
+
+    private fun updatePlayersDisplay() {
+        playersDisplay?.innerHTML = playersSlider!!.value
+    }
+
     private fun initListeners() {
-        Element.fromId("startButton")?.addEventListener("click", {
-            Game.instance.currentScene = MainScene()
-        })
+        playersDisplay = Element.fromId("num_players_display")
+        playersSlider = (Element.fromId("num_players_slider") as HTMLInputElement).apply {
+            addEventListener("input", {
+                updatePlayersDisplay()
+            })
+            max = MainScene.tankColors.size.toString()
+        }
+
+        Element.fromId("startButton")?.apply {
+            addEventListener("click", {
+                Game.instance.currentScene = MainScene(numPlayers = playersSlider?.value?.toIntOrNull() ?: 3)
+            })
+        }
+        updatePlayersDisplay()
     }
 }
