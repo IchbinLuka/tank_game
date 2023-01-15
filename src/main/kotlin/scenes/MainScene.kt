@@ -144,9 +144,6 @@ class MainScene(
                 tank.damage((1 / max(distance.pow(2) * .05, 1.0)) * currentBullet!!.damage)
             }
             Log.d(TAG, "distance: $distance")
-            if (!tank.active) {
-                iterator.remove()
-            }
             tank.adjustTransformToGround(ground)
         }
         addGameObject(Explosion(position = vector3))
@@ -155,12 +152,15 @@ class MainScene(
     }
 
     private fun nextTank() {
-        if (tanks.size <= 1) {
+        val aliveTanks = tanks.filter { it.alive }
+        if (aliveTanks.size <= 1) {
             MainScope().launch {
                 GUIHelper.loadGUI("game_over")
             }
         } else {
-            currentTankIndex = (currentTankIndex + 1) % tanks.size
+            do {
+                currentTankIndex = (currentTankIndex + 1) % tanks.size
+            } while (!currentTank.active)
         }
         currentState = currentState.copy(currentTank = currentTank)
     }

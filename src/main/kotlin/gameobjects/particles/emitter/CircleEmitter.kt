@@ -12,7 +12,7 @@ class CircleEmitter(
     var normal: Vector3
 ): ParticleEmitter {
 
-    private val baseVector = Vector3(0, -normal.z.toDouble(), -normal.y.toDouble())//.normalize()
+    private val baseVector = Vector3(0, -normal.z, -normal.y)//.normalize()
 
     override fun randomPoint(): Pair<Position, Normal> {
         val angle = Random.nextFloat() * 2 * PI

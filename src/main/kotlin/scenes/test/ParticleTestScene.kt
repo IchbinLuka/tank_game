@@ -8,12 +8,8 @@ import kotlinx.browser.window
 import scenes.GameScene
 import three.js.*
 
-class ParticleTestScene: GameScene() {
-    override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
-        position.z = 20.0
-    }
-
-    private val particleSystem = BasicParticleSystem(
+class ParticleTestScene(
+    private val particleSystem: BasicParticleSystem = BasicParticleSystem(
         particleLifetime = 600.0,
         spawnBurst = 100,
         emitter = SphereEmitter(Vector3(z = -50), 2.0, 0),
@@ -35,6 +31,10 @@ class ParticleTestScene: GameScene() {
             color = Color(0xffffff)
         }*/
     )
+): GameScene() {
+    override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
+        position.z = 20.0
+    }
 
     override val objects = hashSetOf<GameObject>(
         particleSystem,

@@ -2,6 +2,9 @@ package gameobjects
 
 import core.gameobjects.GameObject
 import ext.*
+import gameobjects.particles.Fire
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import three.GLTF
 import three.js.*
 import util.Direction
@@ -16,7 +19,7 @@ class Tank(
     val startRotation: Euler = Euler(),
     val name: String = "Unknown"
 ) : GameObject() {
-    override val renderable: Object3D? get() = gltf?.scene
+    override val renderable: Object3D = Group()
 
     override var position: Vector3
         get() = mainBone?.position!!
@@ -30,6 +33,8 @@ class Tank(
     private var direction = Direction.Right
 
     private var cannon: Object3D? = null
+
+    private var fire: Fire? = null
 
     var rotation: Euler
         set(value) {
@@ -55,6 +60,7 @@ class Tank(
         }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
         mainBone?.position?.set(startPosition)
+        renderable.add(mainBone!!)
         rotation = startRotation
         Log.d(TAG, "Tank rotation ${rotation.toVector3().toFloatList()}, position: ${position.toFloatList()}")
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
@@ -119,6 +125,7 @@ class Tank(
         mainBone?.position?.let {
             val pos = mainBone!!.position.x
             it.y = ground.heightAt(pos)!!
+            fire?.position?.y = it.y
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
         }
@@ -126,8 +133,15 @@ class Tank(
 
     fun damage(amount: Double) {
         _health = max(_health - amount, 0.0)
-        if (_health == 0.0) {
-            // TODO: Show fire particles
+        if (_health <= 0.0) {
+            MainScope().launch {
+                fire = Fire(radius = 3.0, position = Vector3())
+                Log.d(TAG, "tank position: ${position.toFloatList()}")
+                fire!!.initVisual()
+                renderable.add(fire!!.renderable!!)
+                fire?.position?.set(position)
+                Log.d(TAG, "fire position: ${fire!!.position.toFloatList()}")
+            }
         }
     }
 
@@ -143,5 +157,6 @@ class Tank(
     }
 
     override fun update(deltaTime: Double) {
+        fire?.update(deltaTime)
     }
 }

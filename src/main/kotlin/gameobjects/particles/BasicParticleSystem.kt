@@ -54,12 +54,12 @@ open class BasicParticleSystem(
     private val startColList = startColor.toDoubleList()
     private val colors = startColList zip endColor.toDoubleList()
 
-    private var renderableP: Object3D? = null
+    private var _renderable: Object3D? = null
 
     private var lastBirth: Double = 0.0
 
     // region - PUBLIC -
-    override val renderable: Object3D? get() = renderableP
+    override val renderable: Object3D? get() = _renderable
 
     init {
         addParticles(spawnBurst)
@@ -92,7 +92,7 @@ open class BasicParticleSystem(
             }
 
         }
-        renderableP = Points(geometry, material!!)
+        _renderable = Points(geometry, material!!)
     }
 
     override fun update(deltaTime: Double) {
