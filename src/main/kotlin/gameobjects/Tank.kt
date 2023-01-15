@@ -132,6 +132,7 @@ class Tank(
     }
 
     fun damage(amount: Double) {
+        if (!active) return
         _health = max(_health - amount, 0.0)
         if (_health <= 0.0) {
             MainScope().launch {
