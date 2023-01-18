@@ -1,27 +1,7 @@
 import core.Game
 import scenes.StartScene
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
-suspend fun main() {
-    // val game = Game(HeightmapVisualizer(heightMap = GroundNoise(300, 20).allValues(), heightScale = 3f))
+fun main() {
     val game = Game(StartScene())
     game.mainLoop()
-    /*init().then {
-        init_panic_hook()
-
-        val width = 1000
-        val height = 1000
-        val octaves = 80
-
-        val rustTime = measureTime {
-            value_noise(width, height, octaves)
-        }
-        val kotlinTime = measureTime {
-            ValueNoise(width, height, octaves, 5, 5, 20).allValues()
-        }
-        println("rust: $rustTime, kotlin: $kotlinTime")
-    }*/
-    // val renderer = HeightmapRenderer()
-    // renderer.render(ValueNoise(width = 200, height = 200).calculate())
 }
