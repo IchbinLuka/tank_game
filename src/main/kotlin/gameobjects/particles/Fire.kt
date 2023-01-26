@@ -16,7 +16,7 @@ class Fire(
     endColor = Color(0xfc3a0f),
     spawnBurst = 20,
     startSize = 7.0,
-    spawnDelta = 5.0,
+    spawnDelta = 10.0,
     gravity = -10.0,
     endSize = 5.0,
 )

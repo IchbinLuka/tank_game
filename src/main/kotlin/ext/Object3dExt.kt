@@ -1,7 +1,6 @@
 package ext
 
 import three.js.*
-import util.Log
 
 fun Object3D.enableShadows() {
     traverse {
@@ -18,6 +17,18 @@ fun Object3D.applyCustomMat(vararg materials: Material) {
         if (it is Mesh<*, *> && (it.material as Material).name.startsWith(customMaterialPrefix)) {
             val index = (it.material as Material).name.substring(customMaterialPrefix.length).toInt()
             it.material = materials[index - 1].asDynamic()
+        }
+    }
+}
+
+fun Object3D.placeChildren(children: Map<String, Object3D>) {
+    traverse {
+        if (children.containsKey(it.name)) {
+            val child = children[it.name]!!
+            it.position.run {
+                child.position.set(x, y, z)
+            }
+            child.rotation.setFromVector3(it.rotation.toVector3())
         }
     }
 }

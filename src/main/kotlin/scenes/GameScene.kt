@@ -4,32 +4,33 @@ import core.gameobjects.GameObject
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import three.js.Camera
+import three.js.Object3D
 import three.js.Scene
+import ui.UIController
+import util.GUIHelper
 
-abstract class GameScene {
+abstract class GameScene: GameObject() {
 
     open val scene: Scene = Scene()
+    override val renderable: Object3D?
+        get() = scene
+
     open val camera: Camera = Camera()
 
-    /** [MutableSet] containing the relevant GameObjects */
-    abstract val objects: MutableSet<GameObject>
-
     protected fun addGameObject(gameObject: GameObject) {
-        objects.add(gameObject)
+        children.add(gameObject)
         MainScope().launch {
             gameObject.initVisual()
             gameObject.renderable?.let { scene.add(it) }
         }
     }
 
-    /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
-    open suspend fun preloadAssets() {
-        objects.forEach { it.initVisual() }
-    }
 
-    /** Called right after the scene starts being rendered */
-    open suspend fun loadAssets() {}
-    open fun update(delta: Double) {
-        objects.forEach { it.update(delta) }
+
+    protected fun updateUI(uiController: UIController) {
+        GUIHelper.resetGUI()
+        MainScope().launch {
+            uiController.init()
+        }
     }
 }

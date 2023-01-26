@@ -12,7 +12,7 @@ class HeightmapVisualizer(
     private val heightScale: Float = 1f,
     private val heightMap: HeightMap
 ): GameScene() {
-    override val objects: MutableSet<GameObject> = hashSetOf()
+    override val children: MutableSet<GameObject> = hashSetOf()
 
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 4.0

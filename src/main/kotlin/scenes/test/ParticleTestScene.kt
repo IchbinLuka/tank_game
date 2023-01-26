@@ -36,7 +36,7 @@ class ParticleTestScene(
         position.z = 20.0
     }
 
-    override val objects = hashSetOf<GameObject>(
+    override val children = hashSetOf<GameObject>(
         particleSystem,
     )
 

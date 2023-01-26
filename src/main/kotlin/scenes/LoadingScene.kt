@@ -5,7 +5,7 @@ import util.GUIHelper
 
 class LoadingScene: GameScene() {
 
-    override val objects: MutableSet<GameObject> = hashSetOf()
+    override val children: MutableSet<GameObject> = hashSetOf()
 
     override suspend fun loadAssets() {
         GUIHelper.loadGUI("loading_screen")

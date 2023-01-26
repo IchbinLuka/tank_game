@@ -45,7 +45,7 @@ class MainScene(
         rotation.x = -0.3
     }
 
-    override val objects: MutableSet<GameObject> by lazy {
+    override val children: MutableSet<GameObject> by lazy {
         hashSetOf<GameObject>(
             ground,
             Background()
@@ -125,7 +125,7 @@ class MainScene(
                 val distance = aimIntersection.distanceTo(currentTank.position)
                 currentBullet = currentTank.shoot(distance.toDouble() / 2, ground) { onImpact(it) }
                 currentBullet!!.let {
-                    objects.add(it)
+                    children.add(it)
                     scene.add(it.renderable)
                 }
             }
@@ -172,7 +172,7 @@ class MainScene(
             applyCustomMat(MeshToonMaterial().apply { color = Color(0x195917) })
             scale.set(Vector3(2, 2, 2))
         })
-        objects.forEach { o -> o.renderable?.let { scene.add(it) } }
+        children.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
         centerCamera()
     }
@@ -187,7 +187,7 @@ class MainScene(
     }
 
     override fun update(delta: Double) {
-        val iterator = objects.iterator()
+        val iterator = children.iterator()
         for (obj in iterator) {
             obj.update(delta)
             if (!obj.alive) {

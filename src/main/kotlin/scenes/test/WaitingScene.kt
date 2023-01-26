@@ -7,7 +7,7 @@ import scenes.GameScene
 class WaitingScene(
     private val duration: Long = 5000L
 ): GameScene() {
-    override val objects: HashSet<GameObject>
+    override val children: HashSet<GameObject>
         get() = hashSetOf()
 
     override suspend fun preloadAssets() {

@@ -9,7 +9,7 @@ import kotlin.math.roundToInt
 
 class MainTopBar(
     private val scene: MainScene
-) {
+): UIController() {
     private val healthElement by lazy { Element.fromId("health") }
     private val nameElement by lazy { Element.fromId("player_name") }
 
@@ -19,7 +19,7 @@ class MainTopBar(
         }
     }
 
-    suspend fun init() {
+    override suspend fun init() {
         GUIHelper.loadTopBar("tool_bar")
         updateUI()
     }

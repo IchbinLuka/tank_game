@@ -8,7 +8,7 @@ import scenes.GameScene
 import three.js.*
 
 class GroundTestScene: GameScene() {
-    override val objects: HashSet<GameObject> = hashSetOf(
+    override val children: HashSet<GameObject> = hashSetOf(
         Ground()
     )
 
@@ -31,7 +31,7 @@ class GroundTestScene: GameScene() {
                     z = 10
                 }
             })
-            objects.forEach { it.renderable?.let { r -> add(r) } }
+            this@GroundTestScene.children.forEach { it.renderable?.let { r -> add(r) } }
             background = Color(0x4ff4f7)
         }
     }

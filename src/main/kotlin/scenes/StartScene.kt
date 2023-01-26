@@ -16,7 +16,7 @@ import util.GUIHelper
 import util.ResourceManager
 
 class StartScene: GameScene() {
-    override val objects: HashSet<GameObject> = hashSetOf(
+    override val children: HashSet<GameObject> = hashSetOf(
         Background(offset = Vector3(z = -150, y = -115))
     )
 
@@ -51,7 +51,7 @@ class StartScene: GameScene() {
         scene.add(landscape)
         landscape.traverse {
             if (tankColors.containsKey(it.name)) {
-                objects.add(
+                children.add(
                     Tank(color = tankColors[it.name]!!, startPosition = it.position, startRotation = it.rotation)
                 )
             }
@@ -62,7 +62,7 @@ class StartScene: GameScene() {
             MeshToonMaterial().apply { color = Color(0x3e8e2c) }
         )
         super.preloadAssets()
-        for (o in objects) {
+        for (o in children) {
             o.renderable?.let { scene.add(it) }
         }
     }

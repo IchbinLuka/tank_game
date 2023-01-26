@@ -10,7 +10,7 @@ import kotlin.math.PI
 
 class MeshTestScene : GameScene() {
 
-    override val objects: HashSet<GameObject>
+    override val children: HashSet<GameObject>
         get() = hashSetOf()
 
     override val scene = Scene().apply {
