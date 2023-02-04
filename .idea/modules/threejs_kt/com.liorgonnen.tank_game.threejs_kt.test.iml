@@ -9,7 +9,7 @@
         </externalSystemTestTasks>
         <testOutputPath>$MODULE_DIR$/../../../threejs_kt/build/classes/kotlin/test</testOutputPath>
         <compilerSettings>
-          <option name="additionalArguments" value="-Xir-module-name=com.liorgonnen:threejs_kt_test -Xir-only -Xir-per-module-output-name=tank_game-threejs_kt-test -Xir-produce-klib-dir" />
+          <option name="additionalArguments" value="-Xir-only -Xir-per-module-output-name=tank_game-threejs_kt-test -Xir-produce-klib-dir -Xir-module-name=com.liorgonnen:threejs_kt_test" />
         </compilerSettings>
         <compilerArguments>
           <flagArguments>

@@ -11,8 +11,9 @@ abstract class GameObject {
     /** A unique Identifier for the GameObject */
     val uuid = Uuid.next()
 
-    /** [MutableSet] containing the relevant GameObjects */
-    open val children: MutableSet<GameObject> = hashSetOf()
+    /** [MutableMap] containing the relevant GameObjects */
+    open val children: MutableMap<String, GameObject> = hashMapOf()
+    // open val children: MutableSet<GameObject> = hashSetOf()
 
     open var position: Vector3
         get() = renderable?.position ?: Vector3()
@@ -31,7 +32,7 @@ abstract class GameObject {
 
     /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
     open suspend fun preloadAssets() {
-        children.forEach { it.initVisual() }
+        children.values.forEach { it.initVisual() }
     }
 
     /** Called right after the scene starts being rendered */
@@ -39,6 +40,6 @@ abstract class GameObject {
 
     /** Gets called on each frame. [delta] indicates the time passed since the last frame in seconds */
     open fun update(delta: Double) {
-        children.forEach { it.update(delta) }
+        children.values.forEach { it.update(delta) }
     }
 }
