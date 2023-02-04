@@ -52,9 +52,6 @@ class Tank(
         }
         get() = mainBone!!.rotation
 
-    val health: Double by ::_health
-    private var _health: Double = 1.0
-
     val active: Boolean
         get() = health > 0
 
@@ -103,7 +100,7 @@ class Tank(
         }
     }
 
-    fun shoot(velocity: Double, ground: Ground): BulletObject? {
+    fun shoot(velocity: Double): BulletObject? {
         if (cannon == null) return null
         val worldPosition = cannon!!.getWorldPosition(Vector3())
         val worldRotation = cannon!!.getWorldEuler(Euler())
@@ -114,7 +111,6 @@ class Tank(
                 -sin(worldRotation.z.toDouble()) * velocity,
                 cos(worldRotation.z.toDouble()) * velocity * direction.vector3.x,
             ),
-            ground = ground,
         )
     }
 
@@ -139,18 +135,15 @@ class Tank(
         }
     }
 
-    fun damage(amount: Double) {
-        if (!active) return
-        _health = max(_health - amount, 0.0)
-        if (_health <= 0.0) {
-            MainScope().launch {
-                fire = Fire(radius = 3.0, position = Vector3())
-                Log.d(TAG, "tank position: ${position.toFloatList()}")
-                fire!!.initVisual()
-                renderable.add(fire!!.renderable!!)
-                fire?.position?.set(position)
-                Log.d(TAG, "fire position: ${fire!!.position.toFloatList()}")
-            }
+    override fun onDeath() {
+        super.onDeath()
+        MainScope().launch {
+            fire = Fire(radius = 3.0, position = Vector3())
+            Log.d(TAG, "tank position: ${position.toFloatList()}")
+            fire!!.initVisual()
+            renderable.add(fire!!.renderable!!)
+            fire?.position?.set(position)
+            Log.d(TAG, "fire position: ${fire!!.position.toFloatList()}")
         }
     }
 

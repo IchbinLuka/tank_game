@@ -14,8 +14,6 @@ class ParticleTestScene(
         spawnBurst = 100,
         emitter = SphereEmitter(Vector3(z = -50), 2.0, 0),
         startVelocity = 10.0,
-        // gravity = 50.0,
-        // spawnDelta = 6.0,
         startSize = 2.0,
         endSize = 10.0,
         startColor = Color(0xfcd125),
@@ -23,21 +21,14 @@ class ParticleTestScene(
         startDirectionRandomness = 0.2,
         particleLifetimeRandomness = 0.3,
         velocityRandomness = 0.3,
-        /*material = PointsMaterial().apply {
-            // vertexColors = true
-            size = 2
-            side = DoubleSide
-            // shadowSide = DoubleSide
-            color = Color(0xffffff)
-        }*/
     )
 ): GameScene() {
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 20.0
     }
 
-    override val children = hashSetOf<GameObject>(
-        particleSystem,
+    override val _children: MutableMap<String, GameObject> = hashMapOf(
+        "particleSystem" to particleSystem
     )
 
     override val scene = Scene().apply {

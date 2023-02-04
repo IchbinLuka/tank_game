@@ -45,12 +45,14 @@ class MainScene(
         rotation.x = -0.3
     }
 
-    override val children: MutableSet<GameObject> by lazy {
-        hashSetOf<GameObject>(
-            ground,
-            Background()
+    override val _children: HashMap<String, GameObject> by lazy {
+        hashMapOf(
+            "ground" to ground,
+            "background" to Background()
         ).apply {
-            addAll(tanks)
+            for (tank in tanks) {
+                add(tank.name, tank)
+            }
         }
     }
 
@@ -123,9 +125,9 @@ class MainScene(
             event as MouseEvent
             if (currentBulletObject == null) {
                 val distance = aimIntersection.distanceTo(currentTank.position)
-                currentBulletObject = currentTank.shoot(distance.toDouble() / 2, ground)
+                currentBulletObject = currentTank.shoot(distance.toDouble() / 2)
                 currentBulletObject!!.let {
-                    children.add(it)
+                    _children["bullet"] = it
                     scene.add(it.renderable)
                     it.addImpactListener { v ->
                         onImpact(v)
@@ -175,7 +177,7 @@ class MainScene(
             applyCustomMat(MeshToonMaterial().apply { color = Color(0x195917) })
             scale.set(Vector3(2, 2, 2))
         })
-        children.forEach { o -> o.renderable?.let { scene.add(it) } }
+        _children.values.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
         centerCamera()
     }
@@ -190,12 +192,12 @@ class MainScene(
     }
 
     override fun update(delta: Double) {
-        val iterator = children.iterator()
+        val iterator = _children.iterator()
         for (obj in iterator) {
-            obj.update(delta)
-            if (!obj.alive) {
+            obj.value.update(delta)
+            if (!obj.value.alive) {
                 iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
-                obj.renderable?.let { scene.remove(it) }
+                obj.value.renderable?.let { scene.remove(it) }
             }
         }
         val currentTank = tanks.getOrNull(currentTankIndex)

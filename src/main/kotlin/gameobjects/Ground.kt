@@ -13,7 +13,6 @@ import util.angleFromAscent
 import util.getLinearGradient
 import util.noise.GroundNoise
 import kotlin.math.*
-import kotlin.time.ExperimentalTime
 
 class Ground(
     private val offset: Vector3 = Vector3(0, 0, 0),
@@ -61,7 +60,6 @@ class Ground(
     private fun getIndex(x: Int, y: Int): Int = x * vertices.first().size + y
 
     //region PUBLIC
-    @OptIn(ExperimentalTime::class)
     fun destroy(position: Double, strength: Double) {
         // TODO
         val function: (Vector3) -> Double = {

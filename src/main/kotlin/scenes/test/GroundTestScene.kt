@@ -8,8 +8,8 @@ import scenes.GameScene
 import three.js.*
 
 class GroundTestScene: GameScene() {
-    override val children: HashSet<GameObject> = hashSetOf(
-        Ground()
+    override val _children: MutableMap<String, GameObject> = hashMapOf(
+        "ground" to Ground()
     )
 
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
@@ -31,7 +31,7 @@ class GroundTestScene: GameScene() {
                     z = 10
                 }
             })
-            this@GroundTestScene.children.forEach { it.renderable?.let { r -> add(r) } }
+            this@GroundTestScene._children.forEach { it.value.renderable?.let { r -> add(r) } }
             background = Color(0x4ff4f7)
         }
     }

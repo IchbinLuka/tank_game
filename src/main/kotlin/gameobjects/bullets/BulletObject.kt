@@ -1,5 +1,6 @@
 package gameobjects.bullets
 
+import core.Game
 import core.gameobjects.MovingGameObject
 import ext.set
 import ext.toFloatList
@@ -10,35 +11,22 @@ import three.js.*
 import util.AssetInitializer
 import util.ResourceManager
 
-abstract class Bullet {
-    abstract val name: String
-
-    abstract fun createObject(ground: Ground): BulletObject
-
-    final override fun hashCode(): Int {
-        return name.hashCode()
-    }
-
-    final override fun equals(other: Any?): Boolean {
-        return other is Bullet && other.name == this.name
-    }
-}
-
 typealias ImpactListener = (Vector3) -> Unit
 
 open class BulletObject(
     startVelocity: Vector3,
     startPos: Vector3,
-    private val ground: Ground,
 ) : MovingGameObject() {
+
+    private val ground: Ground
 
     private val impactListeners: MutableList<ImpactListener> = mutableListOf()
 
-    public fun addImpactListener(listener: ImpactListener) {
+    fun addImpactListener(listener: ImpactListener) {
         impactListeners.add(listener)
     }
 
-    public fun removeImpactListener(listener: ImpactListener) {
+    fun removeImpactListener(listener: ImpactListener) {
         impactListeners.remove(listener)
     }
 
@@ -71,6 +59,7 @@ open class BulletObject(
     ).apply { this@apply.position.set(startPos) }
 
     init {
+        ground = Game.instance.currentScene.findObject<Ground>()!!
         ResourceManager.disc.asPromise().then {
             renderable.add(Points(dots,
                 PointsMaterial().apply {

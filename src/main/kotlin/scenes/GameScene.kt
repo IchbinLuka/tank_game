@@ -13,8 +13,6 @@ import three.js.Scene
 import three.js.Vector3
 import ui.UIController
 import util.GUIHelper
-import kotlin.collections.ArrayList
-import kotlin.collections.map
 import kotlin.collections.set
 
 abstract class GameScene: GameObject() {
@@ -26,7 +24,7 @@ abstract class GameScene: GameObject() {
     open val camera: Camera = Camera()
 
     protected fun addGameObject(gameObject: GameObject, name: String? = null) {
-        children[name ?: gameObject.uuid.toString()] = gameObject
+        _children[name ?: gameObject.uuid.toString()] = gameObject
         MainScope().launch {
             gameObject.initVisual()
             gameObject.renderable?.let { scene.add(it) }
@@ -34,7 +32,7 @@ abstract class GameScene: GameObject() {
     }
 
     fun getConfiguration(): ObjectConfiguration = ObjectConfiguration(
-        ArrayList(children.map {
+        ArrayList(_children.map {
             val pos = it.value.position
             val rot = it.value.renderable?.rotation?.toVector3() ?: Vector3()
             ObjectConfigurationItem(
@@ -47,7 +45,7 @@ abstract class GameScene: GameObject() {
 
     fun applyConfiguration(configuration: ObjectConfiguration) {
         for (conf in configuration.items) {
-            children[conf.name]?.let {
+            _children[conf.name]?.let {
                 it.position.set(conf.pos.x, conf.pos.y, conf.pos.z)
                 it.renderable?.rotation?.set(conf.rot.x, conf.rot.y, conf.rot.z)
             }
