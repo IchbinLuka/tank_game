@@ -2,23 +2,33 @@ package gameobjects
 
 import core.gameobjects.GameObject
 import ext.*
+import gameobjects.bullets.Bullet
+import gameobjects.bullets.BulletObject
 import gameobjects.particles.Fire
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import three.GLTF
 import three.js.*
-import util.Direction
-import util.Log
-import util.ResourceManager
-import util.toUnitCircle
+import util.*
 import kotlin.math.*
+import kotlin.properties.Delegates
+
+typealias Count = Int
 
 class Tank(
     val color: Color = Color(0x338530),
     val startPosition: Vector3,
     val startRotation: Euler = Euler(),
     val name: String = "Unknown"
-) : GameObject() {
+) : GameObject(), Observable<Bullet> by DefaultObservable<Bullet>() {
+
+    private val bullets: List<Pair<Bullet, Count>>
+        get() = TODO()
+
+    val currentBullet: Bullet by Delegates.observable(bullets.first().first, notifyObservers)
+
+
+
     override val renderable: Object3D = Group()
 
     override var position: Vector3
@@ -42,8 +52,7 @@ class Tank(
         }
         get() = mainBone!!.rotation
 
-    val health: Double
-        get() = _health
+    val health: Double by ::_health
     private var _health: Double = 1.0
 
     val active: Boolean
@@ -94,19 +103,18 @@ class Tank(
         }
     }
 
-    fun shoot(velocity: Double, ground: Ground, onImpact: (Vector3) -> Unit): Bullet? {
+    fun shoot(velocity: Double, ground: Ground): BulletObject? {
         if (cannon == null) return null
         val worldPosition = cannon!!.getWorldPosition(Vector3())
         val worldRotation = cannon!!.getWorldEuler(Euler())
         Log.v(TAG, worldRotation.toVector3().toFloatList().toString())
-        return Bullet(
+        return BulletObject(
             startPos = Vector3(worldPosition.x, worldPosition.y),
             startVelocity = Vector3(
                 -sin(worldRotation.z.toDouble()) * velocity,
                 cos(worldRotation.z.toDouble()) * velocity * direction.vector3.x,
             ),
             ground = ground,
-            onImpact = onImpact
         )
     }
 

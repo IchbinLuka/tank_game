@@ -4,8 +4,9 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 
 plugins {
-    kotlin("js") version "1.7.21"
+    kotlin("js") version "1.8.0"
     id("io.kotest.multiplatform") version "5.5.0"
+    kotlin("plugin.serialization") version "1.7.20"
 }
 
 //group = "com.liorgonnen"
@@ -26,6 +27,8 @@ kotlin {
         binaries.executable()
         dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.6.4")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+            testImplementation(kotlin("test-js"))
         }
 
     }
@@ -35,6 +38,7 @@ kotlin {
             val pathToLocalNpmModule = rootProject.projectDir.resolve("rust/pkg").canonicalPath
             implementation(npm("rust_js", "file:$pathToLocalNpmModule", generateExternals = false))
         }
+
         test {
             dependencies {
                 implementation("io.kotest:kotest-framework-engine-js:5.5.0")
@@ -97,12 +101,15 @@ tasks.create("debug") {
     tasks.findByName("browserDevelopmentRun")?.mustRunAfter("browserDevelopmentWebpack")
 }
 
+tasks.findByName("run")?.dependsOn?.add("browserDevelopmentWebpack")
+// tasks.findByName("browserDevelopmentRun")?.mustRunAfter("browserDevelopmentWebpack")
+
 tasks.withType(KotlinJsCompile::class.java).named("compileKotlinJs") {
     kotlinOptions.moduleKind = "commonjs"
 }
 
 // Fixes webpack-cli incompatibility by pinning the newest version.
-rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
+/*rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
     versions.webpackCli.version = "4.10.0"
     versions.webpackDevServer.version = "4.8.0"
-}
+}*/

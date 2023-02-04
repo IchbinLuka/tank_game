@@ -4,9 +4,9 @@ import core.Game
 import core.gameobjects.GameObject
 import ext.*
 import gameobjects.Background
-import gameobjects.Bullet
 import gameobjects.Ground
 import gameobjects.Tank
+import gameobjects.bullets.BulletObject
 import gameobjects.particles.Explosion
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
@@ -84,7 +84,7 @@ class MainScene(
     private var currentTankIndex: Int = 0
     private val currentTank get() = tanks[currentTankIndex]
 
-    private var currentBullet: Bullet? = null
+    private var currentBulletObject: BulletObject? = null
 
     var currentState: GameState by Delegates.observable(GameState(currentTank), notifyObservers)
 
@@ -121,12 +121,15 @@ class MainScene(
         })
         window.addEventListener("click", { event ->
             event as MouseEvent
-            if (currentBullet == null) {
+            if (currentBulletObject == null) {
                 val distance = aimIntersection.distanceTo(currentTank.position)
-                currentBullet = currentTank.shoot(distance.toDouble() / 2, ground) { onImpact(it) }
-                currentBullet!!.let {
+                currentBulletObject = currentTank.shoot(distance.toDouble() / 2, ground)
+                currentBulletObject!!.let {
                     children.add(it)
                     scene.add(it.renderable)
+                    it.addImpactListener { v ->
+                        onImpact(v)
+                    }
                 }
             }
         })
@@ -140,14 +143,14 @@ class MainScene(
         val iterator = tanks.iterator()
         iterator.forEach { tank ->
             val distance = tank.position.distanceTo(vector3).toDouble()
-            if (distance < currentBullet!!.explosionWidth) {
-                tank.damage((1 / max(distance.pow(2) * .05, 1.0)) * currentBullet!!.damage)
+            if (distance < currentBulletObject!!.explosionWidth) {
+                tank.damage((1 / max(distance.pow(2) * .05, 1.0)) * currentBulletObject!!.damage)
             }
             Log.d(TAG, "distance: $distance")
             tank.adjustTransformToGround(ground)
         }
         addGameObject(Explosion(position = vector3))
-        currentBullet = null
+        currentBulletObject = null
         nextTank()
     }
 
@@ -197,7 +200,7 @@ class MainScene(
         }
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
-            if (currentBullet != null) return@forEach
+            if (currentBulletObject != null) return@forEach
             when (it.keyCode) {
                 97 -> {
                     currentTank?.move(Vector3(-6, 0, 0), delta, ground)

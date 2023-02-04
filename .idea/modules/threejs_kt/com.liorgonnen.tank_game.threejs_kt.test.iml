@@ -9,7 +9,7 @@
         </externalSystemTestTasks>
         <testOutputPath>$MODULE_DIR$/../../../threejs_kt/build/classes/kotlin/test</testOutputPath>
         <compilerSettings>
-          <option name="additionalArguments" value="-Xir-only -Xir-per-module-output-name=tank_game-threejs_kt-test -Xir-produce-klib-dir -Xir-module-name=com.liorgonnen:threejs_kt_test" />
+          <option name="additionalArguments" value="-Xir-module-name=com.liorgonnen:threejs_kt_test -Xir-only -Xir-per-module-output-name=tank_game-threejs_kt-test -Xir-produce-klib-dir" />
         </compilerSettings>
         <compilerArguments>
           <flagArguments>
@@ -23,8 +23,8 @@
             <stringArg name="outputFile" arg="$MODULE_DIR$/../../../threejs_kt/build/classes/kotlin/test" />
             <stringArg name="sourceMapEmbedSources" arg="never" />
             <stringArg name="target" arg="v5" />
-            <stringArg name="apiVersion" arg="1.7" />
-            <stringArg name="languageVersion" arg="1.7" />
+            <stringArg name="apiVersion" arg="1.8" />
+            <stringArg name="languageVersion" arg="1.8" />
           </stringArguments>
           <arrayArguments>
             <arrayArg name="pluginClasspaths" />

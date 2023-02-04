@@ -1,22 +1,50 @@
-package gameobjects
+package gameobjects.bullets
 
 import core.gameobjects.MovingGameObject
 import ext.set
 import ext.toFloatList
+import gameobjects.Ground
 import kotlinx.coroutines.asPromise
 import org.khronos.webgl.Float32Array
 import three.js.*
 import util.AssetInitializer
 import util.ResourceManager
 
-class Bullet(
+abstract class Bullet {
+    abstract val name: String
+
+    abstract fun createObject(ground: Ground): BulletObject
+
+    final override fun hashCode(): Int {
+        return name.hashCode()
+    }
+
+    final override fun equals(other: Any?): Boolean {
+        return other is Bullet && other.name == this.name
+    }
+}
+
+typealias ImpactListener = (Vector3) -> Unit
+
+open class BulletObject(
     startVelocity: Vector3,
     startPos: Vector3,
     private val ground: Ground,
-    private val onImpact: (Vector3) -> Unit = {}
 ) : MovingGameObject() {
 
-    val explosionWidth = 30.0
+    private val impactListeners: MutableList<ImpactListener> = mutableListOf()
+
+    public fun addImpactListener(listener: ImpactListener) {
+        impactListeners.add(listener)
+    }
+
+    public fun removeImpactListener(listener: ImpactListener) {
+        impactListeners.remove(listener)
+    }
+
+    open val gravity = Vector3(0, -20, 0)
+
+    val explosionWidth: Double = 30.0
     val damage: Double = 0.5
 
     override val renderable: Object3D by lazy {
@@ -59,7 +87,9 @@ class Bullet(
     override suspend fun initVisual() {}
 
     override var velocity: Vector3 = startVelocity
-    override var acceleration: Vector3 = Vector3(0, g, 0)
+    override var acceleration: Vector3
+        get() = gravity
+        set(value) {}
 
     private fun updateGeometry() {
         dots.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
@@ -87,12 +117,14 @@ class Bullet(
         if (height == null || height > position.y.toFloat()) {
             alive = false
             ground.destroy(position.x, explosionWidth)
-            onImpact(position.clone().apply { y = height ?: y })
+            val pos = position.clone().apply { y = height ?: y }
+            for (listener in impactListeners) {
+                listener(pos)
+            }
         }
     }
 
     companion object: AssetInitializer {
-        const val g = -20
         const val bulletRadius = 0.5f
 
         override suspend fun initAssets() {
