@@ -1,15 +1,22 @@
 package gameobjects.bullets
 
 import core.Game
+import core.currentScene
 import core.gameobjects.MovingGameObject
+import ext.TAG
 import ext.set
 import ext.toFloatList
 import gameobjects.Ground
+import gameobjects.Tank
+import gameobjects.particles.Explosion
 import kotlinx.coroutines.asPromise
 import org.khronos.webgl.Float32Array
 import three.js.*
 import util.AssetInitializer
+import util.Log
 import util.ResourceManager
+import kotlin.math.max
+import kotlin.math.pow
 
 typealias ImpactListener = (Vector3) -> Unit
 
@@ -84,9 +91,9 @@ open class BulletObject(
         dots.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
     }
 
-    override fun update(deltaTime: Double) {
-        super.update(deltaTime)
-        dotTimer += deltaTime
+    override fun update(delta: Double) {
+        super.update(delta)
+        dotTimer += delta
         if (dotTimer > 0.5) {
             dotTimer = 0.0
             vertices.apply {
@@ -107,6 +114,18 @@ open class BulletObject(
             alive = false
             ground.destroy(position.x, explosionWidth)
             val pos = position.clone().apply { y = height ?: y }
+            currentScene.addGameObject(Explosion(position = pos))
+            for (o in Game.instance.currentScene.children.values) {
+                val distance = o.position.distanceTo(pos).toDouble()
+                if (distance < explosionWidth) {
+                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+                }
+                Log.d(TAG, "distance: $distance")
+
+                if (o is Tank) {
+                    o.adjustTransformToGround(ground)
+                }
+            }
             for (listener in impactListeners) {
                 listener(pos)
             }

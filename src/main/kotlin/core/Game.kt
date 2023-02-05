@@ -19,6 +19,9 @@ import util.GUIHelper
 import util.Log
 import kotlin.coroutines.CoroutineContext
 
+val currentScene: GameScene
+    get() = Game.instance.currentScene
+
 class Game(
     initialScene: GameScene
 ) : CoroutineScope {

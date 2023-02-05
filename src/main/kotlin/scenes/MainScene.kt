@@ -2,12 +2,14 @@ package scenes
 
 import core.Game
 import core.gameobjects.GameObject
-import ext.*
+import ext.applyCustomMat
+import ext.aspectRatio
+import ext.enableShadows
+import ext.set
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.bullets.BulletObject
-import gameobjects.particles.Explosion
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -16,8 +18,17 @@ import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import ui.MainTopBar
 import util.*
-import kotlin.math.max
-import kotlin.math.pow
+import kotlin.collections.HashMap
+import kotlin.collections.MutableList
+import kotlin.collections.filter
+import kotlin.collections.first
+import kotlin.collections.forEach
+import kotlin.collections.getOrNull
+import kotlin.collections.hashMapOf
+import kotlin.collections.isNotEmpty
+import kotlin.collections.iterator
+import kotlin.collections.listOf
+import kotlin.collections.set
 import kotlin.properties.Delegates
 
 data class GameState(val currentTank: Tank)
@@ -51,7 +62,7 @@ class MainScene(
             "background" to Background()
         ).apply {
             for (tank in tanks) {
-                add(tank.name, tank)
+                set(tank.name, tank)
             }
         }
     }
@@ -66,11 +77,6 @@ class MainScene(
     private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
-    /*private val tanks = mutableListOf<Tank>(
-        Tank(startPosition = Vector3(x = 0, z = 1.5), name = "Green"),
-        Tank(color = Color(0xfc522f), startPosition = Vector3(x = -60, z = 1.5), name = "Orange"),
-        Tank(color = Color(0xff0000), startPosition = Vector3(x = 60, z = 1.5), name = "Red")
-    )*/
 
     private val tanks = MutableList(numPlayers) {
         val data = tankColors[it]
@@ -88,9 +94,7 @@ class MainScene(
 
     private var currentBulletObject: BulletObject? = null
 
-    var currentState: GameState by Delegates.observable(GameState(currentTank), notifyObservers)
-
-    // private var awaitingShot = false
+    var currentState: GameState by Delegates.observable(GameState(currentTank), ::notifyObservers)
 
     private val topBar = MainTopBar(this)
 
@@ -130,7 +134,7 @@ class MainScene(
                     _children["bullet"] = it
                     scene.add(it.renderable)
                     it.addImpactListener { v ->
-                        onImpact(v)
+                        onImpact()
                     }
                 }
             }
@@ -141,17 +145,7 @@ class MainScene(
         camera.lookAt(Vector3(y = 100))
     }
 
-    private fun onImpact(vector3: Vector3) {
-        val iterator = tanks.iterator()
-        iterator.forEach { tank ->
-            val distance = tank.position.distanceTo(vector3).toDouble()
-            if (distance < currentBulletObject!!.explosionWidth) {
-                tank.damage((1 / max(distance.pow(2) * .05, 1.0)) * currentBulletObject!!.damage)
-            }
-            Log.d(TAG, "distance: $distance")
-            tank.adjustTransformToGround(ground)
-        }
-        addGameObject(Explosion(position = vector3))
+    private fun onImpact() {
         currentBulletObject = null
         nextTank()
     }

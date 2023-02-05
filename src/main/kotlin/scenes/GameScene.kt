@@ -13,7 +13,6 @@ import three.js.Scene
 import three.js.Vector3
 import ui.UIController
 import util.GUIHelper
-import kotlin.collections.set
 
 abstract class GameScene: GameObject() {
 
@@ -22,14 +21,6 @@ abstract class GameScene: GameObject() {
         get() = scene
 
     open val camera: Camera = Camera()
-
-    protected fun addGameObject(gameObject: GameObject, name: String? = null) {
-        _children[name ?: gameObject.uuid.toString()] = gameObject
-        MainScope().launch {
-            gameObject.initVisual()
-            gameObject.renderable?.let { scene.add(it) }
-        }
-    }
 
     fun getConfiguration(): ObjectConfiguration = ObjectConfiguration(
         ArrayList(_children.map {

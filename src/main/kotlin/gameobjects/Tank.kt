@@ -22,14 +22,23 @@ class Tank(
     val name: String = "Unknown"
 ) : GameObject(), Observable<Bullet> by DefaultObservable<Bullet>() {
 
-    private val bullets: List<Pair<Bullet, Count>>
-        get() = TODO()
+    private val _bullets: HashMap<Bullet, Count?> = hashMapOf(
+        Bullet.Normal to null,
+        Bullet.NoGravity to 5
+    )
 
-    val currentBullet: Bullet by Delegates.observable(bullets.first().first, notifyObservers)
+    val bullets: Map<Bullet, Count?> by ::_bullets
 
+    var currentBullet: Bullet by Delegates.observable(_bullets.keys.first(), ::notifyObservers)
+    private val bulletSequence = _bullets.keys.asSequence().repeat().filter { (bullets[it] ?: 1) > 0 }
 
+    override val invincible: Boolean = false
 
     override val renderable: Object3D = Group()
+
+    fun nextBullet() {
+        currentBullet = bulletSequence.first()
+    }
 
     override var position: Vector3
         get() = mainBone?.position!!
@@ -44,7 +53,8 @@ class Tank(
 
     private var cannon: Object3D? = null
 
-    private var fire: Fire? = null
+    private val fire: Fire?
+        get() = findObject("fire")
 
     var rotation: Euler
         set(value) {
@@ -105,13 +115,20 @@ class Tank(
         val worldPosition = cannon!!.getWorldPosition(Vector3())
         val worldRotation = cannon!!.getWorldEuler(Euler())
         Log.v(TAG, worldRotation.toVector3().toFloatList().toString())
-        return BulletObject(
-            startPos = Vector3(worldPosition.x, worldPosition.y),
-            startVelocity = Vector3(
+        if (_bullets[currentBullet] != null) {
+            _bullets[currentBullet] = _bullets[currentBullet]!! - 1
+        }
+        val bulletObject =  currentBullet.createObject(
+            Vector3(
                 -sin(worldRotation.z.toDouble()) * velocity,
                 cos(worldRotation.z.toDouble()) * velocity * direction.vector3.x,
             ),
+            Vector3(worldPosition.x, worldPosition.y)
         )
+        if ((_bullets[currentBullet] ?: 1) <= 0) {
+            nextBullet()
+        }
+        return bulletObject
     }
 
     fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
@@ -138,12 +155,13 @@ class Tank(
     override fun onDeath() {
         super.onDeath()
         MainScope().launch {
-            fire = Fire(radius = 3.0, position = Vector3())
+            val fire = Fire(radius = 3.0, position = Vector3())
             Log.d(TAG, "tank position: ${position.toFloatList()}")
-            fire!!.initVisual()
-            renderable.add(fire!!.renderable!!)
-            fire?.position?.set(position)
-            Log.d(TAG, "fire position: ${fire!!.position.toFloatList()}")
+            fire.initVisual()
+            _children["fire"] = fire
+            renderable.add(fire.renderable!!)
+            fire.position.set(position)
+            Log.d(TAG, "fire position: ${fire.position.toFloatList()}")
         }
     }
 
@@ -156,9 +174,5 @@ class Tank(
 
     private fun switchDirection() {
         setDirection(direction.inverse)
-    }
-
-    override fun update(deltaTime: Double) {
-        fire?.update(deltaTime)
     }
 }

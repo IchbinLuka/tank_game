@@ -1,6 +1,8 @@
 package core.gameobjects
 
 import ext.toFloatArray
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import three.js.Object3D
 import three.js.Vector3
 import util.Uuid
@@ -32,8 +34,16 @@ abstract class GameObject {
     /** Indicates whether the object should longer be a part of the scene */
     var alive = true
 
+    fun addGameObject(gameObject: GameObject, name: String? = null) {
+        _children[name ?: gameObject.uuid.toString()] = gameObject
+        MainScope().launch {
+            gameObject.initVisual()
+            gameObject.renderable?.let { renderable?.add(it) }
+        }
+    }
+
     open fun damage(amount: Double) {
-        if (invincible) return
+        if (invincible || _health == 0.0) return
         _health = max(_health - amount, 0.0)
         if (_health == 0.0) onDeath()
     }
@@ -53,6 +63,8 @@ abstract class GameObject {
     }
 
     inline fun <reified T> findObject(name: String? = null): T? = findObjectWithNameAndType(name, T::class) as T?
+
+    inline fun <reified T> findObjects(): Collection<T> = children.values.filterIsInstance<T>()
 
     /** Function used for preparing the GameObject. Useful for e.g. loading Assets */
     open suspend fun initVisual() {}
