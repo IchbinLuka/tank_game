@@ -18,16 +18,6 @@ import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import ui.MainTopBar
 import util.*
-import kotlin.collections.HashMap
-import kotlin.collections.MutableList
-import kotlin.collections.filter
-import kotlin.collections.first
-import kotlin.collections.forEach
-import kotlin.collections.getOrNull
-import kotlin.collections.hashMapOf
-import kotlin.collections.isNotEmpty
-import kotlin.collections.iterator
-import kotlin.collections.listOf
 import kotlin.collections.set
 import kotlin.properties.Delegates
 
@@ -125,7 +115,7 @@ class MainScene(
                 }
             }
         })
-        window.addEventListener("click", { event ->
+        Game.instance.gameContainer.addEventListener("click", { event ->
             event as MouseEvent
             if (currentBulletObject == null) {
                 val distance = aimIntersection.distanceTo(currentTank.position)
@@ -178,7 +168,7 @@ class MainScene(
 
     override suspend fun loadAssets() {
         super.loadAssets()
-        topBar.init()
+        topBar.initAssets()
         scene.background = Color(0x64DBFF)
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)

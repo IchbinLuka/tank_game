@@ -8,7 +8,7 @@ class GameOver(
     private val name: String
 ): UIController() {
 
-    override suspend fun init() {
+    override suspend fun initAssets() {
         GUIHelper.loadGUI("game_over")
         Element.fromId("winner_name")?.apply {
             innerHTML = name

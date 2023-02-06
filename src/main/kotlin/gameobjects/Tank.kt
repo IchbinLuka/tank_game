@@ -29,15 +29,23 @@ class Tank(
 
     val bullets: Map<Bullet, Count?> by ::_bullets
 
-    var currentBullet: Bullet by Delegates.observable(_bullets.keys.first(), ::notifyObservers)
-    private val bulletSequence = _bullets.keys.asSequence().repeat().filter { (bullets[it] ?: 1) > 0 }
+    private val bulletSequence = ScrollableList(bullets.keys)
+    var currentBullet: Bullet by Delegates.observable(bulletSequence.current, ::notifyObservers)
 
     override val invincible: Boolean = false
 
     override val renderable: Object3D = Group()
 
     fun nextBullet() {
-        currentBullet = bulletSequence.first()
+        bulletSequence.next()
+        bulletSequence.nextUntil { (bullets[it] ?: 1) <= 0 }
+        currentBullet = bulletSequence.current
+    }
+
+    fun previousBullet() {
+        bulletSequence.previous()
+        bulletSequence.previousUntil { (bullets[it] ?: 1) <= 0 }
+        currentBullet = bulletSequence.current
     }
 
     override var position: Vector3

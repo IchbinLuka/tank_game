@@ -46,7 +46,7 @@ abstract class GameScene: GameObject() {
     protected fun updateUI(uiController: UIController) {
         GUIHelper.resetGUI()
         MainScope().launch {
-            uiController.init()
+            uiController.initAssets()
         }
     }
 }
