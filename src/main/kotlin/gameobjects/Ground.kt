@@ -1,10 +1,12 @@
 package gameobjects
 
 import core.HeightMap
+import core.HitBox
 import core.gameobjects.GameObject
 import ext.minus
 import ext.plus
 import ext.toFloatList
+import gameobjects.bullets.BulletObject
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.js.*
@@ -20,7 +22,22 @@ class Ground(
     private val heightScale: Double = 1.0,
     private val pointDistance: Double = 1.0,
     data: HeightMap = GroundNoise(width = 150, depth = 20, min = -40.0).allValues()
-) : GameObject() {
+) : GameObject(), HitBox {
+
+    // region - HitBox -
+
+    override val associatedObject: GameObject = this
+    override val vertices: Iterable<Vector3> = emptyList()
+    override fun containsPoint(point: Vector3): Boolean = heightAt(point.x)?.let { it > point.y } ?: false
+
+    override fun onIntersection(intersectingBox: HitBox) {
+        super.onIntersection(intersectingBox)
+        if (intersectingBox is BulletObject) {
+            destroy(intersectingBox.position.x, intersectingBox.explosionWidth)
+        }
+    }
+
+    // endregion
 
     override val renderable: Object3D by lazy {
         Group().apply {
@@ -43,7 +60,7 @@ class Ground(
         get() = geometry.getAttribute("position") as BufferAttribute
 
     // private val heightData: Array<Double> = Array(res) { (height * 0.2 * (1 - sin(0.5 * it))) + height / 2 }
-    private var vertices = Array<Array<Vector3>>(data.size) { i ->
+    private var groundVertices = Array<Array<Vector3>>(data.size) { i ->
         Array<Vector3>(data[i].size) { j ->
             Vector3(
                 i * pointDistance,
@@ -57,7 +74,7 @@ class Ground(
         updateMesh()
     }
 
-    private fun getIndex(x: Int, y: Int): Int = x * vertices.first().size + y
+    private fun getIndex(x: Int, y: Int): Int = x * groundVertices.first().size + y
 
     //region PUBLIC
     fun destroy(position: Double, strength: Double) {
@@ -80,11 +97,11 @@ class Ground(
         val range = max(
             0.0, nearestVertex - maxDistance
         ).toInt()..min(
-            vertices.size.toDouble(),
+            groundVertices.size.toDouble(),
             nearestVertex + maxDistance
         ).toInt()
         for (i in range) {
-            for (j in 0 until vertices[i].size) {
+            for (j in 0 until groundVertices[i].size) {
                 val index = getIndex(i, j)
                 attribute.setY(index, function2(
                     Vector3(
@@ -102,7 +119,7 @@ class Ground(
 
     fun heightAt(position: Double): Double? {
         val normPos = normalizePos(position)
-        if (position !in vertices.first().first().x..vertices.last().first().x) {
+        if (position !in groundVertices.first().first().x..groundVertices.last().first().x) {
             Log.d(TAG, "Position $position not in range")
             return null
         }
@@ -116,7 +133,7 @@ class Ground(
 
     fun rotationAt(position: Double): Double {
         val normPos = normalizePos(position)
-        if (normPos < 0 || normPos > vertices.size - 1) return 0.0
+        if (normPos < 0 || normPos > groundVertices.size - 1) return 0.0
         val previous = floor(normPos).toInt()
         val next = floor(normPos + 1).toInt()
         val nearest = normPos.roundToInt()
@@ -137,27 +154,30 @@ class Ground(
 
     //region PRIVATE
     private fun normalizePos(position: Double): Double {
-        val pos = position - offset.x.toFloat()
+        val pos = position - offset.x
         return pos / pointDistance
     }
 
     private fun averageAscent(start: Int, end: Int): Double {
-        return (positionAttribute.getY(getIndex(end, 0)) - positionAttribute.getY(getIndex(start, 0))).toDouble() / ((end - start) * pointDistance)
+        return (positionAttribute.getY(getIndex(end, 1)) - positionAttribute.getY(getIndex(start, 1))).toDouble() / ((end - start) * pointDistance)
     }
 
     private fun updateMesh() {
         val positions = mutableListOf<Float>()
         val indices = mutableListOf<Int>()
+        /*val groundVertices = groundVertices.map {
+            arrayOf(it.first() - Vector3(y = 1, z = pointDistance)).asSequence().plus(it).toList()
+        }*/
 
-        for (row in vertices) {
+        for (row in groundVertices) {
             for (vertex in row) {
                 positions.addAll(vertex.toFloatList())
             }
         }
-        for (i in 1..vertices.lastIndex) {
-            for (j in 0 until vertices[i].lastIndex) {
-                val frontStart: Int = i * vertices[i].size + j
-                val backStart: Int = frontStart - vertices[i].size
+        for (i in 1..groundVertices.lastIndex) {
+            for (j in 0 until groundVertices[i].lastIndex) {
+                val frontStart: Int = i * groundVertices[i].size + j
+                val backStart: Int = frontStart - groundVertices[i].size
                 indices.addAll(
                     arrayOf(
                         frontStart, backStart, backStart + 1,

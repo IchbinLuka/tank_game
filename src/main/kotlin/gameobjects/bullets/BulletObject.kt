@@ -1,7 +1,9 @@
 package gameobjects.bullets
 
 import core.Game
+import core.HitBox
 import core.currentScene
+import core.gameobjects.GameObject
 import core.gameobjects.MovingGameObject
 import ext.TAG
 import ext.set
@@ -23,9 +25,40 @@ typealias ImpactListener = (Vector3) -> Unit
 open class BulletObject(
     startVelocity: Vector3,
     startPos: Vector3,
-) : MovingGameObject() {
+) : MovingGameObject(), HitBox {
 
-    private val ground: Ground
+    // region - HitBox -
+    override val associatedObject: GameObject
+        get() = this
+
+    override val vertices: Iterable<Vector3>
+        get() = listOf(position)
+
+    override fun containsPoint(point: Vector3): Boolean = false
+
+    override fun onIntersection(intersectingBox: HitBox) {
+        super.onIntersection(intersectingBox)
+        alive = false
+        currentScene.addGameObject(Explosion(position = position))
+        for (o in Game.instance.currentScene.children.values) {
+            val distance = o.position.distanceTo(position).toDouble()
+            if (distance < explosionWidth) {
+                o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+            }
+            Log.d(TAG, "distance: $distance")
+
+            if (o is Tank) {
+                o.adjustTransformToGround(ground)
+            }
+        }
+        for (listener in impactListeners) {
+            listener(position)
+        }
+    }
+
+    // endregion
+
+    private val ground: Ground = Game.instance.currentScene.findObject<Ground>()!!
 
     private val impactListeners: MutableList<ImpactListener> = mutableListOf()
 
@@ -40,7 +73,7 @@ open class BulletObject(
     open val gravity = Vector3(0, -20, 0)
 
     val explosionWidth: Double = 30.0
-    val damage: Double = 0.5
+    private val damage: Double = 0.5
 
     override val renderable: Object3D by lazy {
         Group().apply {
@@ -55,7 +88,7 @@ open class BulletObject(
         }
 
     private val dots = BufferGeometry()
-    private val vertices = ArrayDeque<Float>()
+    private val dotVertices = ArrayDeque<Float>()
     private var dotTimer: Double = 0.0
 
     private val bulletMesh = Mesh(
@@ -66,7 +99,6 @@ open class BulletObject(
     ).apply { this@apply.position.set(startPos) }
 
     init {
-        ground = Game.instance.currentScene.findObject<Ground>()!!
         ResourceManager.disc.asPromise().then {
             renderable.add(Points(dots,
                 PointsMaterial().apply {
@@ -88,7 +120,7 @@ open class BulletObject(
         set(value) {}
 
     private fun updateGeometry() {
-        dots.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
+        dots.setAttribute("position", BufferAttribute(Float32Array(dotVertices.toTypedArray()).asDynamic(), 3))
     }
 
     override fun update(delta: Double) {
@@ -96,40 +128,20 @@ open class BulletObject(
         dotTimer += delta
         if (dotTimer > 0.5) {
             dotTimer = 0.0
-            vertices.apply {
+            dotVertices.apply {
                 position.toFloatList().reversed().forEach {
                     addFirst(it)
                 }
             }
             updateGeometry()
         }
-        if (vertices.size > 3 * 10) {
+        if (dotVertices.size > 3 * 10) {
             for (i in 1..3) {
-                vertices.removeLast()
+                dotVertices.removeLast()
             }
             updateGeometry()
         }
-        val height = ground.heightAt(position.x)
-        if (height == null || height > position.y.toFloat()) {
-            alive = false
-            ground.destroy(position.x, explosionWidth)
-            val pos = position.clone().apply { y = height ?: y }
-            currentScene.addGameObject(Explosion(position = pos))
-            for (o in Game.instance.currentScene.children.values) {
-                val distance = o.position.distanceTo(pos).toDouble()
-                if (distance < explosionWidth) {
-                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
-                }
-                Log.d(TAG, "distance: $distance")
-
-                if (o is Tank) {
-                    o.adjustTransformToGround(ground)
-                }
-            }
-            for (listener in impactListeners) {
-                listener(pos)
-            }
-        }
+        hitTest(ground)
     }
 
     companion object: AssetInitializer {
