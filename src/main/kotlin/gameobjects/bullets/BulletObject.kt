@@ -2,10 +2,9 @@ package gameobjects.bullets
 
 import core.Game
 import core.HitBox
+import core.Hittable
 import core.currentScene
-import core.gameobjects.GameObject
 import core.gameobjects.MovingGameObject
-import ext.TAG
 import ext.set
 import ext.toFloatList
 import gameobjects.Ground
@@ -15,7 +14,6 @@ import kotlinx.coroutines.asPromise
 import org.khronos.webgl.Float32Array
 import three.js.*
 import util.AssetInitializer
-import util.Log
 import util.ResourceManager
 import kotlin.math.max
 import kotlin.math.pow
@@ -25,34 +23,37 @@ typealias ImpactListener = (Vector3) -> Unit
 open class BulletObject(
     startVelocity: Vector3,
     startPos: Vector3,
-) : MovingGameObject(), HitBox {
+) : MovingGameObject(), Hittable {
 
     // region - HitBox -
-    override val associatedObject: GameObject
-        get() = this
 
-    override val vertices: Iterable<Vector3>
-        get() = listOf(position)
+    override val hitBox: HitBox = object: HitBox() {
+        override val associatedObject: Hittable
+            get() = this@BulletObject
 
-    override fun containsPoint(point: Vector3): Boolean = false
+        override val vertices: Iterable<Vector3>
+            get() = listOf(this@BulletObject.position)
 
-    override fun onIntersection(intersectingBox: HitBox) {
-        super.onIntersection(intersectingBox)
-        alive = false
-        currentScene.addGameObject(Explosion(position = position))
-        for (o in Game.instance.currentScene.children.values) {
-            val distance = o.position.distanceTo(position).toDouble()
-            if (distance < explosionWidth) {
-                o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+        override fun containsPoint(point: Vector3): Boolean = false
+
+        override fun onIntersection(intersectingBox: Hittable) {
+            super.onIntersection(intersectingBox)
+            this@BulletObject.alive = false
+            currentScene.addGameObject(Explosion(position = this@BulletObject.position))
+            for (o in Game.instance.currentScene.children.values) {
+                val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
+                // TODO: Do not explode if intersecting hitBox at spawn
+                if (distance < explosionWidth) {
+                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+                }
+
+                if (o is Tank) {
+                    o.adjustTransformToGround(ground)
+                }
             }
-            Log.d(TAG, "distance: $distance")
-
-            if (o is Tank) {
-                o.adjustTransformToGround(ground)
+            for (listener in impactListeners) {
+                listener(this@BulletObject.position)
             }
-        }
-        for (listener in impactListeners) {
-            listener(position)
         }
     }
 
@@ -141,7 +142,7 @@ open class BulletObject(
             }
             updateGeometry()
         }
-        hitTest(ground)
+        hitBox.hitTest(ground)
     }
 
     companion object: AssetInitializer {

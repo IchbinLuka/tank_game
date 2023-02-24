@@ -1,16 +1,21 @@
 import core.CuboidHitBox
+import core.HitBox
+import core.Hittable
 import core.gameobjects.GameObject
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.data.blocking.forAll
 import io.kotest.data.row
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
-import three.js.Euler
 import three.js.Object3D
 import three.js.Vector3
 import kotlin.math.PI
 
-class EmptyGameObject: GameObject() {
+class EmptyGameObject: GameObject(), Hittable {
     override val renderable: Object3D? = null
+
+    override val hitBox: HitBox
+        get() = TODO("Not yet implemented")
 }
 
 class CuboidHitBoxTest: StringSpec({
@@ -29,8 +34,7 @@ class CuboidHitBoxTest: StringSpec({
         val rotatedHitBox = CuboidHitBox(
             associatedObject = EmptyGameObject(),
             size = Vector3(1, 1, 1),
-            rotation = Euler(y=.5 * PI)
-        )
+        ).apply { rotation.setFromVector3(Vector3(y=.5 * PI)) }
 
         forAll(
             row(Vector3(), true),
@@ -41,5 +45,22 @@ class CuboidHitBoxTest: StringSpec({
             rotatedHitBox.containsPoint(a) shouldBe b
         }
 
+    }
+
+    "CuboidHitBox should have correct vertices" {
+        val hitBox = CuboidHitBox(associatedObject = EmptyGameObject(), size = Vector3(1, 1, 1))
+
+        // Check vertices
+        val vertices = listOf(
+            Vector3(.5, .5, .5),
+            Vector3(.5, .5, -.5),
+            Vector3(.5, -.5, .5),
+            Vector3(.5, -.5, -.5),
+            Vector3(-.5, .5, .5),
+            Vector3(-.5, .5, -.5),
+            Vector3(-.5, -.5, .5),
+            Vector3(-.5, -.5, -.5)
+        )
+        hitBox.vertices.shouldContainAll(vertices)
     }
 })

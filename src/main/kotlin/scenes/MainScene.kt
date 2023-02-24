@@ -176,14 +176,7 @@ class MainScene(
     }
 
     override fun update(delta: Double) {
-        val iterator = _children.iterator()
-        for (obj in iterator) {
-            obj.value.update(delta)
-            if (!obj.value.alive) {
-                iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
-                obj.value.renderable?.let { scene.remove(it) }
-            }
-        }
+        super.update(delta)
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
             if (currentBulletObject != null) return@forEach

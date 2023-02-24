@@ -1,8 +1,10 @@
 package core.gameobjects
 
+import ext.getWorldEuler
 import ext.toFloatArray
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import three.js.Euler
 import three.js.Object3D
 import three.js.Vector3
 import util.Uuid
@@ -30,6 +32,12 @@ abstract class GameObject {
         set(value) {
             renderable?.position?.set(*value.toFloatArray())
         }
+
+    open val globalPosition: Vector3
+        get() = renderable?.getWorldPosition(Vector3()) ?: Vector3()
+
+    open val globalRotation: Euler
+        get() = renderable?.getWorldEuler(Euler()) ?: Euler()
 
     /** Indicates whether the object should longer be a part of the scene */
     var alive = true
@@ -82,6 +90,16 @@ abstract class GameObject {
 
     /** Gets called on each frame. [delta] indicates the time passed since the last frame in seconds */
     open fun update(delta: Double) {
-        _children.values.forEach { it.update(delta) }
+
+        val iterator = _children.iterator()
+        for (obj in iterator) {
+            if (obj.value.alive) {
+                obj.value.update(delta)
+            }
+            if (!obj.value.alive) {
+                iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
+                obj.value.renderable?.let { renderable?.remove(it) }
+            }
+        }
     }
 }

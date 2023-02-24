@@ -11,5 +11,4 @@ enum class Bullet(
     NoGravity({ v, p ->
         NoGravityBulletObject(startPos = p, startVelocity = v)
     })
-
 }

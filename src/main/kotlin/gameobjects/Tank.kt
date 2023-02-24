@@ -1,5 +1,7 @@
 package gameobjects
 
+import core.CuboidHitBox
+import core.Hittable
 import core.gameobjects.GameObject
 import ext.*
 import gameobjects.bullets.Bullet
@@ -20,7 +22,13 @@ class Tank(
     val startPosition: Vector3,
     val startRotation: Euler = Euler(),
     val name: String = "Unknown"
-) : GameObject(), Observable<Bullet> by DefaultObservable<Bullet>() {
+) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable {
+
+    override val hitBox: CuboidHitBox = CuboidHitBox(size = Vector3(20, 20, 10), associatedObject = this).also {
+        it.addIntersectionListener(::onIntersection)
+    }
+
+    override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
 
     private val _bullets: HashMap<Bullet, Count?> = hashMapOf(
         Bullet.Normal to null,
@@ -35,6 +43,10 @@ class Tank(
     override val invincible: Boolean = false
 
     override val renderable: Object3D = Group()
+
+    private fun onIntersection(other: Hittable) {
+
+    }
 
     fun nextBullet() {
         bulletSequence.next()

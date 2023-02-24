@@ -2,6 +2,8 @@ package gameobjects
 
 import core.HeightMap
 import core.HitBox
+import core.Hittable
+import core.currentScene
 import core.gameobjects.GameObject
 import ext.minus
 import ext.plus
@@ -22,18 +24,22 @@ class Ground(
     private val heightScale: Double = 1.0,
     private val pointDistance: Double = 1.0,
     data: HeightMap = GroundNoise(width = 150, depth = 20, min = -40.0).allValues()
-) : GameObject(), HitBox {
+) : GameObject(), Hittable {
 
     // region - HitBox -
 
-    override val associatedObject: GameObject = this
-    override val vertices: Iterable<Vector3> = emptyList()
-    override fun containsPoint(point: Vector3): Boolean = heightAt(point.x)?.let { it > point.y } ?: false
+    override val hitBox: HitBox = object : HitBox() {
+        override val associatedObject: Hittable = this@Ground
+        override val vertices: Iterable<Vector3> = emptyList()
+        override fun containsPoint(point: Vector3): Boolean =
+            heightAt(point.x)?.let { it > point.y } ?: false || currentScene.findObjects<Tank>()
+                .any { it.hitBox.containsPoint(point) }
 
-    override fun onIntersection(intersectingBox: HitBox) {
-        super.onIntersection(intersectingBox)
-        if (intersectingBox is BulletObject) {
-            destroy(intersectingBox.position.x, intersectingBox.explosionWidth)
+        override fun onIntersection(intersectingBox: Hittable) {
+            super.onIntersection(intersectingBox)
+            if (intersectingBox is BulletObject) {
+                destroy(intersectingBox.position.x, intersectingBox.explosionWidth)
+            }
         }
     }
 
@@ -89,7 +95,10 @@ class Ground(
             if (distance > maxDistance) {
                 it.y
             } else {
-                min(height - sqrt(maxDistance.pow(2) - distance.pow(2)), it.y) //- abs((offset.y - it.z) * 0.0005).pow(2)
+                min(
+                    height - sqrt(maxDistance.pow(2) - distance.pow(2)),
+                    it.y
+                ) //- abs((offset.y - it.z) * 0.0005).pow(2)
             }
         }
         val attribute = positionAttribute
@@ -103,13 +112,15 @@ class Ground(
         for (i in range) {
             for (j in 0 until groundVertices[i].size) {
                 val index = getIndex(i, j)
-                attribute.setY(index, function2(
-                    Vector3(
-                        attribute.getX(index),
-                        attribute.getY(index),
-                        attribute.getZ(index)
+                attribute.setY(
+                    index, function2(
+                        Vector3(
+                            attribute.getX(index),
+                            attribute.getY(index),
+                            attribute.getZ(index)
+                        )
                     )
-                ))
+                )
             }
         }
         attribute.needsUpdate = true
@@ -128,7 +139,11 @@ class Ground(
         val nextIndex = getIndex(ceil(normPos).toInt(), 0)
 
         val progress = (position - attribute.getX(previousIndex).toDouble()) / pointDistance
-        return getLinearGradient(attribute.getY(previousIndex).toDouble(), attribute.getY(nextIndex).toDouble(), progress)
+        return getLinearGradient(
+            attribute.getY(previousIndex).toDouble(),
+            attribute.getY(nextIndex).toDouble(),
+            progress
+        )
     }
 
     fun rotationAt(position: Double): Double {
@@ -159,7 +174,12 @@ class Ground(
     }
 
     private fun averageAscent(start: Int, end: Int): Double {
-        return (positionAttribute.getY(getIndex(end, 1)) - positionAttribute.getY(getIndex(start, 1))).toDouble() / ((end - start) * pointDistance)
+        return (positionAttribute.getY(getIndex(end, 1)) - positionAttribute.getY(
+            getIndex(
+                start,
+                1
+            )
+        )).toDouble() / ((end - start) * pointDistance)
     }
 
     private fun updateMesh() {

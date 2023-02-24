@@ -4,39 +4,52 @@ import core.gameobjects.GameObject
 import ext.minus
 import ext.plus
 import ext.times
-import ext.unaryMinus
-import three.js.Euler
-import three.js.Matrix4
-import three.js.Plane
-import three.js.Vector3
+import three.js.*
 
-interface HitBox {
+interface Hittable {
+    val hitBox: HitBox
+}
 
-    val vertices: Iterable<Vector3>
+typealias IntersectionListener = (Hittable) -> Unit
+abstract class HitBox: GameObject() {
 
-    val associatedObject: GameObject
+    private val intersectionListeners: MutableList<IntersectionListener> = mutableListOf()
 
-    fun containsPoint(point: Vector3): Boolean
+    override val renderable: Object3D = Object3D()
 
-    fun intersects(other: HitBox): Boolean = vertices.any {
+    abstract val vertices: Iterable<Vector3>
+
+    abstract val associatedObject: Hittable
+
+    abstract fun containsPoint(point: Vector3): Boolean
+
+    private fun intersects(other: HitBox): Boolean = vertices.any {
         other.containsPoint(it)
     } || other.vertices.any {
         containsPoint(it)
     }
 
-    fun hitTest(other: HitBox) {
-        if (intersects(other)) {
+    fun hitTest(other: Hittable) {
+        if (intersects(other.hitBox)) {
             onIntersection(other)
-            other.onIntersection(this)
+            other.hitBox.onIntersection(associatedObject)
         }
     }
 
-    fun onIntersection(intersectingBox: HitBox) {}
+    open fun onIntersection(intersectingBox: Hittable) {
+        for (listener in intersectionListeners) {
+            listener.invoke(intersectingBox)
+        }
+    }
+
+    fun addIntersectionListener(listener: IntersectionListener) {
+        intersectionListeners.add(listener)
+    }
 
 }
 
 
-abstract class ConvexPolygonHitBox: HitBox {
+abstract class ConvexPolygonHitBox: HitBox() {
     abstract val planes: Iterable<Plane>
 
     override fun containsPoint(point: Vector3): Boolean = planes.all {
@@ -45,43 +58,51 @@ abstract class ConvexPolygonHitBox: HitBox {
 }
 
 open class CuboidHitBox(
-    val position: Vector3 = Vector3(),
-    val size: Vector3 = Vector3(),
-    val rotation: Euler = Euler(),
-    override val associatedObject: GameObject
+    open val size: Vector3 = Vector3(),
+    override val associatedObject: Hittable
 ): ConvexPolygonHitBox() {
+
+    var rotation: Euler
+        get() = renderable.rotation
+        set(value) { renderable.rotation.setFromVector3(value.toVector3()) }
+
     final override val planes: Iterable<Plane>
+        get() = normals.map {
+            Plane().setFromNormalAndCoplanarPoint(it, globalPosition + it.multiply(size) * 0.5)
+        }
+
     final override val vertices: Iterable<Vector3>
+        get() {
+            val halfSize = size * 0.5
+            val normals = normals
+            val position = globalPosition
+            val v2 = listOf(
+                normals[2] * halfSize.y,
+                normals[3] * halfSize.y,
+            )
+            val v3 = listOf(
+                normals[4] * halfSize.z,
+                normals[5] * halfSize.z,
+            )
+            return listOf(
+                normals[0] * halfSize.x,
+                normals[1] * halfSize.x
+            ).flatMap { n ->
+                v2.flatMap { a ->
+                    v3.map {
+                        position + a + n + it
+                    }
+                }
+            }
+        }
 
-    init {
-        val rotMat = Matrix4().makeRotationFromEuler(rotation)
-
-        val halfSize = size * 0.5
-
-        val normals = listOf(
+    private val normals: List<Vector3>
+        get() = listOf(
             Vector3(x = 1),
             Vector3(x = -1),
             Vector3(y = 1),
             Vector3(y = -1),
             Vector3(z = 1),
             Vector3(z = -1)
-        ).map { it.applyMatrix4(rotMat) }
-
-        vertices = listOf(
-            normals[2] * halfSize.y,
-            normals[3] * halfSize.y,
-            normals[4] * halfSize.z,
-            normals[5] * halfSize.z,
-            - normals[2] * halfSize.y,
-            - normals[3] * halfSize.y,
-            - normals[4] * halfSize.z,
-            - normals[5] * halfSize.z,
-        ).map { it + position + normals[0] }
-
-        planes = normals.map {
-            Plane().setFromNormalAndCoplanarPoint(it, position + it.multiply(size) * 0.5)
-        }
-
-    }
+        ).map { it.applyMatrix4(Matrix4().makeRotationFromEuler(globalRotation)) }
 }
-
