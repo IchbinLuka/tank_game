@@ -44,6 +44,7 @@ class Game(
                 value.preloadAssets()
                 GUIHelper.resetGUI()
                 _currentScene = value
+                _currentScene.onSceneReady()
                 updateComposer()
                 _currentScene.loadAssets()
                 updateRenderer()
@@ -108,7 +109,9 @@ class Game(
             val delta = clock.getDelta().toDouble()
             stats.begin()
             EventManager.keyboardEvents.switchBatches()
+            currentScene.preUpdate()
             currentScene.update(delta)
+            currentScene.lateUpdate()
             // composer.render()
             effect.render(_currentScene.scene, _currentScene.camera)
             stats.update()

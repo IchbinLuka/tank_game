@@ -4,7 +4,9 @@ import core.Game
 import core.HitBox
 import core.Hittable
 import core.currentScene
+import core.gameobjects.GameObject
 import core.gameobjects.MovingGameObject
+import ext.TAG
 import ext.set
 import ext.toFloatList
 import gameobjects.Ground
@@ -14,6 +16,7 @@ import kotlinx.coroutines.asPromise
 import org.khronos.webgl.Float32Array
 import three.js.*
 import util.AssetInitializer
+import util.Log
 import util.ResourceManager
 import kotlin.math.max
 import kotlin.math.pow
@@ -27,7 +30,7 @@ open class BulletObject(
 
     // region - HitBox -
 
-    override val hitBox: HitBox = object: HitBox() {
+    final override val hitBox: HitBox = object: HitBox() {
         override val associatedObject: Hittable
             get() = this@BulletObject
 
@@ -36,8 +39,13 @@ open class BulletObject(
 
         override fun containsPoint(point: Vector3): Boolean = false
 
-        override fun onIntersection(intersectingBox: Hittable) {
-            super.onIntersection(intersectingBox)
+        override fun onIntersectionEnter(intersectingBox: Hittable) {
+            super.onIntersectionEnter(intersectingBox)
+            Log.d(TAG, "intersected with ${intersectingBox.TAG}")
+            Log.d(TAG, "intersections: ${intersections.map { it.TAG }}")
+            if (isNew) return
+            if (intersectingBox !is Tank && intersectingBox !is Ground) return
+
             this@BulletObject.alive = false
             currentScene.addGameObject(Explosion(position = this@BulletObject.position))
             for (o in Game.instance.currentScene.children.values) {
@@ -56,6 +64,8 @@ open class BulletObject(
             }
         }
     }
+
+    override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
 
     // endregion
 
@@ -99,6 +109,7 @@ open class BulletObject(
         }
     ).apply { this@apply.position.set(startPos) }
 
+    private var isNew: Boolean = true
     init {
         ResourceManager.disc.asPromise().then {
             renderable.add(Points(dots,
@@ -142,7 +153,7 @@ open class BulletObject(
             }
             updateGeometry()
         }
-        hitBox.hitTest(ground)
+        if (isNew) { isNew = false }
     }
 
     companion object: AssetInitializer {

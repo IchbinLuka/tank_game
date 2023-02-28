@@ -24,8 +24,9 @@ class Tank(
     val name: String = "Unknown"
 ) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable {
 
-    override val hitBox: CuboidHitBox = CuboidHitBox(size = Vector3(20, 20, 10), associatedObject = this).also {
+    override val hitBox: CuboidHitBox = CuboidHitBox(size = Vector3(5, 10, 5), associatedObject = this, showVertices = false).also {
         it.addIntersectionListener(::onIntersection)
+        it.position = Vector3(x = -2.5)
     }
 
     override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
@@ -42,10 +43,10 @@ class Tank(
 
     override val invincible: Boolean = false
 
-    override val renderable: Object3D = Group()
+    override var renderable: Object3D = Group()
 
     private fun onIntersection(other: Hittable) {
-
+        Log.d(TAG, "intersected with ${other.TAG}")
     }
 
     fun nextBullet() {
@@ -86,6 +87,7 @@ class Tank(
         get() = health > 0
 
     override suspend fun initVisual() {
+        super.initVisual()
         Log.v(TAG, "Loading tank")
         gltf = ResourceManager.tank.await()
         gltf?.scene?.apply {
@@ -96,9 +98,8 @@ class Tank(
         }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
         mainBone?.position?.set(startPosition)
-        renderable.add(mainBone!!)
+        renderable = mainBone!!
         rotation = startRotation
-        Log.d(TAG, "Tank rotation ${rotation.toVector3().toFloatList()}, position: ${position.toFloatList()}")
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
         if (mainBone == null || cannon == null) {
             Log.e(TAG, "Failed to identify mainBone and cannon")
@@ -109,7 +110,6 @@ class Tank(
 
     fun aim(point: Vector2) {
         if (cannon?.rotation == null) return
-        //Log.v("Position: ${cannon!!.position.toFloatList()}")
         val globalpos = cannon!!.getWorldPosition(Vector3())
         val delta = Vector2(point.x - globalpos.x, point.y - globalpos.y)
         var rotation = atan(delta.y.toFloat().absoluteValue / delta.x.toFloat().absoluteValue)
@@ -134,7 +134,6 @@ class Tank(
         if (cannon == null) return null
         val worldPosition = cannon!!.getWorldPosition(Vector3())
         val worldRotation = cannon!!.getWorldEuler(Euler())
-        Log.v(TAG, worldRotation.toVector3().toFloatList().toString())
         if (_bullets[currentBullet] != null) {
             _bullets[currentBullet] = _bullets[currentBullet]!! - 1
         }
@@ -159,29 +158,28 @@ class Tank(
             }
         }
         adjustTransformToGround(ground)
-        Log.d(TAG, "Position: ${mainBone?.position?.toFloatList()}")
     }
 
     fun adjustTransformToGround(ground: Ground) {
         mainBone?.position?.let {
             val pos = mainBone!!.position.x
             it.y = ground.heightAt(pos)!!
-            fire?.position?.y = it.y
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
         }
+        fire?.renderable?.rotation?.z = -renderable.rotation.z.toDouble()
     }
 
     override fun onDeath() {
         super.onDeath()
         MainScope().launch {
             val fire = Fire(radius = 3.0, position = Vector3())
-            Log.d(TAG, "tank position: ${position.toFloatList()}")
             fire.initVisual()
             _children["fire"] = fire
-            renderable.add(fire.renderable!!)
-            fire.position.set(position)
-            Log.d(TAG, "fire position: ${fire.position.toFloatList()}")
+            val fireRenderable = fire.renderable!!
+            renderable.add(fireRenderable)
+            fire.position.set(Vector3())
+            fire.renderable?.rotation?.z = -renderable.rotation.z.toDouble()
         }
     }
 

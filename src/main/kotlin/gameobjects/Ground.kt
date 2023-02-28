@@ -3,8 +3,8 @@ package gameobjects
 import core.HeightMap
 import core.HitBox
 import core.Hittable
-import core.currentScene
 import core.gameobjects.GameObject
+import ext.TAG
 import ext.minus
 import ext.plus
 import ext.toFloatList
@@ -32,16 +32,28 @@ class Ground(
         override val associatedObject: Hittable = this@Ground
         override val vertices: Iterable<Vector3> = emptyList()
         override fun containsPoint(point: Vector3): Boolean =
-            heightAt(point.x)?.let { it > point.y } ?: false || currentScene.findObjects<Tank>()
-                .any { it.hitBox.containsPoint(point) }
+            heightAt(point.x)?.let { it > point.y } ?: false
 
-        override fun onIntersection(intersectingBox: Hittable) {
-            super.onIntersection(intersectingBox)
+        override fun onSceneReady() {
+            super.onSceneReady()
+            // TODO destroy ground when tank is hit
+            /*Log.d(TAG, "Adding listeners")
+            for (tank in currentScene.findObjects<Tank>()) {
+                tank.hitBox.addIntersectionListener(::onIntersectionEnter)
+            }*/
+        }
+
+        override fun onIntersectionEnter(intersectingBox: Hittable) {
+            super.onIntersectionEnter(intersectingBox)
+
+            Log.d(TAG, "intersected with ${intersectingBox.TAG}")
             if (intersectingBox is BulletObject) {
                 destroy(intersectingBox.position.x, intersectingBox.explosionWidth)
             }
         }
     }
+
+    override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
 
     // endregion
 
@@ -77,6 +89,7 @@ class Ground(
     }
 
     override suspend fun initVisual() {
+        super.initVisual()
         updateMesh()
     }
 

@@ -161,7 +161,7 @@ class MainScene(
             applyCustomMat(MeshToonMaterial().apply { color = Color(0x195917) })
             scale.set(Vector3(2, 2, 2))
         })
-        _children.values.forEach { o -> o.renderable?.let { scene.add(it) } }
+        // _children.values.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
         centerCamera()
     }

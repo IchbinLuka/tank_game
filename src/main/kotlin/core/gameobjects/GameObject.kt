@@ -47,6 +47,7 @@ abstract class GameObject {
         MainScope().launch {
             gameObject.initVisual()
             gameObject.renderable?.let { renderable?.add(it) }
+            gameObject.onSceneReady()
         }
     }
 
@@ -75,7 +76,9 @@ abstract class GameObject {
     inline fun <reified T> findObjects(): Collection<T> = children.values.filterIsInstance<T>()
 
     /** Function used for preparing the GameObject. Useful for e.g. loading Assets */
-    open suspend fun initVisual() {}
+    open suspend fun initVisual() {
+        _children.values.forEach { it.initVisual() }
+    }
 
     override fun equals(other: Any?): Boolean = other is GameObject && other.uuid == uuid
     override fun hashCode(): Int = uuid.toInt()
@@ -83,10 +86,26 @@ abstract class GameObject {
     /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
     open suspend fun preloadAssets() {
         _children.values.forEach { it.initVisual() }
+        _children.values.forEach { it.preloadAssets() }
+        _children.values.forEach { o -> o.renderable?.let { renderable?.add(it) } }
     }
 
     /** Called right after the scene starts being rendered */
     open suspend fun loadAssets() {}
+
+    /**
+     * Called when the scene is ready (all GameObjects have been initialized) and before the first game loop iteration.
+     */
+    open fun onSceneReady() {
+        for (child in _children.values) { child.onSceneReady() }
+    }
+
+    /** Called before [update] has been called on any GameObject. Useful for preparations before GameObjects should act */
+    open fun preUpdate() {
+        for (child in _children.values) {
+            child.preUpdate()
+        }
+    }
 
     /** Gets called on each frame. [delta] indicates the time passed since the last frame in seconds */
     open fun update(delta: Double) {
@@ -100,6 +119,12 @@ abstract class GameObject {
                 iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
                 obj.value.renderable?.let { renderable?.remove(it) }
             }
+        }
+    }
+    /** Called after [update] has been called on all other [GameObject]s */
+    open fun lateUpdate() {
+        for (child in _children.values) {
+            child.lateUpdate()
         }
     }
 }

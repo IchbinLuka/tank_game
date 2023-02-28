@@ -29,6 +29,7 @@ class PlaneNoise(
 
 class GroundTest : StringSpec({
     "Ground.heightAt with a flat plane as heightmap should always return 0.0" {
+        // Game()
         val flat = Ground(data = PlaneNoise(50, 50, Vector3(0, 1, 0)).allValues())
         flat.initVisual()
         flat.heightAt(10.0) shouldBe 0.0

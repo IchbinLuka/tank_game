@@ -4,6 +4,8 @@ import core.gameobjects.GameObject
 import ext.minus
 import ext.plus
 import ext.times
+import ext.toFloatList
+import org.khronos.webgl.Float32Array
 import three.js.*
 
 interface Hittable {
@@ -11,7 +13,13 @@ interface Hittable {
 }
 
 typealias IntersectionListener = (Hittable) -> Unit
-abstract class HitBox: GameObject() {
+
+abstract class HitBox : GameObject() {
+
+    val intersections: Collection<Hittable>
+        get() = _intersections
+
+    private var _intersections: HashSet<Hittable> = hashSetOf()
 
     private val intersectionListeners: MutableList<IntersectionListener> = mutableListOf()
 
@@ -21,6 +29,8 @@ abstract class HitBox: GameObject() {
 
     abstract val associatedObject: Hittable
 
+    private var newIntersections: HashSet<Hittable> = hashSetOf()
+
     abstract fun containsPoint(point: Vector3): Boolean
 
     private fun intersects(other: HitBox): Boolean = vertices.any {
@@ -29,14 +39,9 @@ abstract class HitBox: GameObject() {
         containsPoint(it)
     }
 
-    fun hitTest(other: Hittable) {
-        if (intersects(other.hitBox)) {
-            onIntersection(other)
-            other.hitBox.onIntersection(associatedObject)
-        }
-    }
+    private fun hitTest(other: Hittable): Boolean = intersects(other.hitBox) || other.hitBox.intersects(this)
 
-    open fun onIntersection(intersectingBox: Hittable) {
+    open fun onIntersectionEnter(intersectingBox: Hittable) {
         for (listener in intersectionListeners) {
             listener.invoke(intersectingBox)
         }
@@ -46,11 +51,57 @@ abstract class HitBox: GameObject() {
         intersectionListeners.add(listener)
     }
 
+    private fun getIntersections(): Collection<Hittable> = currentScene.findObjects<Hittable>().filter {
+        it != associatedObject && hitTest(it)
+    }
+
+    override fun preUpdate() {
+        super.preUpdate()
+        newIntersections = getIntersections().toHashSet()
+    }
+
+    override fun update(delta: Double) {
+        for (intersection in newIntersections.minus(_intersections)) {
+            onIntersectionEnter(intersection)
+        }
+
+        _intersections = newIntersections
+    }
+
+}
+
+class EnsembleHitBox(
+    private vararg val hitBoxes: HitBox,
+    override val associatedObject: Hittable
+) : HitBox() {
+    override val vertices: Iterable<Vector3>
+        get() = hitBoxes.flatMap { it.vertices }
+
+    override fun containsPoint(point: Vector3): Boolean = hitBoxes.any { it.containsPoint(point) }
 }
 
 
-abstract class ConvexPolygonHitBox: HitBox() {
+abstract class ConvexPolygonHitBox(private val showVertices: Boolean = false) : HitBox() {
+
+    private val geometry: BufferGeometry = BufferGeometry()
+
+    override val renderable: Object3D = if (!showVertices) {
+        Object3D()
+    } else Points(material = PointsMaterial().apply { color = Color(0xffffff) }, geometry = geometry)
+
     abstract val planes: Iterable<Plane>
+
+    override fun update(delta: Double) {
+        super.update(delta)
+        if (showVertices) {
+            geometry.setAttribute("position",
+                BufferAttribute(array = Float32Array(
+                    vertices.flatMap { renderable.worldToLocal(it).toFloatList() }.toTypedArray()
+                ).asDynamic(), itemSize = 3)
+            )
+        }
+
+    }
 
     override fun containsPoint(point: Vector3): Boolean = planes.all {
         it.normal.dot(point - it.coplanarPoint(Vector3())).toDouble() <= 0.0
@@ -59,16 +110,19 @@ abstract class ConvexPolygonHitBox: HitBox() {
 
 open class CuboidHitBox(
     open val size: Vector3 = Vector3(),
-    override val associatedObject: Hittable
-): ConvexPolygonHitBox() {
+    override val associatedObject: Hittable,
+    showVertices: Boolean = false
+) : ConvexPolygonHitBox(showVertices) {
 
     var rotation: Euler
         get() = renderable.rotation
-        set(value) { renderable.rotation.setFromVector3(value.toVector3()) }
+        set(value) {
+            renderable.rotation.setFromVector3(value.toVector3())
+        }
 
     final override val planes: Iterable<Plane>
         get() = normals.map {
-            Plane().setFromNormalAndCoplanarPoint(it, globalPosition + it.multiply(size) * 0.5)
+            Plane().setFromNormalAndCoplanarPoint(it, globalPosition + Vector3(it.x * size.x, it.y * size.y, it.z * size.z) * 0.5)
         }
 
     final override val vertices: Iterable<Vector3>
@@ -95,6 +149,17 @@ open class CuboidHitBox(
                 }
             }
         }
+
+    companion object {
+        val unRotatedNormals = listOf(
+            Vector3(x = 1),
+            Vector3(x = -1),
+            Vector3(y = 1),
+            Vector3(y = -1),
+            Vector3(z = 1),
+            Vector3(z = -1)
+        )
+    }
 
     private val normals: List<Vector3>
         get() = listOf(
