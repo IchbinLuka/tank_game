@@ -23,7 +23,7 @@ class MainTopBar(
     override suspend fun initAssets() {
         GUIHelper.loadTopBar("tool_bar")
         initListeners()
-        updateUI()
+        updateState()
     }
 
     private fun initListeners() {
@@ -38,7 +38,7 @@ class MainTopBar(
         })
     }
 
-    private fun updateState(state: GameState) {
+    private fun updateState(state: GameState = scene.currentState) {
         state.currentTank.addListener { _, _, new ->
             updateBulletCount(new)
         }
