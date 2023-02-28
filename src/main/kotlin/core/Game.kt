@@ -1,5 +1,6 @@
 package core
 
+import DevTools
 import ext.TAG
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -14,7 +15,9 @@ import three.js.Vector2
 import three.js.WebGLRenderer
 import three.js.WebGLRendererParameters
 import three.postprocessing.*
-import util.*
+import util.EventManager
+import util.GUIHelper
+import util.Log
 import kotlin.coroutines.CoroutineContext
 
 val currentScene: GameScene
@@ -76,9 +79,6 @@ class Game(
         composer = EffectComposer(renderer)
         val width = window.innerWidth
         val height = window.innerHeight
-        if (debugLevel == RunConfig.Debug) {
-            OrbitControls(currentScene.camera, renderer.domElement)
-        }
         val bloomPass = UnrealBloomPass(Vector2(window.innerWidth, window.innerHeight), 0.75, 0.2, 0.3)
         val ssaoPass = SSAOPass(currentScene.scene, currentScene.camera, width, height).apply {
             kernelRadius = 5
@@ -90,6 +90,10 @@ class Game(
             //addPass(ssaoPass)
             //addPass(bloomPass)
         }
+    }
+
+    fun activateDeveloperCamera() {
+        OrbitControls(currentScene.camera, renderer.domElement)
     }
 
     init {
@@ -110,7 +114,7 @@ class Game(
             stats.begin()
             EventManager.keyboardEvents.switchBatches()
             currentScene.preUpdate()
-            currentScene.update(delta)
+            currentScene.update(delta * DevTools.gameSpeed)
             currentScene.lateUpdate()
             // composer.render()
             effect.render(_currentScene.scene, _currentScene.camera)
