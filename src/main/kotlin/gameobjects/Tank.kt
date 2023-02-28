@@ -33,7 +33,8 @@ class Tank(
 
     private val _bullets: HashMap<Bullet, Count?> = hashMapOf(
         Bullet.Normal to null,
-        Bullet.NoGravity to 5
+        Bullet.NoGravity to 5,
+        Bullet.Big to 2
     )
 
     val bullets: Map<Bullet, Count?> by ::_bullets

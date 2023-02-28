@@ -10,5 +10,8 @@ enum class Bullet(
     }),
     NoGravity({ v, p ->
         NoGravityBulletObject(startPos = p, startVelocity = v)
+    }),
+    Big({ v, p ->
+        BigBulletObject(startPos = p, startVelocity = v)
     })
 }

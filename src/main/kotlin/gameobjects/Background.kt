@@ -20,8 +20,8 @@ class Background(
         Cloud(
             speed = cloudSpeed,
             startDirection = Direction.Left,
-            min = -300.0,
-            max = 300.0,
+            min = -400.0,
+            max = 400.0,
             startPos = Vector3(
                 x = 600 * random.nextDouble() - 300,
                 y = 45 * random.nextDouble() + 130,

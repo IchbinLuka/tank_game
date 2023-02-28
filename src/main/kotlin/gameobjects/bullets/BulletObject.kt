@@ -47,10 +47,9 @@ open class BulletObject(
             if (intersectingBox !is Tank && intersectingBox !is Ground) return
 
             this@BulletObject.die()
-            currentScene.addGameObject(Explosion(position = this@BulletObject.position))
+            currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
             for (o in Game.instance.currentScene.children.values) {
                 val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
-                // TODO: Do not explode if intersecting hitBox at spawn
                 if (distance < explosionWidth) {
                     o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
                 }
@@ -87,8 +86,8 @@ open class BulletObject(
 
     open val gravity = Vector3(0, -20, 0)
 
-    val explosionWidth: Double = 30.0
-    private val damage: Double = 0.5
+    open val explosionWidth: Double = 30.0
+    protected open val damage: Double = 0.4
 
     override val renderable: Object3D by lazy {
         Group().apply {
@@ -106,12 +105,16 @@ open class BulletObject(
     private val dotVertices = ArrayDeque<Float>()
     private var dotTimer: Double = 0.0
 
-    private val bulletMesh = Mesh(
-        SphereGeometry(radius = bulletRadius),
-        MeshPhongMaterial().apply {
-            color = Color(0x111111)
-        }
-    ).apply { this@apply.position.set(startPos) }
+    protected open val bulletRadius = 0.5f
+
+    protected open val bulletMesh by lazy {
+        Mesh(
+            SphereGeometry(radius = bulletRadius),
+            MeshPhongMaterial().apply {
+                color = Color(0x111111)
+            }
+        ).apply { this@apply.position.set(startPos) }
+    }
 
     private var isNew: Boolean = true
     init {
@@ -162,7 +165,7 @@ open class BulletObject(
     }
 
     companion object: AssetInitializer {
-        const val bulletRadius = 0.5f
+
 
         override suspend fun initAssets() {
             ResourceManager.disc.await()

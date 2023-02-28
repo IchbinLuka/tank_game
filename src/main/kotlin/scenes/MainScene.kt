@@ -35,15 +35,13 @@ class MainScene(
             enableShadows()
         }
         add(light)
-        // add(DirectionalLightHelper(light, size = 10, color = 0xFDFFD9))
-        // fog = FogExp2(0x5f9be5, 0.005)
         add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 150.0
         position.y = 120.0
-        rotation.x = -0.3
+        lookAt(Vector3(y = 100))
     }
 
     override val _children: HashMap<String, GameObject> by lazy {
@@ -62,7 +60,7 @@ class MainScene(
     private var aimIntersection = Vector3()
     private var aiming = true
 
-    private var freeCamera = false
+    private var freeCamera = true
 
     private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
@@ -109,7 +107,7 @@ class MainScene(
                     aimIntersection = intersection.first().point
                     currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
                     if (!freeCamera) {
-                        camera.position.x = aimingPoint.x * 50
+                        camera.position.x = aimingPoint.x * 40
                         centerCamera()
                     }
                 }
@@ -132,7 +130,7 @@ class MainScene(
     }
 
     private fun centerCamera() {
-        camera.lookAt(Vector3(y = 100))
+        camera.lookAt(Vector3(camera.position.x * 0.5, y = 100))
     }
 
     private fun onImpact() {
@@ -159,7 +157,7 @@ class MainScene(
         scene.add(ResourceManager.testLandscape.await().scene.apply {
             enableShadows()
             applyCustomMat(MeshToonMaterial().apply { color = Color(0x195917) })
-            scale.set(Vector3(2, 2, 2))
+            scale.set(Vector3(4, 4, 4))
         })
         // _children.values.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
@@ -173,6 +171,7 @@ class MainScene(
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
         }
+        centerCamera()
     }
 
     override fun update(delta: Double) {
