@@ -46,7 +46,7 @@ open class BulletObject(
             if (isNew) return
             if (intersectingBox !is Tank && intersectingBox !is Ground) return
 
-            this@BulletObject.alive = false
+            this@BulletObject.die()
             currentScene.addGameObject(Explosion(position = this@BulletObject.position))
             for (o in Game.instance.currentScene.children.values) {
                 val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
@@ -59,9 +59,6 @@ open class BulletObject(
                     o.adjustTransformToGround(ground)
                 }
             }
-            for (listener in impactListeners) {
-                listener(this@BulletObject.position)
-            }
         }
     }
 
@@ -69,7 +66,7 @@ open class BulletObject(
 
     // endregion
 
-    private val ground: Ground = Game.instance.currentScene.findObject<Ground>()!!
+    protected val ground: Ground = Game.instance.currentScene.findObject<Ground>()!!
 
     private val impactListeners: MutableList<ImpactListener> = mutableListOf()
 
@@ -79,6 +76,13 @@ open class BulletObject(
 
     fun removeImpactListener(listener: ImpactListener) {
         impactListeners.remove(listener)
+    }
+
+    override fun onDeath() {
+        super.onDeath()
+        for (listener in impactListeners) {
+            listener(this@BulletObject.position)
+        }
     }
 
     open val gravity = Vector3(0, -20, 0)
@@ -153,6 +157,7 @@ open class BulletObject(
             }
             updateGeometry()
         }
+        if (ground.heightAt(position.x) == null) { die() }
         if (isNew) { isNew = false }
     }
 

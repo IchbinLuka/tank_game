@@ -40,7 +40,8 @@ abstract class GameObject {
         get() = renderable?.getWorldEuler(Euler()) ?: Euler()
 
     /** Indicates whether the object should longer be a part of the scene */
-    var alive = true
+    val alive: Boolean get() = _alive
+    private var _alive = true
 
     fun addGameObject(gameObject: GameObject, name: String? = null) {
         _children[name ?: gameObject.uuid.toString()] = gameObject
@@ -55,6 +56,11 @@ abstract class GameObject {
         if (invincible || _health == 0.0) return
         _health = max(_health - amount, 0.0)
         if (_health == 0.0) onDeath()
+    }
+
+    fun die() {
+        _alive = false
+        onDeath()
     }
 
     protected open fun onDeath() {}

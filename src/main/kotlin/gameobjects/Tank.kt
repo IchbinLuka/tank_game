@@ -103,7 +103,7 @@ class Tank(
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
         if (mainBone == null || cannon == null) {
             Log.e(TAG, "Failed to identify mainBone and cannon")
-            alive = false
+            die()
         }
         Log.d(TAG, "Loaded tank")
     }
