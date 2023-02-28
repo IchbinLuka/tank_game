@@ -121,34 +121,49 @@ open class CuboidHitBox(
         }
 
     final override val planes: Iterable<Plane>
-        get() = normals.map {
-            Plane().setFromNormalAndCoplanarPoint(it, globalPosition + Vector3(it.x * size.x, it.y * size.y, it.z * size.z) * 0.5)
-        }
+        get() = _planes
+
+    private var _planes: Iterable<Plane> = listOf()
 
     final override val vertices: Iterable<Vector3>
-        get() {
-            val halfSize = size * 0.5
-            val normals = normals
-            val position = globalPosition
-            val v2 = listOf(
-                normals[2] * halfSize.y,
-                normals[3] * halfSize.y,
-            )
-            val v3 = listOf(
-                normals[4] * halfSize.z,
-                normals[5] * halfSize.z,
-            )
-            return listOf(
-                normals[0] * halfSize.x,
-                normals[1] * halfSize.x
-            ).flatMap { n ->
-                v2.flatMap { a ->
-                    v3.map {
-                        position + a + n + it
-                    }
+        get() = _vertices
+    private var _vertices: Iterable<Vector3> = listOf()
+
+    private fun updateVertices() {
+        val halfSize = size * 0.5
+        val normals = normals
+        val position = globalPosition
+        val v2 = listOf(
+            normals[2] * halfSize.y,
+            normals[3] * halfSize.y,
+        )
+        val v3 = listOf(
+            normals[4] * halfSize.z,
+            normals[5] * halfSize.z,
+        )
+        _vertices = listOf(
+            normals[0] * halfSize.x,
+            normals[1] * halfSize.x
+        ).flatMap { n ->
+            v2.flatMap { a ->
+                v3.map {
+                    position + a + n + it
                 }
             }
         }
+    }
+
+    private fun updatePlanes() {
+        _planes = normals.map {
+            Plane().setFromNormalAndCoplanarPoint(it, globalPosition + Vector3(it.x * size.x, it.y * size.y, it.z * size.z) * 0.5)
+        }
+    }
+
+    override fun preUpdate() {
+        updateVertices()
+        updatePlanes()
+        super.preUpdate()
+    }
 
     companion object {
         val unRotatedNormals = listOf(
