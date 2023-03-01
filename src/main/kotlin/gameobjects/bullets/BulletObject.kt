@@ -49,9 +49,13 @@ open class BulletObject(
             this@BulletObject.die()
             currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
             for (o in Game.instance.currentScene.children.values) {
-                val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
-                if (distance < explosionWidth) {
-                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+                if (o == intersectingBox) {
+                    o.damage(damage)
+                } else {
+                    val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
+                    if (distance < explosionWidth) {
+                        o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+                    }
                 }
 
                 if (o is Tank) {

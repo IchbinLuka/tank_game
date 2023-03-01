@@ -154,8 +154,12 @@ class Tank(
     fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
         mainBone?.position?.let {
             val ascend = abs(ground.rotationAt(it.x))
+            var newPos = it.clone()
             if (true || ascend > 0.5 * PI) {
-                it.addScaledVector(vector3, deltaTime)
+                newPos = newPos.addScaledVector(vector3, deltaTime)
+            }
+            if (ground.heightAt(newPos.x) != null) {
+                it.set(newPos)
             }
         }
         adjustTransformToGround(ground)
@@ -168,7 +172,7 @@ class Tank(
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
         }
-        fire?.renderable?.rotation?.z = -renderable.rotation.z.toDouble()
+        updateFireRotation()
     }
 
     override fun onDeath() {
@@ -180,8 +184,12 @@ class Tank(
             val fireRenderable = fire.renderable!!
             renderable.add(fireRenderable)
             fire.position.set(Vector3())
-            fire.renderable?.rotation?.z = -renderable.rotation.z.toDouble()
+            updateFireRotation()
         }
+    }
+
+    private fun updateFireRotation() {
+        fire?.renderable?.rotation?.z = -renderable.rotation.z.toDouble() + if (direction == Direction.Right) 0.0 else 2 * PI
     }
 
     private fun setDirection(direction: Direction) {
