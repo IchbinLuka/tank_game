@@ -1,6 +1,5 @@
 package scenes.test
 
-import core.gameobjects.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
@@ -9,9 +8,6 @@ import three.js.*
 import kotlin.math.PI
 
 class MeshTestScene : GameScene() {
-
-    override val children: HashSet<GameObject>
-        get() = hashSetOf()
 
     override val scene = Scene().apply {
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 1))

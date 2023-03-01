@@ -6,7 +6,6 @@
     <style>
         body {
             margin: 0;
-            cursor: url("textures/sprites/crosshair.ico"), default;
         }
         canvas {
         }
@@ -17,10 +16,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Mouse+Memoirs&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="uiContainer" id="uiContainer" autofocus></div>
+    <div class="uiContainer" style="pointer-events: none;">
+        <div id="uiContainer" style="pointer-events: auto"></div>
+    </div>
+
     <div id="full">
-        <div id="topBar"></div>
-        <canvas id="gameContainer" style="flex: 1"></canvas>
+        <div id="topBar" autofocus></div>
+        <canvas id="gameContainer" style="flex: 1; cursor: crosshair;"></canvas>
     </div>
 </body>
 <script src="tank_game.js"></script>

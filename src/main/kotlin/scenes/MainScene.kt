@@ -2,12 +2,14 @@ package scenes
 
 import core.Game
 import core.gameobjects.GameObject
-import ext.*
+import ext.applyCustomMat
+import ext.aspectRatio
+import ext.enableShadows
+import ext.set
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.bullets.BulletObject
-import gameobjects.particles.Explosion
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -16,8 +18,7 @@ import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import ui.MainTopBar
 import util.*
-import kotlin.math.max
-import kotlin.math.pow
+import kotlin.collections.set
 import kotlin.properties.Delegates
 
 data class GameState(val currentTank: Tank)
@@ -34,23 +35,23 @@ class MainScene(
             enableShadows()
         }
         add(light)
-        // add(DirectionalLightHelper(light, size = 10, color = 0xFDFFD9))
-        // fog = FogExp2(0x5f9be5, 0.005)
         add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 150.0
         position.y = 120.0
-        rotation.x = -0.3
+        lookAt(Vector3(y = 100))
     }
 
-    override val children: MutableSet<GameObject> by lazy {
-        hashSetOf<GameObject>(
-            ground,
-            Background()
+    override val _children: HashMap<String, GameObject> by lazy {
+        hashMapOf(
+            "ground" to ground,
+            "background" to Background()
         ).apply {
-            addAll(tanks)
+            for (tank in tanks) {
+                set(tank.name, tank)
+            }
         }
     }
 
@@ -59,16 +60,11 @@ class MainScene(
     private var aimIntersection = Vector3()
     private var aiming = true
 
-    private var freeCamera = false
+    private var freeCamera = true
 
     private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
-    /*private val tanks = mutableListOf<Tank>(
-        Tank(startPosition = Vector3(x = 0, z = 1.5), name = "Green"),
-        Tank(color = Color(0xfc522f), startPosition = Vector3(x = -60, z = 1.5), name = "Orange"),
-        Tank(color = Color(0xff0000), startPosition = Vector3(x = 60, z = 1.5), name = "Red")
-    )*/
 
     private val tanks = MutableList(numPlayers) {
         val data = tankColors[it]
@@ -86,9 +82,7 @@ class MainScene(
 
     private var currentBulletObject: BulletObject? = null
 
-    var currentState: GameState by Delegates.observable(GameState(currentTank), notifyObservers)
-
-    // private var awaitingShot = false
+    var currentState: GameState by Delegates.observable(GameState(currentTank), ::notifyObservers)
 
     private val topBar = MainTopBar(this)
 
@@ -113,22 +107,22 @@ class MainScene(
                     aimIntersection = intersection.first().point
                     currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
                     if (!freeCamera) {
-                        camera.position.x = aimingPoint.x * 50
+                        camera.position.x = aimingPoint.x * 40
                         centerCamera()
                     }
                 }
             }
         })
-        window.addEventListener("click", { event ->
+        Game.instance.gameContainer.addEventListener("click", { event ->
             event as MouseEvent
             if (currentBulletObject == null) {
                 val distance = aimIntersection.distanceTo(currentTank.position)
-                currentBulletObject = currentTank.shoot(distance.toDouble() / 2, ground)
+                currentBulletObject = currentTank.shoot(distance.toDouble() / 2)
                 currentBulletObject!!.let {
-                    children.add(it)
+                    _children["bullet"] = it
                     scene.add(it.renderable)
                     it.addImpactListener { v ->
-                        onImpact(v)
+                        onImpact()
                     }
                 }
             }
@@ -136,20 +130,10 @@ class MainScene(
     }
 
     private fun centerCamera() {
-        camera.lookAt(Vector3(y = 100))
+        camera.lookAt(Vector3(camera.position.x * 0.5, y = 100))
     }
 
-    private fun onImpact(vector3: Vector3) {
-        val iterator = tanks.iterator()
-        iterator.forEach { tank ->
-            val distance = tank.position.distanceTo(vector3).toDouble()
-            if (distance < currentBulletObject!!.explosionWidth) {
-                tank.damage((1 / max(distance.pow(2) * .05, 1.0)) * currentBulletObject!!.damage)
-            }
-            Log.d(TAG, "distance: $distance")
-            tank.adjustTransformToGround(ground)
-        }
-        addGameObject(Explosion(position = vector3))
+    private fun onImpact() {
         currentBulletObject = null
         nextTank()
     }
@@ -173,31 +157,25 @@ class MainScene(
         scene.add(ResourceManager.testLandscape.await().scene.apply {
             enableShadows()
             applyCustomMat(MeshToonMaterial().apply { color = Color(0x195917) })
-            scale.set(Vector3(2, 2, 2))
+            scale.set(Vector3(4, 4, 4))
         })
-        children.forEach { o -> o.renderable?.let { scene.add(it) } }
+        // _children.values.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
         centerCamera()
     }
 
     override suspend fun loadAssets() {
         super.loadAssets()
-        topBar.init()
+        topBar.initAssets()
         scene.background = Color(0x64DBFF)
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
         }
+        centerCamera()
     }
 
     override fun update(delta: Double) {
-        val iterator = children.iterator()
-        for (obj in iterator) {
-            obj.update(delta)
-            if (!obj.alive) {
-                iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
-                obj.renderable?.let { scene.remove(it) }
-            }
-        }
+        super.update(delta)
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
             if (currentBulletObject != null) return@forEach

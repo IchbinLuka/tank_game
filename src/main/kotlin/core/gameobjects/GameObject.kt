@@ -1,9 +1,15 @@
 package core.gameobjects
 
+import ext.getWorldEuler
 import ext.toFloatArray
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import three.js.Euler
 import three.js.Object3D
 import three.js.Vector3
 import util.Uuid
+import kotlin.math.max
+import kotlin.reflect.KClass
 
 abstract class GameObject {
     abstract val renderable: Object3D?
@@ -11,8 +17,15 @@ abstract class GameObject {
     /** A unique Identifier for the GameObject */
     val uuid = Uuid.next()
 
-    /** [MutableSet] containing the relevant GameObjects */
-    open val children: MutableSet<GameObject> = hashSetOf()
+    /** [MutableMap] containing the relevant GameObjects */
+    protected open val _children: MutableMap<String, GameObject> = hashMapOf()
+    val children: Map<String, GameObject> by ::_children
+    // open val _children: MutableSet<GameObject> = hashSetOf()
+
+    protected var _health: Double = 1.0
+
+    open val health: Double by ::_health
+    open val invincible: Boolean = true
 
     open var position: Vector3
         get() = renderable?.position ?: Vector3()
@@ -20,25 +33,104 @@ abstract class GameObject {
             renderable?.position?.set(*value.toFloatArray())
         }
 
+    open val globalPosition: Vector3
+        get() = renderable?.getWorldPosition(Vector3()) ?: Vector3()
+
+    open val globalRotation: Euler
+        get() = renderable?.getWorldEuler(Euler()) ?: Euler()
+
     /** Indicates whether the object should longer be a part of the scene */
-    var alive = true
+    val alive: Boolean get() = _alive
+    private var _alive = true
+
+    fun addGameObject(gameObject: GameObject, name: String? = null) {
+        _children[name ?: gameObject.uuid.toString()] = gameObject
+        MainScope().launch {
+            gameObject.initVisual()
+            gameObject.renderable?.let { renderable?.add(it) }
+            gameObject.onSceneReady()
+        }
+    }
+
+    open fun damage(amount: Double) {
+        if (invincible || _health == 0.0) return
+        _health = max(_health - amount, 0.0)
+        if (_health == 0.0) onDeath()
+    }
+
+    fun die() {
+        _alive = false
+        onDeath()
+    }
+
+    protected open fun onDeath() {}
+
+    fun findObjectWithNameAndType(name: String? = null, type: KClass<*>): Any? {
+        if (name == null) {
+            for (gameObject in children.values) {
+                if (type.isInstance(gameObject)) return gameObject
+            }
+        } else {
+            val gameObject = children[name]
+            if (type.isInstance(gameObject)) return gameObject
+        }
+        return null
+    }
+
+    inline fun <reified T> findObject(name: String? = null): T? = findObjectWithNameAndType(name, T::class) as T?
+
+    inline fun <reified T> findObjects(): Collection<T> = children.values.filterIsInstance<T>()
 
     /** Function used for preparing the GameObject. Useful for e.g. loading Assets */
-    open suspend fun initVisual() {}
+    open suspend fun initVisual() {
+        _children.values.forEach { it.initVisual() }
+    }
 
     override fun equals(other: Any?): Boolean = other is GameObject && other.uuid == uuid
     override fun hashCode(): Int = uuid.toInt()
 
     /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
     open suspend fun preloadAssets() {
-        children.forEach { it.initVisual() }
+        _children.values.forEach { it.initVisual() }
+        _children.values.forEach { it.preloadAssets() }
+        _children.values.forEach { o -> o.renderable?.let { renderable?.add(it) } }
     }
 
     /** Called right after the scene starts being rendered */
     open suspend fun loadAssets() {}
 
+    /**
+     * Called when the scene is ready (all GameObjects have been initialized) and before the first game loop iteration.
+     */
+    open fun onSceneReady() {
+        for (child in _children.values) { child.onSceneReady() }
+    }
+
+    /** Called before [update] has been called on any GameObject. Useful for preparations before GameObjects should act */
+    open fun preUpdate() {
+        for (child in _children.values) {
+            child.preUpdate()
+        }
+    }
+
     /** Gets called on each frame. [delta] indicates the time passed since the last frame in seconds */
     open fun update(delta: Double) {
-        children.forEach { it.update(delta) }
+
+        val iterator = _children.iterator()
+        for (obj in iterator) {
+            if (obj.value.alive) {
+                obj.value.update(delta)
+            }
+            if (!obj.value.alive) {
+                iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
+                obj.value.renderable?.let { renderable?.remove(it) }
+            }
+        }
+    }
+    /** Called after [update] has been called on all other [GameObject]s */
+    open fun lateUpdate() {
+        for (child in _children.values) {
+            child.lateUpdate()
+        }
     }
 }

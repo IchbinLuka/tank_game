@@ -1,6 +1,5 @@
 package scenes.test
 
-import core.gameobjects.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import scenes.GameScene
@@ -12,9 +11,6 @@ class BloomTestScene: GameScene() {
         emissiveIntensity = 2
         color = Color(0x00aa00)
     })
-
-    override val children: HashSet<GameObject>
-        get() = TODO("Not yet implemented")
 
     override val scene: Scene = Scene().apply {
         add(cube)

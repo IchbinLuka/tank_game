@@ -8,13 +8,11 @@ interface Observable<T> {
 
     val observers: Iterable<PropertyChangeListener<T>>
 
-    val notifyObservers: (KProperty<*>, T, T) -> Unit
-        get() = {
-                property: KProperty<*>, a: T, b: T ->
-            for (observer in observers) {
-                observer(property, a, b)
-            }
+    fun notifyObservers(property: KProperty<*>, a: T, b: T) {
+        for (observer in observers) {
+            observer(property, a, b)
         }
+    }
 
     fun addListener(listener: PropertyChangeListener<T>)
     fun removeListener(listener: PropertyChangeListener<T>)

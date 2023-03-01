@@ -1,5 +1,5 @@
 package ui
 
 abstract class UIController {
-    abstract suspend fun init()
+    abstract suspend fun initAssets()
 }

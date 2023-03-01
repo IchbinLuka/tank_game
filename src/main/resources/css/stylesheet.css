@@ -79,3 +79,33 @@ html, body, #full {
     cursor: pointer;
 
 }
+
+.arrow-button {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    padding: 3px;
+    cursor: pointer;
+}
+
+.right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+.left {
+    transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+}
+
+.up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+}
+
+.down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}

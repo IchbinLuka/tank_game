@@ -1,5 +1,6 @@
 package core
 
+import DevTools
 import ext.TAG
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -18,6 +19,9 @@ import util.EventManager
 import util.GUIHelper
 import util.Log
 import kotlin.coroutines.CoroutineContext
+
+val currentScene: GameScene
+    get() = Game.instance.currentScene
 
 class Game(
     initialScene: GameScene
@@ -41,6 +45,7 @@ class Game(
                 value.preloadAssets()
                 GUIHelper.resetGUI()
                 _currentScene = value
+                _currentScene.onSceneReady()
                 updateComposer()
                 _currentScene.loadAssets()
                 updateRenderer()
@@ -50,8 +55,10 @@ class Game(
 
     private val stats = Stats().apply {
         showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+        domElement.id = "fpsDisplay"
         document.body?.appendChild(domElement)
         with(domElement.style) {
+            visibility = "hidden"
             position = "fixed"
             top = "0px"
             left = "0px"
@@ -74,7 +81,6 @@ class Game(
         composer = EffectComposer(renderer)
         val width = window.innerWidth
         val height = window.innerHeight
-        OrbitControls(currentScene.camera, renderer.domElement)
         val bloomPass = UnrealBloomPass(Vector2(window.innerWidth, window.innerHeight), 0.75, 0.2, 0.3)
         val ssaoPass = SSAOPass(currentScene.scene, currentScene.camera, width, height).apply {
             kernelRadius = 5
@@ -86,6 +92,10 @@ class Game(
             //addPass(ssaoPass)
             //addPass(bloomPass)
         }
+    }
+
+    fun activateDeveloperCamera() {
+        OrbitControls(currentScene.camera, renderer.domElement)
     }
 
     init {
@@ -105,7 +115,9 @@ class Game(
             val delta = clock.getDelta().toDouble()
             stats.begin()
             EventManager.keyboardEvents.switchBatches()
-            currentScene.update(delta)
+            currentScene.preUpdate()
+            currentScene.update(delta * DevTools.gameSpeed)
+            currentScene.lateUpdate()
             // composer.render()
             effect.render(_currentScene.scene, _currentScene.camera)
             stats.update()

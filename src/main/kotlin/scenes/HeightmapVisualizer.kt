@@ -1,7 +1,6 @@
 package scenes
 
 import core.HeightMap
-import core.gameobjects.GameObject
 import ext.aspectRatio
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
@@ -12,7 +11,6 @@ class HeightmapVisualizer(
     private val heightScale: Float = 1f,
     private val heightMap: HeightMap
 ): GameScene() {
-    override val children: MutableSet<GameObject> = hashSetOf()
 
     override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 4.0

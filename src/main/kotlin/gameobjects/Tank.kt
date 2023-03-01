@@ -1,5 +1,7 @@
 package gameobjects
 
+import core.CuboidHitBox
+import core.Hittable
 import core.gameobjects.GameObject
 import ext.*
 import gameobjects.bullets.Bullet
@@ -20,16 +22,45 @@ class Tank(
     val startPosition: Vector3,
     val startRotation: Euler = Euler(),
     val name: String = "Unknown"
-) : GameObject(), Observable<Bullet> by DefaultObservable<Bullet>() {
+) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable {
 
-    private val bullets: List<Pair<Bullet, Count>>
-        get() = TODO()
+    override val hitBox: CuboidHitBox = CuboidHitBox(size = Vector3(5, 10, 5), associatedObject = this, showVertices = false).also {
+        it.addIntersectionListener(::onIntersection)
+        it.position = Vector3(x = -2.5)
+    }
 
-    val currentBullet: Bullet by Delegates.observable(bullets.first().first, notifyObservers)
+    override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
 
+    private val _bullets: HashMap<Bullet, Count?> = hashMapOf(
+        Bullet.Normal to null,
+        Bullet.NoGravity to 5,
+        Bullet.Big to 2
+    )
 
+    val bullets: Map<Bullet, Count?> by ::_bullets
 
-    override val renderable: Object3D = Group()
+    private val bulletSequence = ScrollableList(bullets.keys)
+    var currentBullet: Bullet by Delegates.observable(bulletSequence.current, ::notifyObservers)
+
+    override val invincible: Boolean = false
+
+    override var renderable: Object3D = Group()
+
+    private fun onIntersection(other: Hittable) {
+        Log.d(TAG, "intersected with ${other.TAG}")
+    }
+
+    fun nextBullet() {
+        bulletSequence.next()
+        bulletSequence.nextUntil { (bullets[it] ?: 1) <= 0 }
+        currentBullet = bulletSequence.current
+    }
+
+    fun previousBullet() {
+        bulletSequence.previous()
+        bulletSequence.previousUntil { (bullets[it] ?: 1) <= 0 }
+        currentBullet = bulletSequence.current
+    }
 
     override var position: Vector3
         get() = mainBone?.position!!
@@ -44,7 +75,8 @@ class Tank(
 
     private var cannon: Object3D? = null
 
-    private var fire: Fire? = null
+    private val fire: Fire?
+        get() = findObject("fire")
 
     var rotation: Euler
         set(value) {
@@ -52,13 +84,11 @@ class Tank(
         }
         get() = mainBone!!.rotation
 
-    val health: Double by ::_health
-    private var _health: Double = 1.0
-
     val active: Boolean
         get() = health > 0
 
     override suspend fun initVisual() {
+        super.initVisual()
         Log.v(TAG, "Loading tank")
         gltf = ResourceManager.tank.await()
         gltf?.scene?.apply {
@@ -69,20 +99,18 @@ class Tank(
         }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
         mainBone?.position?.set(startPosition)
-        renderable.add(mainBone!!)
+        renderable = mainBone!!
         rotation = startRotation
-        Log.d(TAG, "Tank rotation ${rotation.toVector3().toFloatList()}, position: ${position.toFloatList()}")
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
         if (mainBone == null || cannon == null) {
             Log.e(TAG, "Failed to identify mainBone and cannon")
-            alive = false
+            die()
         }
         Log.d(TAG, "Loaded tank")
     }
 
     fun aim(point: Vector2) {
         if (cannon?.rotation == null) return
-        //Log.v("Position: ${cannon!!.position.toFloatList()}")
         val globalpos = cannon!!.getWorldPosition(Vector3())
         val delta = Vector2(point.x - globalpos.x, point.y - globalpos.y)
         var rotation = atan(delta.y.toFloat().absoluteValue / delta.x.toFloat().absoluteValue)
@@ -103,55 +131,65 @@ class Tank(
         }
     }
 
-    fun shoot(velocity: Double, ground: Ground): BulletObject? {
+    fun shoot(velocity: Double): BulletObject? {
         if (cannon == null) return null
         val worldPosition = cannon!!.getWorldPosition(Vector3())
         val worldRotation = cannon!!.getWorldEuler(Euler())
-        Log.v(TAG, worldRotation.toVector3().toFloatList().toString())
-        return BulletObject(
-            startPos = Vector3(worldPosition.x, worldPosition.y),
-            startVelocity = Vector3(
+        if (_bullets[currentBullet] != null) {
+            _bullets[currentBullet] = _bullets[currentBullet]!! - 1
+        }
+        val bulletObject =  currentBullet.createObject(
+            Vector3(
                 -sin(worldRotation.z.toDouble()) * velocity,
                 cos(worldRotation.z.toDouble()) * velocity * direction.vector3.x,
             ),
-            ground = ground,
+            Vector3(worldPosition.x, worldPosition.y)
         )
+        if ((_bullets[currentBullet] ?: 1) <= 0) {
+            nextBullet()
+        }
+        return bulletObject
     }
 
     fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
         mainBone?.position?.let {
             val ascend = abs(ground.rotationAt(it.x))
+            var newPos = it.clone()
             if (true || ascend > 0.5 * PI) {
-                it.addScaledVector(vector3, deltaTime)
+                newPos = newPos.addScaledVector(vector3, deltaTime)
+            }
+            if (ground.heightAt(newPos.x) != null) {
+                it.set(newPos)
             }
         }
         adjustTransformToGround(ground)
-        Log.d(TAG, "Position: ${mainBone?.position?.toFloatList()}")
     }
 
     fun adjustTransformToGround(ground: Ground) {
         mainBone?.position?.let {
             val pos = mainBone!!.position.x
             it.y = ground.heightAt(pos)!!
-            fire?.position?.y = it.y
             val rotation = ground.rotationAt(pos)
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
         }
+        updateFireRotation()
     }
 
-    fun damage(amount: Double) {
-        if (!active) return
-        _health = max(_health - amount, 0.0)
-        if (_health <= 0.0) {
-            MainScope().launch {
-                fire = Fire(radius = 3.0, position = Vector3())
-                Log.d(TAG, "tank position: ${position.toFloatList()}")
-                fire!!.initVisual()
-                renderable.add(fire!!.renderable!!)
-                fire?.position?.set(position)
-                Log.d(TAG, "fire position: ${fire!!.position.toFloatList()}")
-            }
+    override fun onDeath() {
+        super.onDeath()
+        MainScope().launch {
+            val fire = Fire(radius = 3.0, position = Vector3())
+            fire.initVisual()
+            _children["fire"] = fire
+            val fireRenderable = fire.renderable!!
+            renderable.add(fireRenderable)
+            fire.position.set(Vector3())
+            updateFireRotation()
         }
+    }
+
+    private fun updateFireRotation() {
+        fire?.renderable?.rotation?.z = -renderable.rotation.z.toDouble() + if (direction == Direction.Right) 0.0 else 2 * PI
     }
 
     private fun setDirection(direction: Direction) {
@@ -163,9 +201,5 @@ class Tank(
 
     private fun switchDirection() {
         setDirection(direction.inverse)
-    }
-
-    override fun update(deltaTime: Double) {
-        fire?.update(deltaTime)
     }
 }

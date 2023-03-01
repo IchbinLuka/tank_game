@@ -116,7 +116,7 @@ open class BasicParticleSystem(
         if (!alive || particles.isEmpty()) return
         val currentTime = Date.now()
         if (currentTime - startTime > totalLifetime) {
-            alive = false
+            die()
             onFinished()
         }
         // Update each particle
