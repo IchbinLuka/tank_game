@@ -26,4 +26,8 @@ object DevTools {
     fun loadConfiguration(json: String) {
         Game.instance.currentScene.applyConfiguration(Json.decodeFromString(json))
     }
+
+    var showFps: Boolean
+        get() = (Element.fromId("fpsDisplay") as HTMLElement).style.visibility != "hidden"
+        set(value) { (Element.fromId("fpsDisplay") as HTMLElement).style.visibility = if (value) "visible" else "hidden" }
 }

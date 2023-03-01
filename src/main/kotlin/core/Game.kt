@@ -55,8 +55,10 @@ class Game(
 
     private val stats = Stats().apply {
         showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+        domElement.id = "fpsDisplay"
         document.body?.appendChild(domElement)
         with(domElement.style) {
+            visibility = "hidden"
             position = "fixed"
             top = "0px"
             left = "0px"
