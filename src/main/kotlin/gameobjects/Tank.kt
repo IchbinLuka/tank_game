@@ -24,9 +24,16 @@ class Tank(
     val name: String = "Unknown"
 ) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable {
 
-    override val hitBox: CuboidHitBox = CuboidHitBox(size = Vector3(5, 10, 5), associatedObject = this, showVertices = false).also {
-        it.addIntersectionListener(::onIntersection)
-        it.position = Vector3(x = -2.5)
+    override val hitBox: CuboidHitBox = object: CuboidHitBox(size = Vector3(5, 10, 5), associatedObject = this@Tank, showVertices = false) {
+        init {
+            position = Vector3(x = -2.5)
+        }
+
+        override fun onIntersectionEnter(intersectingBox: Hittable) {
+            Log.d(TAG, "intersected with ${intersectingBox.TAG}")
+            if (spawnedBullet) return
+            super.onIntersectionEnter(intersectingBox)
+        }
     }
 
     override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
@@ -44,10 +51,18 @@ class Tank(
 
     override val invincible: Boolean = false
 
+    private var spawnedBullet: Boolean = false
+
     override var renderable: Object3D = Group()
 
-    private fun onIntersection(other: Hittable) {
-        Log.d(TAG, "intersected with ${other.TAG}")
+    private val deathListeners: MutableList<() -> Unit> = mutableListOf()
+
+    fun addDeathListener(listener: () -> Unit) {
+        deathListeners.add(listener)
+    }
+
+    fun removeDeathListener(listener: () -> Unit) {
+        deathListeners.remove(listener)
     }
 
     fun nextBullet() {
@@ -114,14 +129,14 @@ class Tank(
         val globalpos = cannon!!.getWorldPosition(Vector3())
         val delta = Vector2(point.x - globalpos.x, point.y - globalpos.y)
         var rotation = atan(delta.y.toFloat().absoluteValue / delta.x.toFloat().absoluteValue)
-        val globalRot = cannon!!.getWorldEuler(Euler())
+        val (_, _, globalRot) = cannon!!.getWorldEuler(Euler())
         if (delta.x.toFloat() * delta.y.toFloat() * direction.vector3.x.toFloat() < 0) {
             rotation *= -1
         }
         if (delta.x.toFloat() < 0) {
             rotation += PI.toFloat()
         }
-        val angle = rotation - globalRot.z - 0.5 * PI
+        val angle = rotation - globalRot - 0.5 * PI
         if (toUnitCircle(cannon!!.rotation.z.toDouble() + angle) < 2.8) {
             cannon?.rotateOnWorldAxis(Vector3(0, 0, 1), angle)
         }
@@ -148,6 +163,7 @@ class Tank(
         if ((_bullets[currentBullet] ?: 1) <= 0) {
             nextBullet()
         }
+        spawnedBullet = true
         return bulletObject
     }
 
@@ -177,19 +193,24 @@ class Tank(
 
     override fun onDeath() {
         super.onDeath()
+        for (listener in deathListeners) {
+            listener()
+        }
         MainScope().launch {
             val fire = Fire(radius = 3.0, position = Vector3())
             fire.initVisual()
             _children["fire"] = fire
             val fireRenderable = fire.renderable!!
             renderable.add(fireRenderable)
-            fire.position.set(Vector3())
             updateFireRotation()
         }
     }
 
-    private fun updateFireRotation() {
-        fire?.renderable?.rotation?.z = -renderable.rotation.z.toDouble() + if (direction == Direction.Right) 0.0 else 2 * PI
+    fun updateFireRotation() {
+        fire?.renderable?.lookAt(fire!!.globalPosition + Vector3(z = 1))
+        // fire?.renderable?.rotation?.setFromVector3(-renderable.rotation.toVector3())
+        // fire?.renderable?.rotation?.y = -renderable.rotation.y.toDouble()
+        // fire?.renderable?.rotation?.z = -renderable.rotation.z.toDouble() //+ if (direction == Direction.Right) 0.0 else 2 * PI
     }
 
     private fun setDirection(direction: Direction) {
@@ -197,6 +218,11 @@ class Tank(
             mainBone?.rotateX(PI)
         }
         this.direction = direction
+    }
+
+    override fun update(delta: Double) {
+        super.update(delta)
+        if (spawnedBullet) { spawnedBullet = false }
     }
 
     private fun switchDirection() {

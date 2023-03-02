@@ -3,6 +3,7 @@ package gameobjects
 import core.HeightMap
 import core.HitBox
 import core.Hittable
+import core.currentScene
 import core.gameobjects.GameObject
 import ext.TAG
 import ext.minus
@@ -37,10 +38,10 @@ class Ground(
         override fun onSceneReady() {
             super.onSceneReady()
             // TODO destroy ground when tank is hit
-            /*Log.d(TAG, "Adding listeners")
+            Log.d(TAG, "Adding listeners")
             for (tank in currentScene.findObjects<Tank>()) {
                 tank.hitBox.addIntersectionListener(::onIntersectionEnter)
-            }*/
+            }
         }
 
         override fun onIntersectionEnter(intersectingBox: Hittable) {

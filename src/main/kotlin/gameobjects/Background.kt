@@ -23,7 +23,7 @@ class Background(
             min = -400.0,
             max = 400.0,
             startPos = Vector3(
-                x = 600 * random.nextDouble() - 300,
+                x = 800 * random.nextDouble() - 400,
                 y = 45 * random.nextDouble() + 130,
                 z = 30 * random.nextDouble() - 100
             )

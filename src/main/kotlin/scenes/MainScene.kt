@@ -11,13 +11,15 @@ import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import ui.MainTopBar
-import util.*
+import util.DefaultObservable
+import util.EventManager
+import util.Observable
+import util.ResourceManager
 import kotlin.collections.set
 import kotlin.properties.Delegates
 
@@ -65,6 +67,7 @@ class MainScene(
     private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
+    private val deadTanks = ArrayDeque<Tank>()
 
     private val tanks = MutableList(numPlayers) {
         val data = tankColors[it]
@@ -72,10 +75,8 @@ class MainScene(
             color = data.second,
             startPosition = Vector3(x = (200 / (numPlayers - 1)) * it - 100, z = 1.5),
             name = data.first
-        )
+        ).apply { deadTanks.addFirst(this) }
     }
-
-
 
     private var currentTankIndex: Int = 0
     private val currentTank get() = tanks[currentTankIndex]
@@ -90,8 +91,13 @@ class MainScene(
         initListeners()
     }
 
+
+    private lateinit var pointerMove: (Event) -> Unit
+
+    private lateinit var clickListener: (Event) -> Unit
+
     private fun initListeners() {
-        window.addEventListener("pointermove", {
+        pointerMove = {
             it as PointerEvent
             val aimingPoint = Vector2()
             val containerBox = Game.instance.gameContainer.getBoundingClientRect()
@@ -112,8 +118,8 @@ class MainScene(
                     }
                 }
             }
-        })
-        Game.instance.gameContainer.addEventListener("click", { event ->
+        }
+        clickListener = { event ->
             event as MouseEvent
             if (currentBulletObject == null) {
                 val distance = aimIntersection.distanceTo(currentTank.position)
@@ -126,7 +132,10 @@ class MainScene(
                     }
                 }
             }
-        })
+        }
+        window.addEventListener("pointermove", pointerMove)
+
+        Game.instance.gameContainer.addEventListener("click", clickListener)
     }
 
     private fun centerCamera() {
@@ -139,11 +148,10 @@ class MainScene(
     }
 
     private fun nextTank() {
-        val aliveTanks = tanks.filter { it.alive }
+        val aliveTanks = tanks.filter { it.active }
         if (aliveTanks.size <= 1) {
-            MainScope().launch {
-                GUIHelper.loadGUI("game_over")
-            }
+            for (tank in aliveTanks) { deadTanks.addFirst(tank) }
+            Game.instance.currentScene = GameEndScene(deadTanks)
         } else {
             do {
                 currentTankIndex = (currentTankIndex + 1) % tanks.size
@@ -192,6 +200,12 @@ class MainScene(
 
             }
         }
+    }
+
+    override fun dispose() {
+        super.dispose()
+        window.removeEventListener("pointermove", pointerMove)
+        Game.instance.gameContainer.removeEventListener("click", clickListener)
     }
 
     companion object {

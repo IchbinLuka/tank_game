@@ -1,0 +1,60 @@
+package scenes
+
+import core.gameobjects.GameObject
+import ext.applyCustomMat
+import ext.aspectRatio
+import ext.enableShadows
+import ext.placeChildren
+import gameobjects.Background
+import gameobjects.Tank
+import kotlinx.browser.window
+import three.js.*
+import util.ResourceManager
+
+abstract class TankPresentingScene(
+    private val tanks: Collection<Tank>
+): GameScene() {
+    override val _children: HashMap<String, GameObject> = hashMapOf<String, GameObject>(
+        "Background" to Background(offset = Vector3(z = -150, y = -115))
+    ).apply {
+        for (tank in tanks) {
+            put(tank.uuid.toString(), tank)
+        }
+    }
+
+    override val scene: Scene = Scene().apply {
+        background = Color(0x3333ff)
+        val light = DirectionalLight(0xFDFFD9, 1).apply {
+            position.set(-30, 70, 40)
+            castShadow = true
+            enableShadows()
+        }
+        background = Color(0x64DBFF)
+        add(light)
+        add(AmbientLight(0x404040, 0.1))
+        add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
+    }
+    override val camera: Camera = PerspectiveCamera(60, window.aspectRatio, 0.1, 1000).apply {
+        position.x = -1.6
+        position.y = 8.0
+        position.z = 36.0
+
+        rotation.x = -0.4
+    }
+
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
+        val landscape = ResourceManager.startLandScape.await().scene
+        scene.add(landscape)
+        landscape.placeChildren(
+            HashMap<String, Object3D>().apply {
+                putAll((1..3).map { "tank$it" } zip tanks.map { it.renderable })
+            }
+        )
+        landscape.applyCustomMat(
+            MeshToonMaterial().apply { color = Color(0x11710F) },
+            MeshToonMaterial().apply { color = Color(0x6D3600) },
+            MeshToonMaterial().apply { color = Color(0x3e8e2c) }
+        )
+    }
+}

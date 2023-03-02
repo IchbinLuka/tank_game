@@ -29,25 +29,24 @@ class Game(
 
     override val coroutineContext: CoroutineContext = MainScope().coroutineContext
 
-    private val clock = Clock()
-
     val gameContainer: HTMLCanvasElement
         get() = document.getElementById("gameContainer") as HTMLCanvasElement
 
-    private lateinit var _currentScene: GameScene
+    private var _currentScene: GameScene? = null
     var currentScene: GameScene
-        get() = _currentScene
+        get() = _currentScene!!
         set(value) {
+            _currentScene?.dispose()
             _currentScene = LoadingScene()
-            launch { _currentScene.loadAssets() }
+            launch { _currentScene!!.loadAssets() }
             updateComposer()
             launch(Dispatchers.Unconfined) {
                 value.preloadAssets()
                 GUIHelper.resetGUI()
                 _currentScene = value
-                _currentScene.onSceneReady()
+                _currentScene!!.onSceneReady()
                 updateComposer()
-                _currentScene.loadAssets()
+                _currentScene!!.loadAssets()
                 updateRenderer()
             }
             Log.d("Game", "Loading assets")
@@ -119,7 +118,7 @@ class Game(
             currentScene.update(delta * DevTools.gameSpeed)
             currentScene.lateUpdate()
             // composer.render()
-            effect.render(_currentScene.scene, _currentScene.camera)
+            effect.render(currentScene.scene, currentScene.camera)
             stats.update()
             val error = renderer.getContext().getError()
             if (error != 0) {

@@ -95,7 +95,7 @@ open class BasicParticleSystem(
             }
 
         }
-        _renderable = Points(geometry, material!!)
+        _renderable = Points(geometry, material!!)//.apply { up = Vector3(z = -1) }
     }
 
     private fun initMesh() {

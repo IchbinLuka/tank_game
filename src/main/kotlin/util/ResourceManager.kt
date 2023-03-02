@@ -36,4 +36,6 @@ object ResourceManager {
     val testLandscape get() = gltfAsync("models/test_landscape.glb")
 
     val startLandScape get() = gltfAsync("models/start_background.glb")
+
+    val winnerPodium get() = gltfAsync("models/winner_podium.glb")
 }

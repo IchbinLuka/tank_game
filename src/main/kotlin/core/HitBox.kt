@@ -16,10 +16,8 @@ typealias IntersectionListener = (Hittable) -> Unit
 
 abstract class HitBox : GameObject() {
 
-    val intersections: Collection<Hittable>
-        get() = _intersections
-
-    private var _intersections: HashSet<Hittable> = hashSetOf()
+    var intersections: HashSet<Hittable> = hashSetOf()
+        private set
 
     private val intersectionListeners: MutableList<IntersectionListener> = mutableListOf()
 
@@ -61,11 +59,11 @@ abstract class HitBox : GameObject() {
     }
 
     override fun update(delta: Double) {
-        for (intersection in newIntersections.minus(_intersections)) {
+        for (intersection in newIntersections.minus(intersections)) {
             onIntersectionEnter(intersection)
         }
 
-        _intersections = newIntersections
+        intersections = newIntersections
     }
 
 }
@@ -120,14 +118,11 @@ open class CuboidHitBox(
             renderable.rotation.setFromVector3(value.toVector3())
         }
 
-    final override val planes: Iterable<Plane>
-        get() = _planes
+    final override var planes: Iterable<Plane> = listOf()
+        private set
 
-    private var _planes: Iterable<Plane> = listOf()
-
-    final override val vertices: Iterable<Vector3>
-        get() = _vertices
-    private var _vertices: Iterable<Vector3> = listOf()
+    final override var vertices: Iterable<Vector3> = listOf()
+        private set
 
     private fun updateVertices() {
         val halfSize = size * 0.5
@@ -141,7 +136,7 @@ open class CuboidHitBox(
             normals[4] * halfSize.z,
             normals[5] * halfSize.z,
         )
-        _vertices = listOf(
+        vertices = listOf(
             normals[0] * halfSize.x,
             normals[1] * halfSize.x
         ).flatMap { n ->
@@ -154,7 +149,7 @@ open class CuboidHitBox(
     }
 
     private fun updatePlanes() {
-        _planes = normals.map {
+        planes = normals.map {
             Plane().setFromNormalAndCoplanarPoint(it, globalPosition + Vector3(it.x * size.x, it.y * size.y, it.z * size.z) * 0.5)
         }
     }

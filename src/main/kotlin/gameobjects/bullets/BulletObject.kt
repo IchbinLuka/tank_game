@@ -42,11 +42,8 @@ open class BulletObject(
         override fun onIntersectionEnter(intersectingBox: Hittable) {
             super.onIntersectionEnter(intersectingBox)
             Log.d(TAG, "intersected with ${intersectingBox.TAG}")
-            Log.d(TAG, "intersections: ${intersections.map { it.TAG }}")
             if (isNew) return
             if (intersectingBox !is Tank && intersectingBox !is Ground) return
-
-            this@BulletObject.die()
             currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
             for (o in Game.instance.currentScene.children.values) {
                 if (o == intersectingBox) {
@@ -62,6 +59,7 @@ open class BulletObject(
                     o.adjustTransformToGround(ground)
                 }
             }
+            this@BulletObject.die()
         }
     }
 

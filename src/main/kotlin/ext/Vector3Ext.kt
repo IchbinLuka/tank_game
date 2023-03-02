@@ -7,7 +7,7 @@ import kotlin.math.sqrt
 fun Vector3.toFloatList(): List<Float> = toArray().map { it.toFloat() }
 fun Vector3.toFloatArray(): Array<Float> = toFloatList().toTypedArray()
 
-fun Vector3.set(value: Vector3) = set(*value.toFloatArray())
+fun Vector3.set(value: Vector3) = set(value.x, value.y, value.z)
 
 operator fun Vector3.times(number: Number): Vector3 = Vector3().addScaledVector(this, number)
 
@@ -20,3 +20,7 @@ operator fun Vector3.minus(vector: Vector3): Vector3 = clone().addScaledVector(v
 operator fun Vector3.unaryMinus(): Vector3 = this * -1
 
 fun Vector3.euclidicNorm(): Double = sqrt(x.pow(2) + y.pow(2) + z.pow(2))
+
+operator fun Vector3.component1() = x
+operator fun Vector3.component2() = y
+operator fun Vector3.component3() = z

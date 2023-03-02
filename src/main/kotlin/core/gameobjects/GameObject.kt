@@ -1,7 +1,7 @@
 package core.gameobjects
 
 import ext.getWorldEuler
-import ext.toFloatArray
+import ext.set
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import three.js.Euler
@@ -22,15 +22,15 @@ abstract class GameObject {
     val children: Map<String, GameObject> by ::_children
     // open val _children: MutableSet<GameObject> = hashSetOf()
 
-    protected var _health: Double = 1.0
+    open var health: Double = 1.0
+        protected set
 
-    open val health: Double by ::_health
     open val invincible: Boolean = true
 
     open var position: Vector3
         get() = renderable?.position ?: Vector3()
         set(value) {
-            renderable?.position?.set(*value.toFloatArray())
+            renderable?.position?.set(value)
         }
 
     open val globalPosition: Vector3
@@ -40,8 +40,8 @@ abstract class GameObject {
         get() = renderable?.getWorldEuler(Euler()) ?: Euler()
 
     /** Indicates whether the object should longer be a part of the scene */
-    val alive: Boolean get() = _alive
-    private var _alive = true
+    var alive: Boolean = true
+       private set
 
     fun addGameObject(gameObject: GameObject, name: String? = null) {
         _children[name ?: gameObject.uuid.toString()] = gameObject
@@ -53,13 +53,13 @@ abstract class GameObject {
     }
 
     open fun damage(amount: Double) {
-        if (invincible || _health == 0.0) return
-        _health = max(_health - amount, 0.0)
-        if (_health == 0.0) onDeath()
+        if (invincible || health == 0.0) return
+        health = max(health - amount, 0.0)
+        if (health == 0.0) onDeath()
     }
 
     fun die() {
-        _alive = false
+        alive = false
         onDeath()
     }
 
@@ -116,14 +116,15 @@ abstract class GameObject {
     /** Gets called on each frame. [delta] indicates the time passed since the last frame in seconds */
     open fun update(delta: Double) {
 
-        val iterator = _children.iterator()
+        val iterator = _children.values.iterator()
         for (obj in iterator) {
-            if (obj.value.alive) {
-                obj.value.update(delta)
+            if (obj.alive) {
+                obj.update(delta)
             }
-            if (!obj.value.alive) {
+            if (!obj.alive) {
                 iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
-                obj.value.renderable?.let { renderable?.remove(it) }
+                obj.renderable?.let { renderable?.remove(it) }
+                obj.dispose()
             }
         }
     }
@@ -131,6 +132,13 @@ abstract class GameObject {
     open fun lateUpdate() {
         for (child in _children.values) {
             child.lateUpdate()
+        }
+    }
+
+    open fun dispose() {
+        for (child in _children.values) {
+            child.renderable?.let { renderable?.remove(it) }
+            child.dispose()
         }
     }
 }
