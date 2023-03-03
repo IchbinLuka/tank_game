@@ -1,5 +1,6 @@
 package ext
 
+import core.gameobjects.GameObject
 import three.js.*
 
 fun Object3D.enableShadows() {
@@ -21,14 +22,12 @@ fun Object3D.applyCustomMat(vararg materials: Material) {
     }
 }
 
-fun Object3D.placeChildren(children: Map<String, Object3D>) {
+fun Object3D.placeChildren(children: Map<String, GameObject>) {
     traverse {
         if (children.containsKey(it.name)) {
             val child = children[it.name]!!
-            it.position.run {
-                child.position.set(x, y, z)
-            }
-            child.rotation.setFromVector3(it.rotation.toVector3())
+            child.position = it.position
+            child.renderable?.rotation?.setFromVector3(it.rotation.toVector3())
         }
     }
 }

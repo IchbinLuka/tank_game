@@ -19,4 +19,8 @@ class Fire(
     spawnDelta = 10.0,
     gravity = -10.0,
     endSize = 5.0,
-)
+) {
+    override fun toString(): String {
+        return "Fire(position = $position, rotation = ${renderable?.rotation})"
+    }
+}

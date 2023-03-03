@@ -208,9 +208,6 @@ class Tank(
 
     fun updateFireRotation() {
         fire?.renderable?.lookAt(fire!!.globalPosition + Vector3(z = 1))
-        // fire?.renderable?.rotation?.setFromVector3(-renderable.rotation.toVector3())
-        // fire?.renderable?.rotation?.y = -renderable.rotation.y.toDouble()
-        // fire?.renderable?.rotation?.z = -renderable.rotation.z.toDouble() //+ if (direction == Direction.Right) 0.0 else 2 * PI
     }
 
     private fun setDirection(direction: Direction) {
@@ -227,5 +224,9 @@ class Tank(
 
     private fun switchDirection() {
         setDirection(direction.inverse)
+    }
+
+    override fun toString(): String {
+        return "Tank($name), children: $children"
     }
 }

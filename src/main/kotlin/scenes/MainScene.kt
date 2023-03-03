@@ -75,7 +75,7 @@ class MainScene(
             color = data.second,
             startPosition = Vector3(x = (200 / (numPlayers - 1)) * it - 100, z = 1.5),
             name = data.first
-        ).apply { deadTanks.addFirst(this) }
+        ).apply { addDeathListener { deadTanks.addFirst(this) } }
     }
 
     private var currentTankIndex: Int = 0
@@ -152,6 +152,7 @@ class MainScene(
         if (aliveTanks.size <= 1) {
             for (tank in aliveTanks) { deadTanks.addFirst(tank) }
             Game.instance.currentScene = GameEndScene(deadTanks)
+            return
         } else {
             do {
                 currentTankIndex = (currentTankIndex + 1) % tanks.size

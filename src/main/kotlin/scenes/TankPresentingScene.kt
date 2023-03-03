@@ -1,14 +1,12 @@
 package scenes
 
 import core.gameobjects.GameObject
-import ext.applyCustomMat
-import ext.aspectRatio
-import ext.enableShadows
-import ext.placeChildren
+import ext.*
 import gameobjects.Background
 import gameobjects.Tank
 import kotlinx.browser.window
 import three.js.*
+import util.Log
 import util.ResourceManager
 
 abstract class TankPresentingScene(
@@ -46,10 +44,12 @@ abstract class TankPresentingScene(
         super.preloadAssets()
         val landscape = ResourceManager.startLandScape.await().scene
         scene.add(landscape)
+        val map = HashMap<String, GameObject>().apply {
+            putAll((1..3).map { "tank$it" } zip tanks)
+        }
+        Log.d(TAG, map)
         landscape.placeChildren(
-            HashMap<String, Object3D>().apply {
-                putAll((1..3).map { "tank$it" } zip tanks.map { it.renderable })
-            }
+            map
         )
         landscape.applyCustomMat(
             MeshToonMaterial().apply { color = Color(0x11710F) },
