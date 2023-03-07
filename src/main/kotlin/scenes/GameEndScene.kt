@@ -8,7 +8,7 @@ import util.GUIHelper
 
 class GameEndScene(
     private val winners: Collection<Tank>
-): TankPresentingScene(winners) {
+): TankPresentingScene(winners.take(3)) {
     override suspend fun loadAssets() {
         super.loadAssets()
         for (tank in winners) { tank.updateFireRotation() }

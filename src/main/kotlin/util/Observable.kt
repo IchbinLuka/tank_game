@@ -29,3 +29,39 @@ open class DefaultObservable<T>: Observable<T> {
         observers.remove(listener)
     }
 }
+
+typealias ValueListener<T> = (new: T) -> Unit
+
+class ValueNotifier<T>(
+    initialValue: T
+) {
+    private var _value: T = initialValue
+    var value: T
+        get() = _value
+        set(value) {
+            _value = value
+            notifyListeners()
+        }
+
+    private val listeners = mutableListOf<ValueListener<T>>()
+
+    fun addListener(listener: ValueListener<T>) {
+        listeners.add(listener)
+    }
+
+    fun removeListener(listener: ValueListener<T>) {
+        listeners.remove(listener)
+    }
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        this.value = value
+    }
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
+
+    fun notifyListeners() {
+        for (listener in listeners) {
+            listener.invoke(_value)
+        }
+    }
+}

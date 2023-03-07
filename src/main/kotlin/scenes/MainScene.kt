@@ -16,11 +16,10 @@ import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import ui.MainTopBar
-import util.DefaultObservable
-import util.EventManager
-import util.Observable
-import util.ResourceManager
+import util.*
 import kotlin.collections.set
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.properties.Delegates
 
 data class GameState(val currentTank: Tank)
@@ -83,6 +82,9 @@ class MainScene(
 
     private var currentBulletObject: BulletObject? = null
 
+    val aimingStrength = ValueNotifier<Double>(0.0)
+    private var aimingStrengthValue: Double by aimingStrength
+
     var currentState: GameState by Delegates.observable(GameState(currentTank), ::notifyObservers)
 
     private val topBar = MainTopBar(this)
@@ -107,6 +109,7 @@ class MainScene(
             aimingPoint.y = - ( y / containerBox.height ) * 2 + 1
 
             if (aiming) {
+                updateAimingStrength()
                 aimingCaster.setFromCamera(aimingPoint, camera)
                 val intersection = aimingCaster.intersectObject(aimingAidPlane)
                 if (intersection.isNotEmpty()) {
@@ -122,8 +125,7 @@ class MainScene(
         clickListener = { event ->
             event as MouseEvent
             if (currentBulletObject == null) {
-                val distance = aimIntersection.distanceTo(currentTank.position)
-                currentBulletObject = currentTank.shoot(distance.toDouble() / 2)
+                currentBulletObject = currentTank.shoot(aimingStrengthValue * MAX_POINTER_DISTANCE)
                 currentBulletObject!!.let {
                     _children["bullet"] = it
                     scene.add(it.renderable)
@@ -136,6 +138,13 @@ class MainScene(
         window.addEventListener("pointermove", pointerMove)
 
         Game.instance.gameContainer.addEventListener("click", clickListener)
+    }
+
+    private fun updateAimingStrength() {
+        aimingStrengthValue = min(
+            aimIntersection.distanceTo(currentTank.position).toDouble() / MAX_POINTER_DISTANCE,
+            max(currentTank.health, 0.3)
+        )
     }
 
     private fun centerCamera() {
@@ -158,6 +167,7 @@ class MainScene(
                 currentTankIndex = (currentTankIndex + 1) % tanks.size
             } while (!currentTank.active)
         }
+        updateAimingStrength()
         currentState = currentState.copy(currentTank = currentTank)
     }
 
@@ -176,6 +186,7 @@ class MainScene(
     override suspend fun loadAssets() {
         super.loadAssets()
         topBar.initAssets()
+        // GUIHelper.loadGUI("main_scene")
         scene.background = Color(0x64DBFF)
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
@@ -217,5 +228,7 @@ class MainScene(
             "Blue" to Color(0x323cfc),
             "Pink" to Color(0xde43f9)
         )
+
+        const val MAX_POINTER_DISTANCE = 125
     }
 }

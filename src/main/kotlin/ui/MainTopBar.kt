@@ -20,6 +20,8 @@ class MainTopBar(
     private val bulletName by lazy { Element.fromId("bullet_name") }
     private val bulletCount by lazy { Element.fromId("bullet_count") }
 
+    private val aimingStrength by lazy { Element.fromId("strength") }
+
     override suspend fun initAssets() {
         GUIHelper.loadTopBar("tool_bar")
         initListeners()
@@ -29,6 +31,9 @@ class MainTopBar(
     private fun initListeners() {
         scene.addListener { _, _, new ->
             updateState(new)
+        }
+        scene.aimingStrength.addListener {
+            aimingStrength?.innerHTML = "${(it * 100).roundToInt()}%"
         }
         leftButton?.addEventListener("click", {
             scene.currentState.currentTank.previousBullet()

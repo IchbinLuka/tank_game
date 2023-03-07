@@ -8,6 +8,7 @@ import core.gameobjects.GameObject
 import core.gameobjects.MovingGameObject
 import ext.TAG
 import ext.set
+import ext.times
 import ext.toFloatList
 import gameobjects.Ground
 import gameobjects.Tank
@@ -135,7 +136,7 @@ open class BulletObject(
 
     override suspend fun initVisual() {}
 
-    override var velocity: Vector3 = startVelocity
+    override var velocity: Vector3 = startVelocity * 0.75
     override var acceleration: Vector3
         get() = gravity
         set(value) {}
