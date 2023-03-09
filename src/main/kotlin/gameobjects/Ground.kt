@@ -179,6 +179,15 @@ class Ground(
         }
         return getLinearGradient(angleFromAscent(nearestAsc), currentAngle, progress)
     }
+
+    fun ascendAt(position: Double): Double {
+        val normPos = normalizePos(position)
+        if (normPos < 0 || normPos > groundVertices.size - 1) return 0.0
+        val previousIndex = getIndex(floor(normPos).toInt(), 0)
+        val nextIndex = getIndex(floor(normPos + 1).toInt(), 0)
+
+        return averageAscent(previousIndex, nextIndex)
+    }
     //endregion
 
     //region PRIVATE

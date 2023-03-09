@@ -171,9 +171,8 @@ class Tank(
         mainBone?.position?.let {
             val ascend = abs(ground.rotationAt(it.x))
             var newPos = it.clone()
-            if (true || ascend > 0.5 * PI) {
-                newPos = newPos.addScaledVector(vector3, deltaTime)
-            }
+            newPos = newPos.addScaledVector(vector3 * cos(ascend), deltaTime)
+
             if (ground.heightAt(newPos.x) != null) {
                 it.set(newPos)
             }
@@ -185,7 +184,7 @@ class Tank(
         mainBone?.position?.let {
             val pos = mainBone!!.position.x
             it.y = ground.heightAt(pos)!!
-            val rotation = ground.rotationAt(pos)
+            val rotation = ground.rotationAt(pos) + 1.5 *  PI
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
         }
         updateFireRotation()
