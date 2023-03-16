@@ -1,14 +1,15 @@
 package gameobjects.bullets
 
 import ext.times
+import gameobjects.Tank
 import three.js.Vector3
 
 class NoGravityBulletObject(
     startVelocity: Vector3,
-    startPos: Vector3,
+    tank: Tank,
 ) : BulletObject(
     if (startVelocity.length().toDouble() > 20) startVelocity else startVelocity.normalize() * 20.0,
-    startPos
+    tank = tank
 ) {
     override var acceleration: Vector3 = Vector3()
 

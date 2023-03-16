@@ -41,7 +41,8 @@ class Tank(
     private val _bullets: HashMap<Bullet, Count?> = hashMapOf(
         Bullet.Normal to null,
         Bullet.NoGravity to 5,
-        Bullet.Big to 2
+        Bullet.Big to 2,
+        Bullet.Teleport to 2
     )
 
     val bullets: Map<Bullet, Count?> by ::_bullets
@@ -102,6 +103,17 @@ class Tank(
     val active: Boolean
         get() = health > 0
 
+    val cannonRotation: Euler
+        get() = cannon!!.getWorldEuler(Euler())
+
+    val cannonDirection: Vector3
+        get() = with(cannonRotation) {
+            Vector3(
+                -sin(z.toDouble()),
+                cos(z.toDouble()) * direction.vector3.x,
+            ).normalize()
+        }
+
     override suspend fun initVisual() {
         super.initVisual()
         Log.v(TAG, "Loading tank")
@@ -148,17 +160,11 @@ class Tank(
 
     fun shoot(velocity: Double): BulletObject? {
         if (cannon == null) return null
-        val worldPosition = cannon!!.getWorldPosition(Vector3())
-        val worldRotation = cannon!!.getWorldEuler(Euler())
         if (_bullets[currentBullet] != null) {
             _bullets[currentBullet] = _bullets[currentBullet]!! - 1
         }
         val bulletObject =  currentBullet.createObject(
-            Vector3(
-                -sin(worldRotation.z.toDouble()) * velocity,
-                cos(worldRotation.z.toDouble()) * velocity * direction.vector3.x,
-            ),
-            Vector3(worldPosition.x, worldPosition.y)
+            cannonDirection * velocity, this
         )
         if ((_bullets[currentBullet] ?: 1) <= 0) {
             nextBullet()

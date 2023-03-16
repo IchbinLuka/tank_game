@@ -26,7 +26,7 @@ typealias ImpactListener = (Vector3) -> Unit
 
 open class BulletObject(
     startVelocity: Vector3,
-    startPos: Vector3,
+    protected val tank: Tank,
 ) : MovingGameObject(), Hittable {
 
     // region - HitBox -
@@ -44,23 +44,7 @@ open class BulletObject(
             super.onIntersectionEnter(intersectingBox)
             Log.d(TAG, "intersected with ${intersectingBox.TAG}")
             if (isNew) return
-            if (intersectingBox !is Tank && intersectingBox !is Ground) return
-            currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
-            for (o in Game.instance.currentScene.children.values) {
-                if (o == intersectingBox) {
-                    o.damage(damage)
-                } else {
-                    val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
-                    if (distance < explosionWidth) {
-                        o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
-                    }
-                }
-
-                if (o is Tank) {
-                    o.adjustTransformToGround(ground)
-                }
-            }
-            this@BulletObject.die()
+            this@BulletObject.onIntersectionEnter(intersectingBox)
         }
     }
 
@@ -71,6 +55,27 @@ open class BulletObject(
     protected val ground: Ground = Game.instance.currentScene.findObject<Ground>()!!
 
     private val impactListeners: MutableList<ImpactListener> = mutableListOf()
+
+    protected open fun onIntersectionEnter(intersectingBox: Hittable) {
+        if (intersectingBox !is Tank && intersectingBox !is Ground) return
+        ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
+        currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
+        for (o in Game.instance.currentScene.children.values) {
+            if (o == intersectingBox) {
+                o.damage(damage)
+            } else {
+                val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
+                if (distance < explosionWidth) {
+                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+                }
+            }
+
+            if (o is Tank) {
+                o.adjustTransformToGround(ground)
+            }
+        }
+        this@BulletObject.die()
+    }
 
     fun addImpactListener(listener: ImpactListener) {
         impactListeners.add(listener)
@@ -116,7 +121,7 @@ open class BulletObject(
             MeshPhongMaterial().apply {
                 color = Color(0x111111)
             }
-        ).apply { this@apply.position.set(startPos) }
+        ).apply { this@apply.position.set(tank.globalPosition) }
     }
 
     private var isNew: Boolean = true
@@ -139,7 +144,7 @@ open class BulletObject(
     override var velocity: Vector3 = startVelocity * 0.75
     override var acceleration: Vector3
         get() = gravity
-        set(value) {}
+        set(_) {}
 
     private fun updateGeometry() {
         dots.setAttribute("position", BufferAttribute(Float32Array(dotVertices.toTypedArray()).asDynamic(), 3))
