@@ -8,11 +8,11 @@ interface Scrollable<T> {
     fun next()
     fun previous()
 
-    fun nextUntil(test: (T) -> Boolean) {
+    fun nextWhile(test: (T) -> Boolean) {
         while (test(current)) next()
     }
 
-    fun previousUntil(test: (T) -> Boolean) {
+    fun previousWhile(test: (T) -> Boolean) {
         while (test(current)) previous()
     }
 }
@@ -27,11 +27,11 @@ class ScrollableList<T>(
         get() = this[currentIndex]
 
     override fun next() {
-        currentIndex = ((currentIndex + 1) % size).absoluteValue
+        currentIndex = ((currentIndex + 1) % size)
     }
 
     override fun previous() {
-        currentIndex = ((currentIndex - 1) % size).absoluteValue
+        currentIndex = ((size + currentIndex - 1).absoluteValue % size)
     }
 
 }

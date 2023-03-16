@@ -68,13 +68,13 @@ class Tank(
 
     fun nextBullet() {
         bulletSequence.next()
-        bulletSequence.nextUntil { (bullets[it] ?: 1) <= 0 }
+        bulletSequence.nextWhile { (bullets[it] ?: 1) <= 0 }
         currentBullet = bulletSequence.current
     }
 
     fun previousBullet() {
         bulletSequence.previous()
-        bulletSequence.previousUntil { (bullets[it] ?: 1) <= 0 }
+        bulletSequence.previousWhile { (bullets[it] ?: 1) <= 0 }
         currentBullet = bulletSequence.current
     }
 
