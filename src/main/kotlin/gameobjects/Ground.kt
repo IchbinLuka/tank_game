@@ -10,6 +10,7 @@ import ext.minus
 import ext.plus
 import ext.toFloatList
 import gameobjects.bullets.BulletObject
+import gameobjects.bullets.BulletTarget
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.js.*
@@ -25,23 +26,25 @@ class Ground(
     private val heightScale: Double = 1.0,
     private val pointDistance: Double = 1.0,
     data: HeightMap = GroundNoise(width = 150, depth = 20, min = -40.0).allValues()
-) : GameObject(), Hittable {
+) : GameObject(), BulletTarget, Hittable {
+
 
     // region - HitBox -
 
     override val hitBox: HitBox = object : HitBox() {
         override val associatedObject: Hittable = this@Ground
         override val vertices: Iterable<Vector3> = emptyList()
+
         override fun containsPoint(point: Vector3): Boolean =
             heightAt(point.x)?.let { it > point.y } ?: false
 
         override fun onSceneReady() {
             super.onSceneReady()
-            // TODO destroy ground when tank is hit
             Log.d(TAG, "Adding listeners")
-            for (tank in currentScene.findObjects<Tank>()) {
-                tank.hitBox.addIntersectionListener(::onIntersectionEnter)
+            for (t in currentScene.findObjects<BulletTarget>().filter { it != associatedObject }) {
+                t.hitBox.addIntersectionListener(::onIntersectionEnter)
             }
+
         }
 
         override fun onIntersectionEnter(intersectingBox: Hittable) {
@@ -55,6 +58,10 @@ class Ground(
     }
 
     override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
+
+    override fun onBulletImpact(bullet: BulletObject) {
+        hitBox.onIntersectionEnter(bullet)
+    }
 
     // endregion
 

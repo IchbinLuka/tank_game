@@ -41,7 +41,7 @@ abstract class GameObject {
 
     /** Indicates whether the object should longer be a part of the scene */
     var alive: Boolean = true
-       private set
+       protected set
 
     fun addGameObject(gameObject: GameObject, name: String? = null) {
         _children[name ?: gameObject.uuid.toString()] = gameObject

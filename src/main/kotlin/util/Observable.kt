@@ -59,7 +59,7 @@ class ValueNotifier<T>(
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 
-    fun notifyListeners() {
+    private fun notifyListeners() {
         for (listener in listeners) {
             listener.invoke(_value)
         }

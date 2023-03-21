@@ -24,6 +24,10 @@ import kotlin.math.pow
 
 typealias ImpactListener = (Vector3) -> Unit
 
+interface BulletTarget: Hittable {
+    fun onBulletImpact(bullet: BulletObject)
+}
+
 open class BulletObject(
     startVelocity: Vector3,
     protected val tank: Tank,
@@ -42,7 +46,7 @@ open class BulletObject(
 
         override fun onIntersectionEnter(intersectingBox: Hittable) {
             super.onIntersectionEnter(intersectingBox)
-            Log.d(TAG, "intersected with ${intersectingBox.TAG}")
+            Log.d(this@BulletObject.TAG, "intersected with ${intersectingBox.TAG}")
             if (isNew) return
             this@BulletObject.onIntersectionEnter(intersectingBox)
         }
@@ -51,46 +55,6 @@ open class BulletObject(
     override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
 
     // endregion
-
-    protected val ground: Ground = Game.instance.currentScene.findObject<Ground>()!!
-
-    private val impactListeners: MutableList<ImpactListener> = mutableListOf()
-
-    protected open fun onIntersectionEnter(intersectingBox: Hittable) {
-        if (intersectingBox !is Tank && intersectingBox !is Ground) return
-        ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
-        currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
-        for (o in Game.instance.currentScene.children.values) {
-            if (o == intersectingBox) {
-                o.damage(damage)
-            } else {
-                val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
-                if (distance < explosionWidth) {
-                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
-                }
-            }
-
-            if (o is Tank) {
-                o.adjustTransformToGround(ground)
-            }
-        }
-        this@BulletObject.die()
-    }
-
-    fun addImpactListener(listener: ImpactListener) {
-        impactListeners.add(listener)
-    }
-
-    fun removeImpactListener(listener: ImpactListener) {
-        impactListeners.remove(listener)
-    }
-
-    override fun onDeath() {
-        super.onDeath()
-        for (listener in impactListeners) {
-            listener(this@BulletObject.position)
-        }
-    }
 
     open val gravity = Vector3(0, -20, 0)
 
@@ -125,6 +89,16 @@ open class BulletObject(
     }
 
     private var isNew: Boolean = true
+
+    protected val ground: Ground = Game.instance.currentScene.findObject<Ground>()!!
+
+    private val impactListeners: MutableList<ImpactListener> = mutableListOf()
+
+    override var velocity: Vector3 = startVelocity * 0.75
+    override var acceleration: Vector3
+        get() = gravity
+        set(_) {}
+
     init {
         ResourceManager.disc.asPromise().then {
             renderable.add(Points(dots,
@@ -139,12 +113,44 @@ open class BulletObject(
         }
     }
 
-    override suspend fun initVisual() {}
+    protected open fun onIntersectionEnter(intersectingBox: Hittable) {
+        if (intersectingBox !is BulletTarget) return
+        ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
+        currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
+        intersectingBox.onBulletImpact(this)
+        for (o in Game.instance.currentScene.children.values) {
+            if (o == intersectingBox) {
+                o.damage(damage)
+            } else {
+                val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
+                if (distance < explosionWidth) {
+                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+                }
+            }
 
-    override var velocity: Vector3 = startVelocity * 0.75
-    override var acceleration: Vector3
-        get() = gravity
-        set(_) {}
+            if (o is Tank) {
+                o.adjustTransformToGround(ground)
+            }
+        }
+        die()
+    }
+
+    fun addImpactListener(listener: ImpactListener) {
+        impactListeners.add(listener)
+    }
+
+    fun removeImpactListener(listener: ImpactListener) {
+        impactListeners.remove(listener)
+    }
+
+    override fun onDeath() {
+        super.onDeath()
+        for (listener in impactListeners) {
+            listener(this@BulletObject.position)
+        }
+    }
+
+
 
     private fun updateGeometry() {
         dots.setAttribute("position", BufferAttribute(Float32Array(dotVertices.toTypedArray()).asDynamic(), 3))
@@ -170,6 +176,12 @@ open class BulletObject(
         }
         if (ground.heightAt(position.x) == null) { die() }
         if (isNew) { isNew = false }
+    }
+
+    override suspend fun initVisual() {
+        super.initVisual()
+        // renderable.remove(hitBox.renderable)
+        bulletMesh.add(hitBox.renderable)
     }
 
     companion object: AssetInitializer {

@@ -1,20 +1,21 @@
 package core
 
 import core.gameobjects.GameObject
-import ext.minus
-import ext.plus
-import ext.times
-import ext.toFloatList
+import ext.*
 import org.khronos.webgl.Float32Array
 import three.js.*
+import util.Log
 
 interface Hittable {
     val hitBox: HitBox
+    val position: Vector3
 }
 
 typealias IntersectionListener = (Hittable) -> Unit
 
 abstract class HitBox : GameObject() {
+
+    private var lastPos: Vector3? = null
 
     var intersections: HashSet<Hittable> = hashSetOf()
         private set
@@ -28,6 +29,8 @@ abstract class HitBox : GameObject() {
     abstract val associatedObject: Hittable
 
     private var newIntersections: HashSet<Hittable> = hashSetOf()
+    private var shouldUpdateIntersections: Boolean = true
+    private var updatedIntersections: Boolean = false
 
     abstract fun containsPoint(point: Vector3): Boolean
 
@@ -55,15 +58,29 @@ abstract class HitBox : GameObject() {
 
     override fun preUpdate() {
         super.preUpdate()
+        if (!shouldUpdateIntersections) { return }
+        updatedIntersections = true
         newIntersections = getIntersections().toHashSet()
+        for (intersection in newIntersections) {
+            intersection.hitBox.newIntersections.add(associatedObject)
+            intersection.hitBox.updatedIntersections = true
+        }
     }
 
     override fun update(delta: Double) {
+        if (!updatedIntersections) return
+        Log.d(TAG, "intersections updated")
         for (intersection in newIntersections.minus(intersections)) {
             onIntersectionEnter(intersection)
         }
-
         intersections = newIntersections
+    }
+
+    override fun lateUpdate() {
+        super.lateUpdate()
+        shouldUpdateIntersections = lastPos != associatedObject.position
+        lastPos = associatedObject.position.clone()
+        updatedIntersections = false
     }
 
 }

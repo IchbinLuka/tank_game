@@ -1,6 +1,6 @@
 package util
 
-val debugLevel = RunConfig.Info
+val debugLevel = RunConfig.Debug
 
 enum class RunConfig {
     Debug,

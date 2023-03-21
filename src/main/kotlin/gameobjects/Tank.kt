@@ -6,6 +6,7 @@ import core.gameobjects.GameObject
 import ext.*
 import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
+import gameobjects.bullets.BulletTarget
 import gameobjects.particles.Fire
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -20,9 +21,10 @@ typealias Count = Int
 class Tank(
     val color: Color = Color(0x338530),
     val startPosition: Vector3,
-    val startRotation: Euler = Euler(),
+    private val startRotation: Euler = Euler(),
     val name: String = "Unknown"
-) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable {
+) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
+    override fun onBulletImpact(bullet: BulletObject) {}
 
     override val hitBox: CuboidHitBox = object: CuboidHitBox(size = Vector3(5, 10, 5), associatedObject = this@Tank, showVertices = false) {
         init {

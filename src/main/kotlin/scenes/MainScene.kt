@@ -9,6 +9,7 @@ import ext.set
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
+import gameobjects.Tree
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import org.w3c.dom.events.Event
@@ -21,6 +22,7 @@ import kotlin.collections.set
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.properties.Delegates
+import kotlin.random.Random
 
 data class GameState(val currentTank: Tank)
 
@@ -52,6 +54,10 @@ class MainScene(
         ).apply {
             for (tank in tanks) {
                 set(tank.name, tank)
+            }
+            val random = Random(10)
+            repeat(25) {
+                set("tree$it", Tree(Vector3(z = 2)))
             }
         }
     }
@@ -190,6 +196,12 @@ class MainScene(
         scene.background = Color(0x64DBFF)
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
+        }
+        val random = Random(10)
+        for (tree in findObjects<Tree>()) {
+            val x = random.nextDouble() * 600 - 300
+            tree.position.x = x
+            tree.position.y = ground.heightAt(tree.position.x) ?: 0.0
         }
         centerCamera()
     }
