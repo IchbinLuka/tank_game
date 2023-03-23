@@ -2,14 +2,14 @@ package ui
 
 import ext.fromId
 import org.w3c.dom.Element
-import util.GUIHelper
 
 class GameOver(
     private val name: String
 ): UIController() {
 
-    override suspend fun initAssets() {
-        GUIHelper.loadGUI("game_over")
+    override val mainGUIName: String = "game_over"
+
+    override fun rebuild() {
         Element.fromId("winner_name")?.apply {
             innerHTML = name
         }

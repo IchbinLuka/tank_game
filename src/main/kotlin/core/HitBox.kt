@@ -17,8 +17,7 @@ abstract class HitBox : GameObject() {
 
     private var lastPos: Vector3? = null
 
-    var intersections: HashSet<Hittable> = hashSetOf()
-        private set
+    private var intersections: HashSet<Hittable> = hashSetOf()
 
     private val intersectionListeners: MutableList<IntersectionListener> = mutableListOf()
 

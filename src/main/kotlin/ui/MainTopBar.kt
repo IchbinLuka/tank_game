@@ -5,12 +5,13 @@ import gameobjects.bullets.Bullet
 import org.w3c.dom.Element
 import scenes.GameState
 import scenes.MainScene
-import util.GUIHelper
 import kotlin.math.roundToInt
 
 class MainTopBar(
     private val scene: MainScene
 ): UIController() {
+    override val mainGUIName: String = "tool_bar"
+
     private val healthElement by lazy { Element.fromId("health") }
     private val nameElement by lazy { Element.fromId("player_name") }
 
@@ -22,8 +23,7 @@ class MainTopBar(
 
     private val aimingStrength by lazy { Element.fromId("strength") }
 
-    override suspend fun initAssets() {
-        GUIHelper.loadTopBar("tool_bar")
+    override fun rebuild() {
         initListeners()
         updateState()
     }

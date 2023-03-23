@@ -1,0 +1,12 @@
+{
+  "settings": "Settings",
+  "language": "Language: ",
+  "return_to_menu": "Return to Menu",
+  "back": "Back",
+  "start_game": "Start the game",
+  "current_player": "Current Player: ",
+  "bullet": "Bullet: ",
+  "health": "Health: ",
+  "strength": "Strength: ",
+  "loading": "Loading"
+}

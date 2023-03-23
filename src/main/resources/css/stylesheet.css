@@ -9,6 +9,10 @@ body {
     font-family: 'Mouse Memoirs', sans-serif;
 }
 
+button {
+    font-family: 'Mouse Memoirs', sans-serif;
+}
+
 html, body, #full {
     height: 100%;
 }
@@ -29,7 +33,7 @@ html, body, #full {
     border-radius: 5px;
     text-align: center;
     padding: 10px;
-    margin: 30px;
+    margin: 15px;
 }
 
 .center {

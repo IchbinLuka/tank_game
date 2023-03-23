@@ -191,8 +191,7 @@ class MainScene(
 
     override suspend fun loadAssets() {
         super.loadAssets()
-        topBar.initAssets()
-        // GUIHelper.loadGUI("main_scene")
+        GUIHelper.pushReplacement(topBar)
         scene.background = Color(0x64DBFF)
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)

@@ -1,6 +1,7 @@
 package core
 
 import DevTools
+import core.models.Settings
 import ext.TAG
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -18,6 +19,7 @@ import three.postprocessing.*
 import util.EventManager
 import util.GUIHelper
 import util.Log
+import util.ValueNotifier
 import kotlin.coroutines.CoroutineContext
 
 val currentScene: GameScene
@@ -28,6 +30,8 @@ class Game(
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext = MainScope().coroutineContext
+
+    val settings = ValueNotifier(Settings())
 
     val gameContainer: HTMLCanvasElement
         get() = document.getElementById("gameContainer") as HTMLCanvasElement
