@@ -23,7 +23,7 @@ object EventManager {
     }
 
     init {
-        window.onkeypress = {
+        window.onkeydown = {
             keyboardEvents.addEvent(it)
         }
     }
