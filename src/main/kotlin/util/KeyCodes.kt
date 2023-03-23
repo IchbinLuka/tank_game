@@ -1,5 +1,6 @@
 package util
 
+@Suppress("unused")
 object KeyCodes {
     const val BACKSPACE = "Backspace"
     const val TAB = "Tab"

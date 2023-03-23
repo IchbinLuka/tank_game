@@ -28,7 +28,9 @@ class Game(
 
     override val coroutineContext: CoroutineContext = MainScope().coroutineContext
 
-    val settings = ValueNotifier(Settings())
+    val settings: ValueNotifier<Settings> = ValueNotifier(Settings.fromCookies() ?: Settings()).apply {
+        addListener { it.saveToCookies() }
+    }
 
     val gameContainer: HTMLCanvasElement
         get() = document.getElementById("gameContainer") as HTMLCanvasElement
