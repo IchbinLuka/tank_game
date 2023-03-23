@@ -19,6 +19,7 @@ object CookieUtil {
 
     fun setCookie(key: String, value: String, expirationDays: Int = 30) {
         val expirationDate = Date(Date().getTime() + expirationDays * 24 * 60 * 60 * 1000)
-        document.cookie = "$key=${encodeURIComponent(value)}; expiryDate=${expirationDate.toUTCString()}; samesite"
+        document.cookie =
+            "$key=${encodeURIComponent(value)}; expiryDate=${expirationDate.toUTCString()}; SameSite=Strict"
     }
 }
