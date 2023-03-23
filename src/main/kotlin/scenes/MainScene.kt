@@ -1,11 +1,9 @@
 package scenes
 
+import KeyCodes
 import core.Game
 import core.gameobjects.GameObject
-import ext.applyCustomMat
-import ext.aspectRatio
-import ext.enableShadows
-import ext.set
+import ext.*
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
@@ -209,18 +207,15 @@ class MainScene(
         super.update(delta)
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
+            Log.d(TAG, "keyCode: ${it.keyCode}, key: ${it.code}")
             if (currentBulletObject != null) return@forEach
-            when (it.keyCode) {
-                97 -> {
+            when (it.code) {
+                KeyCodes.KEY_A, KeyCodes.ARROW_LEFT -> {
                     currentTank?.move(Vector3(-6, 0, 0), delta, ground)
                 }
-                100 -> {
+                KeyCodes.KEY_D, KeyCodes.ARROW_RIGHT -> {
                     currentTank?.move(Vector3(6, 0, 0), delta, ground)
                 }
-                67 -> {
-                    freeCamera = true
-                }
-
             }
         }
     }
