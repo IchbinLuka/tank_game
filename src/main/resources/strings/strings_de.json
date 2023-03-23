@@ -8,5 +8,7 @@
   "bullet": "Kugel: ",
   "health": "Gesundheit: ",
   "strength": "Stärke: ",
-  "loading": "Wird geladen"
+  "loading": "Wird geladen",
+  "player_wins": "{name} gewinnt",
+  "player_count": "Spieler: {count}"
 }

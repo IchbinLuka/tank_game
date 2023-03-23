@@ -23,8 +23,12 @@ class MainTopBar(
 
     private val aimingStrength by lazy { Element.fromId("strength") }
 
-    override fun rebuild() {
+    override suspend fun init() {
+        super.init()
         initListeners()
+    }
+
+    override fun rebuild() {
         updateState()
     }
 

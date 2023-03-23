@@ -8,6 +8,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLInputElement
 import scenes.MainScene
 import util.GUIHelper
+import util.Localizations
 
 class StartController: UIController() {
 
@@ -25,7 +26,7 @@ class StartController: UIController() {
     private var playersDisplay: Element? = null
 
     private fun updatePlayersDisplay() {
-        playersDisplay?.innerHTML = playersSlider!!.value
+        playersDisplay?.innerHTML = Localizations.getString("player_count", "count" to playersSlider!!.value)
     }
 
     private fun initListeners() {

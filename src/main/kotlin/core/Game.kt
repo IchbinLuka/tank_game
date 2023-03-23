@@ -16,10 +16,7 @@ import three.js.Vector2
 import three.js.WebGLRenderer
 import three.js.WebGLRendererParameters
 import three.postprocessing.*
-import util.EventManager
-import util.GUIHelper
-import util.Log
-import util.ValueNotifier
+import util.*
 import kotlin.coroutines.CoroutineContext
 
 val currentScene: GameScene
@@ -45,6 +42,7 @@ class Game(
             launch { _currentScene!!.loadAssets() }
             updateComposer()
             launch(Dispatchers.Unconfined) {
+                Localizations.ensureInitialized()
                 value.preloadAssets()
                 GUIHelper.resetGUI()
                 _currentScene = value
@@ -72,6 +70,10 @@ class Game(
         override var antialias: Boolean? = true
         override var canvas: dynamic = document.getElementById("gameContainer")!!
     })
+
+    private suspend fun ensureLocalizationsInitialized() {
+        Localizations.load(settings.value.language)
+    }
 
     private fun updateRenderer() {
         val topBar = document.getElementById("topBar")!!

@@ -8,5 +8,7 @@
   "bullet": "Bullet: ",
   "health": "Health: ",
   "strength": "Strength: ",
-  "loading": "Loading"
+  "loading": "Loading",
+  "player_wins": "{name} Wins",
+  "player_count": "Players: {count}"
 }
