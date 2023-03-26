@@ -1,12 +1,14 @@
 package scenes
 
 import core.Game
+import core.Player
 import core.gameobjects.GameObject
 import ext.*
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.Tree
+import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import org.w3c.dom.events.Event
@@ -18,7 +20,6 @@ import util.*
 import kotlin.collections.set
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.properties.Delegates
 import kotlin.random.Random
 
 data class GameState(val currentTank: Tank)
@@ -50,7 +51,7 @@ class MainScene(
             "background" to Background()
         ).apply {
             for (tank in tanks) {
-                set(tank.name, tank)
+                set(tank.player.name, tank)
             }
             val random = Random(10)
             repeat(25) {
@@ -69,15 +70,23 @@ class MainScene(
     private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0)
     private val groundRenderable = ground.renderable
 
-    private val deadTanks = ArrayDeque<Tank>()
+    private val deadPlayers = ArrayDeque<Player>()
 
     private val tanks = MutableList(numPlayers) {
         val data = tankColors[it]
         Tank(
-            color = data.second,
+            player = Player(
+                color = data.second,
+                name = data.first,
+                startInventory = hashMapOf(
+                    Bullet.Normal to null,
+                    Bullet.NoGravity to 5u,
+                    Bullet.Big to 2u,
+                    Bullet.Teleport to 2u
+                )
+            ),
             startPosition = Vector3(x = (200 / (numPlayers - 1)) * it - 100, z = 1.5),
-            name = data.first
-        ).apply { addDeathListener { deadTanks.addFirst(this) } }
+        ).apply { addDeathListener { deadPlayers.addFirst(player) } }
     }
 
     private var currentTankIndex: Int = 0
@@ -88,7 +97,7 @@ class MainScene(
     val aimingStrength = ValueNotifier<Double>(0.0)
     private var aimingStrengthValue: Double by aimingStrength
 
-    var currentState: GameState by Delegates.observable(GameState(currentTank), ::notifyObservers)
+    val currentTankNotifier = ValueNotifier(currentTank)
 
     private val topBar = MainTopBar(this)
 
@@ -162,8 +171,10 @@ class MainScene(
     private fun nextTank() {
         val aliveTanks = tanks.filter { it.active }
         if (aliveTanks.size <= 1) {
-            for (tank in aliveTanks) { deadTanks.addFirst(tank) }
-            Game.instance.currentScene = GameEndScene(deadTanks)
+            for (tank in aliveTanks) {
+                deadPlayers.addFirst(tank.player)
+            }
+            Game.instance.currentScene = GameEndScene(deadPlayers)
             return
         } else {
             do {
@@ -171,7 +182,7 @@ class MainScene(
             } while (!currentTank.active)
         }
         updateAimingStrength()
-        currentState = currentState.copy(currentTank = currentTank)
+        currentTankNotifier.value = currentTank
     }
 
     override suspend fun preloadAssets() {

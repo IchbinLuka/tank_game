@@ -60,16 +60,12 @@ open class BasicParticleSystem(
     // region - PUBLIC -
     override val renderable: Object3D? get() = _renderable
 
-    private var initialized: Boolean = false
-
     init {
         initMesh()
         addParticles(spawnBurst)
     }
 
     override suspend fun initVisual() {
-        if (initialized) return
-        initialized = true
         if (material == null) {
             material = ShaderMaterial().apply {
                 side = DoubleSide

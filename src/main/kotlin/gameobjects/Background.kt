@@ -3,7 +3,6 @@ package gameobjects
 import core.gameobjects.GameObject
 import ext.set
 import three.js.*
-import util.Direction
 import kotlin.random.Random
 
 class Background(
@@ -19,7 +18,6 @@ class Background(
     private val clouds = Array<Cloud>(20) {
         Cloud(
             speed = cloudSpeed,
-            startDirection = Direction.Left,
             min = -400.0,
             max = 400.0,
             startPos = Vector3(

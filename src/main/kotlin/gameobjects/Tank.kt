@@ -2,6 +2,7 @@ package gameobjects
 
 import core.CuboidHitBox
 import core.Hittable
+import core.Player
 import core.gameobjects.GameObject
 import ext.*
 import gameobjects.bullets.Bullet
@@ -19,10 +20,9 @@ import kotlin.properties.Delegates
 typealias Count = Int
 
 class Tank(
-    val color: Color = Color(0x338530),
     val startPosition: Vector3,
     private val startRotation: Euler = Euler(),
-    val name: String = "Unknown"
+    val player: Player
 ) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
     override fun onBulletImpact(bullet: BulletObject) {}
 
@@ -40,12 +40,7 @@ class Tank(
 
     override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
 
-    private val _bullets: HashMap<Bullet, Count?> = hashMapOf(
-        Bullet.Normal to null,
-        Bullet.NoGravity to 5,
-        Bullet.Big to 2,
-        Bullet.Teleport to 2
-    )
+    private val _bullets: MutableMap<Bullet, Count?> by player::inventory
 
     val bullets: Map<Bullet, Count?> by ::_bullets
 
@@ -102,6 +97,8 @@ class Tank(
         }
         get() = mainBone!!.rotation
 
+    override var health: Double by player::health
+
     val active: Boolean
         get() = health > 0
 
@@ -123,7 +120,7 @@ class Tank(
         gltf?.scene?.apply {
             enableShadows()
             applyCustomMat(MeshToonMaterial().apply {
-                color = this@Tank.color
+                color = this@Tank.player.color
             })
         }
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
@@ -136,6 +133,9 @@ class Tank(
             die()
         }
         Log.d(TAG, "Loaded tank")
+        if (player.health <= 0.0) {
+            onDeath()
+        }
     }
 
     fun aim(point: Vector2) {
@@ -208,6 +208,7 @@ class Tank(
             fire.initVisual()
             _children["fire"] = fire
             val fireRenderable = fire.renderable!!
+            Log.d(TAG, "adding fire renderable")
             renderable.add(fireRenderable)
             updateFireRotation()
         }
@@ -234,6 +235,6 @@ class Tank(
     }
 
     override fun toString(): String {
-        return "Tank($name), children: $children"
+        return "Tank(${player.name}), children: $children"
     }
 }

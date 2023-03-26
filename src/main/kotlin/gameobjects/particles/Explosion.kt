@@ -20,4 +20,21 @@ class Explosion(
     startDirectionRandomness = 0.2,
     particleLifetimeRandomness = 0.3,
     velocityRandomness = 0.3,
-)
+) /*{
+
+    private val explosionSound: PositionalAudio by lazy { createAudio() }
+
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
+        val buffer = ResourceManager.explosionSound.await()
+        explosionSound.apply {
+            setBuffer(buffer)
+        }
+        renderable?.add(explosionSound)
+    }
+
+    override fun onSceneReady() {
+        super.onSceneReady()
+        explosionSound?.play()
+    }
+}*/

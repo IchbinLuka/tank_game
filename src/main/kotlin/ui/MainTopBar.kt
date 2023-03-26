@@ -3,7 +3,6 @@ package ui
 import ext.fromId
 import gameobjects.bullets.Bullet
 import org.w3c.dom.Element
-import scenes.GameState
 import scenes.MainScene
 import kotlin.math.roundToInt
 
@@ -33,37 +32,38 @@ class MainTopBar(
     }
 
     private fun initListeners() {
-        scene.addListener { _, _, new ->
-            updateState(new)
+        scene.currentTankNotifier.addListener {
+            updateState()
         }
         scene.aimingStrength.addListener {
             aimingStrength?.innerHTML = "${(it * 100).roundToInt()}%"
         }
         leftButton?.addEventListener("click", {
-            scene.currentState.currentTank.previousBullet()
+            scene.currentTankNotifier.value.previousBullet()
         })
         rightButton?.addEventListener("click", {
-            scene.currentState.currentTank.nextBullet()
+            scene.currentTankNotifier.value.nextBullet()
         })
     }
 
-    private fun updateState(state: GameState = scene.currentState) {
-        state.currentTank.addListener { _, _, new ->
+    private fun updateState() {
+        scene.currentTankNotifier.value.addListener { _, _, new ->
             updateBulletCount(new)
         }
-        updateUI(state)
+        updateUI()
     }
 
-    private fun updateBulletCount(bullet: Bullet = scene.currentState.currentTank.currentBullet) {
-        val tank = scene.currentState.currentTank
+    private fun updateBulletCount(bullet: Bullet = scene.currentTankNotifier.value.currentBullet) {
+        val tank = scene.currentTankNotifier.value
         bulletName?.innerHTML = bullet.toString()
         bulletCount?.innerHTML = tank.bullets[bullet]?.toString() ?: "\u221e"
     }
 
-    private fun updateUI(state: GameState = scene.currentState) {
+    private fun updateUI() {
         updateBulletCount()
-        healthElement?.innerHTML = "${(state.currentTank.health * 100).roundToInt()}%"
-        nameElement?.innerHTML = state.currentTank.name
+        val tank = scene.currentTankNotifier.value
+        healthElement?.innerHTML = "${(tank.health * 100).roundToInt()}%"
+        nameElement?.innerHTML = tank.player.name
     }
 
 
