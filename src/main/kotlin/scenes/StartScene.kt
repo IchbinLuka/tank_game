@@ -2,7 +2,6 @@ package scenes
 
 import core.Player
 import gameobjects.Tank
-import gameobjects.bullets.Bullet
 import three.js.Color
 import three.js.Vector3
 import ui.StartController
@@ -15,11 +14,10 @@ class StartScene : TankPresentingScene(listOf(
 ).map {
     Tank(
         startPosition = Vector3(),
-        player = Player(color = it, name = "", inventory = hashMapOf(Bullet.Normal to null))
+        player = Player(color = it, name = "")
     )
 }) {
     override suspend fun loadAssets() {
-        val a: UInt = 1u
         super.loadAssets()
         GUIHelper.pushReplacement(StartController())
     }
