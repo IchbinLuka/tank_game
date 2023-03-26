@@ -4,14 +4,13 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.asDeferred
 import three.GLTF
 import three.GLTFLoader
-import three.js.ImageLoader
-import three.js.Texture
-import three.js.TextureLoader
+import three.js.*
 
 object ResourceManager {
     val gltfLoader = GLTFLoader()
     val textureLoader = TextureLoader()
     val imageLoader = ImageLoader()
+    private val audioLoader = AudioLoader()
 
     private fun textureAsync(uri: String): Deferred<Texture> {
         return textureLoader.loadAsync(uri).asDeferred()
@@ -20,6 +19,8 @@ object ResourceManager {
     private fun gltfAsync(uri: String): Deferred<GLTF> {
         return gltfLoader.loadAsync(uri).asDeferred()
     }
+
+    private fun audioAsync(uri: String): Deferred<AudioBuffer> = audioLoader.loadAsync(uri).asDeferred()
 
     val suzanne get() = gltfAsync("models/suzanne2.gltf")
     val tank get() = gltfAsync("models/tank.glb")
@@ -38,4 +39,6 @@ object ResourceManager {
     val startLandScape get() = gltfAsync("models/start_background.glb")
 
     val winnerPodium get() = gltfAsync("models/winner_podium.glb")
+
+    val explosionSound by lazy { audioAsync("test.mp3") }
 }

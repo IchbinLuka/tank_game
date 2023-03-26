@@ -10,7 +10,7 @@ import kotlin.math.roundToInt
 class MainTopBar(
     private val scene: MainScene
 ): UIController() {
-    override val mainGUIName: String = "tool_bar"
+    override val topBarName: String = "tool_bar"
 
     private val healthElement by lazy { Element.fromId("health") }
     private val nameElement by lazy { Element.fromId("player_name") }

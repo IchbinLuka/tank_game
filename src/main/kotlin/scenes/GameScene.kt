@@ -7,10 +7,7 @@ import generated.Pos
 import generated.Rot
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import three.js.Camera
-import three.js.Object3D
-import three.js.Scene
-import three.js.Vector3
+import three.js.*
 import ui.UIController
 import util.GUIHelper
 
@@ -20,7 +17,11 @@ abstract class GameScene: GameObject() {
     override val renderable: Object3D?
         get() = scene
 
-    open val camera: Camera = Camera()
+    val audioListener = AudioListener()
+
+    open val camera: Camera = Camera().apply {
+        add(audioListener)
+    }
 
     fun getConfiguration(): ObjectConfiguration = ObjectConfiguration(
         ArrayList(_children.map {

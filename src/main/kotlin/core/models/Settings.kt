@@ -15,7 +15,11 @@ data class Settings(
 
     companion object {
         fun fromCookies(): Settings? = CookieUtil.loadCookie("settings")?.let {
-            Json.decodeFromString(it)
+            try {
+                Json.decodeFromString(it)
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 }

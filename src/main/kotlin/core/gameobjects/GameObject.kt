@@ -1,13 +1,23 @@
 package core.gameobjects
 
+import core.currentScene
 import ext.getWorldEuler
 import ext.set
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import three.js.Euler
 import three.js.Object3D
+import three.js.PositionalAudio
 import three.js.Vector3
 import util.Uuid
+import kotlin.collections.Collection
+import kotlin.collections.Map
+import kotlin.collections.MutableMap
+import kotlin.collections.filterIsInstance
+import kotlin.collections.forEach
+import kotlin.collections.hashMapOf
+import kotlin.collections.iterator
+import kotlin.collections.set
 import kotlin.math.max
 import kotlin.reflect.KClass
 
@@ -41,7 +51,9 @@ abstract class GameObject {
 
     /** Indicates whether the object should longer be a part of the scene */
     var alive: Boolean = true
-       protected set
+        protected set
+
+    fun createAudio(): PositionalAudio = PositionalAudio(currentScene.audioListener)
 
     fun addGameObject(gameObject: GameObject, name: String? = null) {
         _children[name ?: gameObject.uuid.toString()] = gameObject

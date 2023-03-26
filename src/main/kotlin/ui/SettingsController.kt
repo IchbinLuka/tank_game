@@ -22,7 +22,9 @@ class SettingsController: UIController() {
 
     private var settings by settingsNotifier
 
-    private val locales = ScrollableList(listOf("en", "de"))
+    private val locales = ScrollableList(listOf("en", "de")).apply {
+        nextWhile { it != settings.language }
+    }
 
     override suspend fun init() {
         super.init()
