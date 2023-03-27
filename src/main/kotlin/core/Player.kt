@@ -10,12 +10,10 @@ class Player(
 ) {
     val inventory: MutableMap<Bullet, Int?> = hashMapOf<Bullet, Int?>(
         Bullet.Normal to null
-    ).mapValues { (k, v) ->
-        if (v == null || startInventory[k] == null) {
-            null
-        } else {
-            v + startInventory[k]!!.toInt()
-        }
-    }.toMutableMap()
+    )
     var health: Double = 1.0
+
+    init {
+        inventory.putAll(startInventory.mapValues { it.value?.toInt() })
+    }
 }

@@ -134,7 +134,7 @@ class Tank(
         }
         Log.d(TAG, "Loaded tank")
         if (player.health <= 0.0) {
-            onDeath()
+            addFire()
         }
     }
 
@@ -204,17 +204,22 @@ class Tank(
             listener()
         }
         MainScope().launch {
-            val fire = Fire(radius = 3.0, position = Vector3())
-            fire.initVisual()
-            _children["fire"] = fire
-            val fireRenderable = fire.renderable!!
-            Log.d(TAG, "adding fire renderable")
-            renderable.add(fireRenderable)
-            updateFireRotation()
+            addFire()
         }
     }
 
+    private suspend fun addFire() {
+        val fire = Fire(radius = 3.0, position = Vector3())
+        fire.initVisual()
+        _children["fire"] = fire
+        val fireRenderable = fire.renderable!!
+        Log.d(TAG, "adding fire renderable")
+        renderable.add(fireRenderable)
+        updateFireRotation()
+    }
+
     fun updateFireRotation() {
+        Log.d(TAG, "adjusting fire rotation")
         fire?.renderable?.lookAt(fire!!.globalPosition + Vector3(z = 1))
     }
 

@@ -56,5 +56,8 @@ abstract class TankPresentingScene(
             MeshToonMaterial().apply { color = Color(0x6D3600) },
             MeshToonMaterial().apply { color = Color(0x3e8e2c) }
         )
+        for (tank in findObjects<Tank>()) {
+            tank.updateFireRotation()
+        }
     }
 }
