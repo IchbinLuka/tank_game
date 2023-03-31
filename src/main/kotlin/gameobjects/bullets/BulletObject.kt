@@ -85,7 +85,7 @@ open class BulletObject(
             MeshPhongMaterial().apply {
                 color = Color(0x111111)
             }
-        ).apply { this@apply.position.set(tank.globalPosition) }
+        ).apply { this@apply.position.set(tank.cannonTipPos!!) }
     }
 
     private var isNew: Boolean = true

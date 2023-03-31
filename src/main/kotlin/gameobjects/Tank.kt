@@ -87,6 +87,9 @@ class Tank(
     private var direction = Direction.Right
 
     private var cannon: Object3D? = null
+    private var cannonTip: Object3D? = null
+
+    val cannonTipPos: Vector3? get() = cannonTip?.getWorldPosition(Vector3())
 
     private val fire: Fire?
         get() = findObject("fire")
@@ -129,6 +132,7 @@ class Tank(
         renderable = mainBone!!
         rotation = startRotation
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
+        cannonTip = cannon?.children?.firstOrNull { it.name == "CannonTip" }
         if (mainBone == null || cannon == null) {
             Log.e(TAG, "Failed to identify mainBone and cannon")
             die()
