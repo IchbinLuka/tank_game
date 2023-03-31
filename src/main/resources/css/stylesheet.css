@@ -46,9 +46,13 @@ html, body, #full {
     left: 50%;
 }
 
-.topbar-menu-item {
+.topbarMenu {
+    border-style: none none solid;
+    border-width: 10px;
     font-size: 50px;
+    border-bottom: black;
 }
+
 
 .slider {
     -webkit-appearance: none;
@@ -114,4 +118,23 @@ html, body, #full {
 .down {
     transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
+}
+
+.menuPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%
+}
+
+.menuContainer {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.menuTitle {
+    align-self: center;
+    font-size: 100px;
 }
