@@ -20,6 +20,8 @@ import util.getLinearGradient
 import util.noise.GroundNoise
 import kotlin.math.*
 
+private const val BACK_SMOOTHING_WIDTH = 3
+
 class Ground(
     private val offset: Vector3 = Vector3(0, 0, 0),
     showVertex: Boolean = false,
@@ -102,7 +104,7 @@ class Ground(
         updateMesh()
     }
 
-    private fun getIndex(x: Int, y: Int): Int = x * groundVertices.first().size + y
+    private fun getIndex(x: Int, y: Int): Int = x * (groundVertices.first().size + BACK_SMOOTHING_WIDTH) + y
 
     //region PUBLIC
     fun destroy(position: Double, strength: Double) {
@@ -132,7 +134,7 @@ class Ground(
             nearestVertex + maxDistance
         ).toInt()
         for (i in range) {
-            for (j in 0 until groundVertices[i].size) {
+            for (j in BACK_SMOOTHING_WIDTH until groundVertices[i].size) {
                 val index = getIndex(i, j)
                 attribute.setY(
                     index, function2(
@@ -143,6 +145,11 @@ class Ground(
                         )
                     )
                 )
+            }
+            val newHeight = attribute.getY(getIndex(i, BACK_SMOOTHING_WIDTH))
+            for (j in 0 until BACK_SMOOTHING_WIDTH) {
+                val index = getIndex(i, j)
+                attribute.setY(index, newHeight - (BACK_SMOOTHING_WIDTH - j).toDouble().pow(2))
             }
         }
         attribute.needsUpdate = true
@@ -157,8 +164,8 @@ class Ground(
             return null
         }
         val attribute = positionAttribute
-        val previousIndex = getIndex(floor(normPos).toInt(), 0)
-        val nextIndex = getIndex(ceil(normPos).toInt(), 0)
+        val previousIndex = getIndex(floor(normPos).toInt(), BACK_SMOOTHING_WIDTH)
+        val nextIndex = getIndex(ceil(normPos).toInt(), BACK_SMOOTHING_WIDTH)
 
         val progress = (position - attribute.getX(previousIndex).toDouble()) / pointDistance
         return getLinearGradient(
@@ -216,9 +223,13 @@ class Ground(
     private fun updateMesh() {
         val positions = mutableListOf<Float>()
         val indices = mutableListOf<Int>()
-        /*val groundVertices = groundVertices.map {
-            arrayOf(it.first() - Vector3(y = 1, z = pointDistance)).asSequence().plus(it).toList()
-        }*/
+        val groundVertices = groundVertices.map {
+            Array(size = BACK_SMOOTHING_WIDTH) { i ->
+                val j = BACK_SMOOTHING_WIDTH - i
+                it.first() - Vector3(y = j.toDouble().pow(2), z = pointDistance * j)
+            }.asSequence().plus(it).toList()
+            // sequenceOf(it.first() - Vector3(y = 1, z = pointDistance))
+        }
 
         for (row in groundVertices) {
             for (vertex in row) {
