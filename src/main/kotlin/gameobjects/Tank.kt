@@ -133,6 +133,10 @@ class Tank(
             die()
         }
         Log.d(TAG, "Loaded tank")
+    }
+
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         if (player.health <= 0.0) {
             addFire()
         }

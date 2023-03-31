@@ -60,12 +60,16 @@ open class BasicParticleSystem(
     // region - PUBLIC -
     override val renderable: Object3D? get() = _renderable
 
+    private var initialized = false
+
     init {
         initMesh()
         addParticles(spawnBurst)
     }
 
     override suspend fun initVisual() {
+        if (initialized) return
+        initialized = true
         if (material == null) {
             material = ShaderMaterial().apply {
                 side = DoubleSide
@@ -110,8 +114,8 @@ open class BasicParticleSystem(
     }
 
     private var previousCount = 0
-    override fun update(deltaTime: Double) {
-        super.update(deltaTime)
+    override fun update(delta: Double) {
+        super.update(delta)
         if (!alive || particles.isEmpty()) return
         val currentTime = Date.now()
         if (currentTime - startTime > totalLifetime) {
@@ -124,8 +128,8 @@ open class BasicParticleSystem(
             if (lifeProgress > 1) {
                 particles.removeAt(index)
             }
-            particle.velocity.addScaledVector(Direction.Down.vector3, gravity * deltaTime)
-            particle.position += particle.velocity * deltaTime
+            particle.velocity.addScaledVector(Direction.Down.vector3, gravity * delta)
+            particle.position += particle.velocity * delta
         }
         // Add new particles
         val newParticleCount = floor(min((currentTime - lastBirth), particleLifetime * spawnDelta) / spawnDelta).toInt()
