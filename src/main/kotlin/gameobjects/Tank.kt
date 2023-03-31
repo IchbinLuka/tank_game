@@ -113,8 +113,9 @@ class Tank(
             ).normalize()
         }
 
-    override suspend fun initVisual() {
-        super.initVisual()
+
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         Log.v(TAG, "Loading tank")
         gltf = ResourceManager.tank.await()
         gltf?.scene?.apply {
@@ -133,10 +134,6 @@ class Tank(
             die()
         }
         Log.d(TAG, "Loaded tank")
-    }
-
-    override suspend fun preloadAssets() {
-        super.preloadAssets()
         if (player.health <= 0.0) {
             addFire()
         }
@@ -214,7 +211,7 @@ class Tank(
 
     private suspend fun addFire() {
         val fire = Fire(radius = 3.0, position = Vector3())
-        fire.initVisual()
+        fire.preloadAssets()
         _children["fire"] = fire
         val fireRenderable = fire.renderable!!
         Log.d(TAG, "adding fire renderable")

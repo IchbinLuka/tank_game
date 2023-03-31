@@ -28,8 +28,12 @@ class Background(
         )
     }
 
-    override suspend fun initVisual() {
-        super.initVisual()
+    override val _children: MutableMap<String, GameObject> = hashMapOf<String, GameObject>().apply {
+        putAll(clouds.map { it.uuid.toString() to it })
+    }
+
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         val sun = Mesh(SphereGeometry(radius = 50, widthSegments = 30, heightSegments = 30), MeshBasicMaterial().apply {
             color = Color(0xFFBF00)
         }).apply {
@@ -39,15 +43,11 @@ class Background(
                 z = -200.0
             }
         }
-        for (cloud in clouds) {
-            cloud.initVisual()
-            cloud.renderable?.let { renderable.add(it) }
-        }
         renderable.add(sun)
     }
 
-    override fun update(deltaTime: Double) {
-        super.update(deltaTime)
-        for (cloud in clouds) cloud.update(deltaTime)
+    override fun update(delta: Double) {
+        super.update(delta)
+        for (cloud in clouds) cloud.update(delta)
     }
 }

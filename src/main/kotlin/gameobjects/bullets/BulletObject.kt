@@ -174,17 +174,21 @@ open class BulletObject(
             }
             updateGeometry()
         }
-        if (ground.heightAt(position.x) == null) { die() }
-        if (isNew) { isNew = false }
+        if (ground.heightAt(position.x) == null) {
+            die()
+        }
+        if (isNew) {
+            isNew = false
+        }
     }
 
-    override suspend fun initVisual() {
-        super.initVisual()
-        // renderable.remove(hitBox.renderable)
+
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         bulletMesh.add(hitBox.renderable)
     }
 
-    companion object: AssetInitializer {
+    companion object : AssetInitializer {
 
 
         override suspend fun initAssets() {

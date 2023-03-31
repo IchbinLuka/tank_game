@@ -19,7 +19,9 @@ class Cloud(
 
     private var offset = startPos.x
 
-    override suspend fun initVisual() {
+
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         renderable = ResourceManager.cloud.await().scene.clone(true).apply {
             applyCustomMat(MeshToonMaterial().apply {
                 color = Color(0xffffff)

@@ -38,7 +38,7 @@ class ParticleTestScene(
 
     override suspend fun preloadAssets() {
         super.preloadAssets()
-        particleSystem.initVisual()
+        particleSystem.preloadAssets()
         particleSystem.renderable?.let { scene.add(it) }
     }
 

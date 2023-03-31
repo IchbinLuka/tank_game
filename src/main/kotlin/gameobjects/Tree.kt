@@ -53,8 +53,8 @@ class Tree(
         alive = false
     }
 
-    override suspend fun initVisual() {
-        super.initVisual()
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         val tree = ResourceManager.tree.await().scene.clone()
         tree.applyCustomMat(
             MeshToonMaterial().apply { color = Color(0x11710F) },

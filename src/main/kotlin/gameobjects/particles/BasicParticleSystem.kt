@@ -67,7 +67,8 @@ open class BasicParticleSystem(
         addParticles(spawnBurst)
     }
 
-    override suspend fun initVisual() {
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         if (initialized) return
         initialized = true
         if (material == null) {

@@ -96,8 +96,9 @@ class Ground(
         }
     }
 
-    override suspend fun initVisual() {
-        super.initVisual()
+
+    override suspend fun preloadAssets() {
+        super.preloadAssets()
         updateMesh()
     }
 

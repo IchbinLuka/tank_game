@@ -10,13 +10,6 @@ import three.js.Object3D
 import three.js.PositionalAudio
 import three.js.Vector3
 import util.Uuid
-import kotlin.collections.Collection
-import kotlin.collections.Map
-import kotlin.collections.MutableMap
-import kotlin.collections.filterIsInstance
-import kotlin.collections.forEach
-import kotlin.collections.hashMapOf
-import kotlin.collections.iterator
 import kotlin.collections.set
 import kotlin.math.max
 import kotlin.reflect.KClass
@@ -58,7 +51,7 @@ abstract class GameObject {
     fun addGameObject(gameObject: GameObject, name: String? = null) {
         _children[name ?: gameObject.uuid.toString()] = gameObject
         MainScope().launch {
-            gameObject.initVisual()
+            gameObject.preloadAssets()
             gameObject.renderable?.let { renderable?.add(it) }
             gameObject.onSceneReady()
         }
@@ -93,17 +86,12 @@ abstract class GameObject {
 
     inline fun <reified T> findObjects(): Collection<T> = children.values.filterIsInstance<T>()
 
-    /** Function used for preparing the GameObject. Useful for e.g. loading Assets */
-    open suspend fun initVisual() {
-        _children.values.forEach { it.initVisual() }
-    }
 
     override fun equals(other: Any?): Boolean = other is GameObject && other.uuid == uuid
     override fun hashCode(): Int = uuid.toInt()
 
     /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
     open suspend fun preloadAssets() {
-        _children.values.forEach { it.initVisual() }
         _children.values.forEach { it.preloadAssets() }
         _children.values.forEach { o -> o.renderable?.let { renderable?.add(it) } }
     }
