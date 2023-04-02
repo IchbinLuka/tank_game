@@ -14,7 +14,7 @@ class Explosion(
     emitter = SphereEmitter(position, radius, 0),
     startVelocity = 10.0,
     startSize = 2.0,
-    endSize = 10.0,
+    endSize = 7.0,
     startColor = Color(0xfcd125),
     endColor = Color(0xfc3a0f),
     startDirectionRandomness = 0.2,

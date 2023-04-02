@@ -5,6 +5,7 @@ import ext.plusAssign
 import ext.times
 import ext.toDoubleList
 import gameobjects.particles.emitter.ParticleEmitter
+import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.LessEqualDepth
@@ -33,8 +34,8 @@ open class BasicParticleSystem(
     endColor: Color = Color(0xffffff),
     val spawnDelta: Double = Double.POSITIVE_INFINITY,
     val spawnBurst: Int = 0,
-    val startSize: Double = 1.0,
-    val endSize: Double = 1.0,
+    startSize: Double = 1.0,
+    endSize: Double = 1.0,
     val onFinished: () -> Unit = {},
     var material: Material? = null,
 ) : GameObject() {
@@ -44,6 +45,9 @@ open class BasicParticleSystem(
         var position: Vector3,
         var birthTime: Double
     )
+
+    private val startSize: Double = adjustSize(startSize)
+    private val endSize: Double = adjustSize(endSize)
 
     private val particles = ArrayDeque<Particle>()
     private val startTime: Double = Date.now()
@@ -66,6 +70,8 @@ open class BasicParticleSystem(
         initMesh()
         addParticles(spawnBurst)
     }
+
+    private fun adjustSize(size: Double): Double = size * window.devicePixelRatio
 
     override suspend fun preloadAssets() {
         super.preloadAssets()
@@ -174,18 +180,6 @@ open class BasicParticleSystem(
         positions.needsUpdate = true
         colorsBuffer.needsUpdate = true
         sizes.needsUpdate = true
-
-        /*val vertices = mutableListOf<Float>()
-        val colors = mutableListOf<Float>()
-        val sizes = mutableListOf<Float>()
-        for (particle in particles) {
-            vertices.addAll(particle.position.toFloatList())
-            colors.addAll(particle.color.map { it.toFloat() })
-            sizes.add(particle.size.toFloat())
-        }
-        geometry.setAttribute("position", BufferAttribute(Float32Array(vertices.toTypedArray()).asDynamic(), 3))
-        geometry.setAttribute("customColor", BufferAttribute(Float32Array(colors.toTypedArray()).asDynamic(), 3))
-        geometry.setAttribute("size", BufferAttribute(Float32Array(sizes.toTypedArray()).asDynamic(), 1))*/
     }
 
     private fun addParticles(number: Int = 1, time: Double = Date.now()) {

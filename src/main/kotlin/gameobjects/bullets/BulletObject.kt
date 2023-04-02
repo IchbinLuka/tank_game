@@ -13,6 +13,7 @@ import ext.toFloatList
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.particles.Explosion
+import kotlinx.browser.window
 import kotlinx.coroutines.asPromise
 import org.khronos.webgl.Float32Array
 import three.js.*
@@ -104,7 +105,7 @@ open class BulletObject(
             renderable.add(Points(dots,
                 PointsMaterial().apply {
                     color = Color(0xffffff)
-                    size = 3
+                    size = 1.5 * window.devicePixelRatio
                     alphaMap = it
                     map = it
                     alphaTest = 0.5
