@@ -5,14 +5,17 @@ import ext.aspectRatio
 import gameobjects.Ground
 import kotlinx.browser.window
 import scenes.GameScene
-import three.js.*
+import three.js.AmbientLight
+import three.js.Color
+import three.js.DirectionalLight
+import three.js.PerspectiveCamera
 
 class GroundTestScene: GameScene() {
     override val _children: MutableMap<String, GameObject> = hashMapOf(
         "ground" to Ground()
     )
 
-    override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
+    override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 4.0
     }
 

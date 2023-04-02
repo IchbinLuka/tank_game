@@ -8,13 +8,26 @@
 
     <div class="menuContainer">
       <div lang-key="cookie_notice" class="menu-element"></div>
+    </div>
 
-      <div>
-        <button id="languageButton" class="menu-element" style="cursor: pointer;">
+    <div class="menuContainer" style="flex-grow: 3">
+
+
+      <div class="gridContainer">
+        <button id="languageButton" class="menu-element" style="cursor: pointer">
           <span lang-key="language"></span>
           <span id="langCode"></span>
         </button>
+
+        <div class="menu-element">
+          <label>
+            <span lang-key="fullscreen"></span>
+            <input class="checkBox" type="checkbox" id="fullscreen_checkbox">
+          </label>
+        </div>
       </div>
+
+
       <div>
         <button lang-key="back" id="backButton" class="menu-element" style="cursor: pointer;"></button>
       </div>

@@ -11,5 +11,6 @@
   "loading": "Wird geladen",
   "player_wins": "{name} gewinnt",
   "player_count": "Spieler: {count}",
-  "cookie_notice": "Diese Website benutzt Cookies um die Einstellungen zu speichern."
+  "cookie_notice": "Diese Website benutzt Cookies um die Einstellungen zu speichern.",
+  "fullscreen": "Vollbild"
 }

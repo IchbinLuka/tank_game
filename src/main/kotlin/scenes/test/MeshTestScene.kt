@@ -50,12 +50,12 @@ class MeshTestScene : GameScene() {
         geometry.setIndex(indices.toTypedArray())
         geometry.setAttribute("normal", BufferAttribute(Float32Array(normals).asDynamic(), 3))
         val mesh = Mesh(geometry, MeshPhongMaterial().apply {
-            color  = Color(0x00ff00)
+            color = Color(0x00ff00)
         })
         mesh.rotation.z = 2 * PI
         add(mesh)
     }
-    override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
+    override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 3.0
         position.y = 0.0
         position.x = 1.0

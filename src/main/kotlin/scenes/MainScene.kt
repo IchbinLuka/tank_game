@@ -39,7 +39,7 @@ class MainScene(
         add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
-    override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
+    override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 150.0
         position.y = 120.0
         lookAt(Vector3(y = 100))

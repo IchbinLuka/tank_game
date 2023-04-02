@@ -138,3 +138,21 @@ html, body, #full {
     align-self: center;
     font-size: 100px;
 }
+
+.gridContainer {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 20px;
+
+}
+
+input[type="checkbox"] {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    accent-color: black;
+
+}

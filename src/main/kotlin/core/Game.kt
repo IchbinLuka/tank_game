@@ -3,6 +3,8 @@ package core
 import DevTools
 import core.models.Settings
 import ext.TAG
+import ext.aspectRatio
+import ext.tryCast
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
@@ -11,10 +13,7 @@ import scenes.GameScene
 import scenes.LoadingScene
 import stats.js.Stats
 import three.OrbitControls
-import three.js.Clock
-import three.js.Vector2
-import three.js.WebGLRenderer
-import three.js.WebGLRendererParameters
+import three.js.*
 import three.postprocessing.*
 import util.*
 import kotlin.coroutines.CoroutineContext
@@ -80,7 +79,12 @@ class Game(
     private fun updateRenderer() {
         val topBar = document.getElementById("topBar")!!
         renderer.setPixelRatio(window.devicePixelRatio)
-        renderer.setSize(window.innerWidth, window.innerHeight - topBar.getBoundingClientRect().height)
+        _currentScene?.camera?.tryCast<PerspectiveCamera>()?.let {
+            Log.d(TAG, "innerHeight: ${window.innerHeight}, innerWidth: ${window.innerWidth}")
+            it.aspect = window.aspectRatio
+            it.updateProjectionMatrix()
+        }
+        renderer.setSize(window.innerWidth, window.innerHeight)
     }
 
     private var composer: EffectComposer = EffectComposer(OutlineEffect(renderer))
@@ -101,11 +105,13 @@ class Game(
         }
     }
 
+
     fun activateDeveloperCamera() {
         OrbitControls(currentScene.camera, renderer.domElement)
     }
 
     init {
+        window.addEventListener("resize", { updateRenderer() }, false)
         window.onloadend = {
             renderer.domElement.focus()
         }
@@ -125,7 +131,6 @@ class Game(
             currentScene.preUpdate()
             currentScene.update(delta * DevTools.gameSpeed)
             currentScene.lateUpdate()
-            // composer.render()
             effect.render(currentScene.scene, currentScene.camera)
             stats.update()
             val error = renderer.getContext().getError()

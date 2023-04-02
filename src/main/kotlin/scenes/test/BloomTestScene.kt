@@ -17,7 +17,7 @@ class BloomTestScene: GameScene() {
         add(AmbientLight(color = Color(0xffffff)))
     }
 
-    override val camera: Camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
+    override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 4.0
     }
 

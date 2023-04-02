@@ -32,7 +32,7 @@ abstract class TankPresentingScene(
         add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
-    override val camera: Camera = PerspectiveCamera(60, window.aspectRatio, 0.1, 1000).apply {
+    override val camera = PerspectiveCamera(60, window.aspectRatio, 0.1, 1000).apply {
         position.x = -1.6
         position.y = 8.0
         position.z = 36.0
