@@ -53,7 +53,6 @@ class MainScene(
             for (tank in tanks) {
                 set(tank.player.name, tank)
             }
-            val random = Random(10)
             repeat(25) {
                 set("tree$it", Tree(Vector3(z = 2)))
             }
@@ -204,7 +203,7 @@ class MainScene(
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
         }
-        val random = Random(10)
+        val random = Random.Default
         for (tree in findObjects<Tree>()) {
             val x = random.nextDouble() * 600 - 300
             tree.position.x = x

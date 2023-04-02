@@ -3,7 +3,6 @@ package gameobjects
 import core.HeightMap
 import core.HitBox
 import core.Hittable
-import core.currentScene
 import core.gameobjects.GameObject
 import ext.TAG
 import ext.minus
@@ -40,23 +39,6 @@ class Ground(
         override fun containsPoint(point: Vector3): Boolean =
             heightAt(point.x)?.let { it > point.y } ?: false
 
-        override fun onSceneReady() {
-            super.onSceneReady()
-            Log.d(TAG, "Adding listeners")
-            for (t in currentScene.findObjects<BulletTarget>().filter { it != associatedObject }) {
-                t.hitBox.addIntersectionListener(::onIntersectionEnter)
-            }
-
-        }
-
-        override fun onIntersectionEnter(intersectingBox: Hittable) {
-            super.onIntersectionEnter(intersectingBox)
-
-            Log.d(TAG, "intersected with ${intersectingBox.TAG}")
-            if (intersectingBox is BulletObject) {
-                destroy(intersectingBox.position.x, intersectingBox.explosionWidth)
-            }
-        }
     }
 
     override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
@@ -108,10 +90,6 @@ class Ground(
 
     //region PUBLIC
     fun destroy(position: Double, strength: Double) {
-        // TODO
-        val function: (Vector3) -> Double = {
-            it.y - 20
-        }
         val maxDistance = strength / pointDistance
         val height = heightAt(position) ?: return
         val function2: (Vector3) -> Double = {
