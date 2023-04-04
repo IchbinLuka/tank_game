@@ -170,6 +170,11 @@ open class CuboidHitBox(
         }
     }
 
+    override fun onSceneReady() {
+        super.onSceneReady()
+        updateVertices()
+    }
+
     override fun preUpdate() {
         updateVertices()
         updatePlanes()

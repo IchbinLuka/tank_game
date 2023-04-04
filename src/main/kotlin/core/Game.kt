@@ -52,7 +52,6 @@ class Game(
                 _currentScene!!.loadAssets()
                 updateRenderer()
             }
-            Log.d("Game", "Loading assets")
         }
 
     private val stats = Stats().apply {
@@ -80,7 +79,6 @@ class Game(
         val topBar = document.getElementById("topBar")!!
         renderer.setPixelRatio(window.devicePixelRatio)
         _currentScene?.camera?.tryCast<PerspectiveCamera>()?.let {
-            Log.d(TAG, "innerHeight: ${window.innerHeight}, innerWidth: ${window.innerWidth}")
             it.aspect = window.aspectRatio
             it.updateProjectionMatrix()
         }

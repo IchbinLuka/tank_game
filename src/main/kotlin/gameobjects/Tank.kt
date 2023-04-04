@@ -26,16 +26,11 @@ class Tank(
 ) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
     override fun onBulletImpact(bullet: BulletObject) {}
 
-    override val hitBox: CuboidHitBox = object: CuboidHitBox(size = Vector3(5, 10, 5), associatedObject = this@Tank, showVertices = false) {
-        init {
-            position = Vector3(x = -2.5)
-        }
-
-        override fun onIntersectionEnter(intersectingBox: Hittable) {
-            Log.d(TAG, "intersected with ${intersectingBox.TAG}")
-            if (spawnedBullet) return
-            super.onIntersectionEnter(intersectingBox)
-        }
+    override val hitBox: CuboidHitBox = CuboidHitBox(
+        size = Vector3(5, 10, 5),
+        associatedObject = this
+    ).apply {
+        position.x = -2.5
     }
 
     override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
@@ -105,10 +100,10 @@ class Tank(
     val active: Boolean
         get() = health > 0
 
-    val cannonRotation: Euler
+    private val cannonRotation: Euler
         get() = cannon!!.getWorldEuler(Euler())
 
-    val cannonDirection: Vector3
+    private val cannonDirection: Vector3
         get() = with(cannonRotation) {
             Vector3(
                 -sin(z.toDouble()),
@@ -118,7 +113,6 @@ class Tank(
 
 
     override suspend fun preloadAssets() {
-        super.preloadAssets()
         Log.v(TAG, "Loading tank")
         gltf = ResourceManager.tank.await()
         gltf?.scene?.apply {
@@ -141,6 +135,7 @@ class Tank(
         if (player.health <= 0.0) {
             addFire()
         }
+        super.preloadAssets()
     }
 
     fun aim(point: Vector2) {
@@ -218,13 +213,11 @@ class Tank(
         fire.preloadAssets()
         _children["fire"] = fire
         val fireRenderable = fire.renderable!!
-        Log.d(TAG, "adding fire renderable")
         renderable.add(fireRenderable)
         updateFireRotation()
     }
 
     fun updateFireRotation() {
-        Log.d(TAG, "adjusting fire rotation")
         fire?.renderable?.lookAt(fire!!.globalPosition + Vector3(z = 1))
     }
 
@@ -233,6 +226,11 @@ class Tank(
             mainBone?.rotateX(PI)
         }
         this.direction = direction
+    }
+
+    override fun onSceneReady() {
+        super.onSceneReady()
+        Log.d(TAG, "hitbox vertices: ${hitBox.vertices.map { it.toFloatList() }}")
     }
 
     override fun update(delta: Double) {

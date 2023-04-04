@@ -3,7 +3,10 @@ package scenes
 import core.Game
 import core.Player
 import core.gameobjects.GameObject
-import ext.*
+import ext.applyCustomMat
+import ext.aspectRatio
+import ext.enableShadows
+import ext.set
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
@@ -216,7 +219,6 @@ class MainScene(
         super.update(delta)
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
-            Log.d(TAG, "keyCode: ${it.keyCode}, key: ${it.code}")
             if (currentBulletObject != null) return@forEach
             when (it.code) {
                 KeyCodes.KEY_A, KeyCodes.ARROW_LEFT -> {
