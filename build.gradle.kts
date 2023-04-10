@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
 plugins {
-    kotlin("js") version "1.8.0"
+    kotlin("js") version "1.8.20"
     id("io.kotest.multiplatform") version "5.5.0"
     kotlin("plugin.serialization") version "1.7.20"
 }
@@ -16,6 +16,7 @@ repositories {
 dependencies {
     api(project(":threejs_kt"))
     api(project(":statsjs_kt"))
+    api(project(":common"))
 }
 
 kotlin {

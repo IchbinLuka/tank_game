@@ -8,4 +8,6 @@ rootProject.name = "tank_game"
 
 include("threejs_kt")
 include("statsjs_kt")
+include("common")
+include("server")
 

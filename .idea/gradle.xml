@@ -12,6 +12,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/server" />
             <option value="$PROJECT_DIR$/statsjs_kt" />
             <option value="$PROJECT_DIR$/threejs_kt" />
           </set>
