@@ -64,6 +64,8 @@ kotlin {
                 implementation("io.ktor:ktor-server-websockets:$ktor_version")
                 implementation("io.ktor:ktor-server-resources:$ktor_version")
                 implementation("io.ktor:ktor-server-cio:$ktor_version")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.0")
             }
         }
         val commonTest by getting {

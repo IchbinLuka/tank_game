@@ -1,6 +1,11 @@
-import kotlinx.serialization.Serializable
+@file:OptIn(ExperimentalSerializationApi::class)
 
-enum class MessageType() {
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
+
+enum class MessageType {
     Death,
     Pos,
     Velocity,
@@ -30,5 +35,9 @@ data class GameMessage(
         result = 31 * result + type.hashCode()
         result = 31 * result + data.contentHashCode()
         return result
+    }
+
+    companion object {
+        fun fromByteArray(bytes: ByteArray): GameMessage = ProtoBuf.decodeFromByteArray(bytes)
     }
 }

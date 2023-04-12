@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromByteArray
@@ -7,14 +9,14 @@ sealed class GameMessageData {
 
     @Serializable
     data class Vec3Data(
-        val value: Vector3
+        val value: Vec3
     ) : GameMessageData()
 
     @Serializable
     object Empty : GameMessageData()
 
     companion object {
-        @OptIn(ExperimentalSerializationApi::class)
+        fun fromByteArray(array: ByteArray) = fromGameMessage(ProtoBuf.decodeFromByteArray(array))
         fun fromGameMessage(message: GameMessage): GameMessageData = when (message.type) {
             MessageType.Pos, MessageType.Velocity -> ProtoBuf.decodeFromByteArray<Vec3Data>(message.data)
             else -> Empty
