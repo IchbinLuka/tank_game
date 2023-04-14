@@ -3,6 +3,7 @@
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 
 sealed class GameMessageData {
@@ -14,6 +15,8 @@ sealed class GameMessageData {
 
     @Serializable
     object Empty : GameMessageData()
+
+    fun toByteArray(): ByteArray = ProtoBuf.encodeToByteArray(this)
 
     companion object {
         fun fromByteArray(array: ByteArray) = fromGameMessage(ProtoBuf.decodeFromByteArray(array))

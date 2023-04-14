@@ -3,6 +3,7 @@
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 
 enum class MessageType {
@@ -36,6 +37,8 @@ data class GameMessage(
         result = 31 * result + data.contentHashCode()
         return result
     }
+
+    fun toByteArray(): ByteArray = ProtoBuf.encodeToByteArray(this)
 
     companion object {
         fun fromByteArray(bytes: ByteArray): GameMessage = ProtoBuf.decodeFromByteArray(bytes)
