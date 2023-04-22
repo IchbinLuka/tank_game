@@ -1,5 +1,6 @@
 package core.gameobjects
 
+import core.ConnectionManager
 import core.currentScene
 import ext.getWorldEuler
 import ext.set
@@ -45,6 +46,12 @@ abstract class GameObject {
     /** Indicates whether the object should longer be a part of the scene */
     var alive: Boolean = true
         protected set
+
+    open fun registerMultiplayerSynchronized(manager: ConnectionManager) {
+        for (child in children.values) {
+            child.registerMultiplayerSynchronized(manager)
+        }
+    }
 
     fun createAudio(): PositionalAudio = PositionalAudio(currentScene.audioListener)
 

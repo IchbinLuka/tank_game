@@ -9,9 +9,9 @@ import kotlin.test.assertEquals
 class GameMessageDataTest {
     @Test
     fun vec3Test() {
-        val vec = GameMessageData.Vec3Data(Vec3(1.0, 1.0, 1.0))
+        val vec = GameMessageData.Vec3(1.0, 1.0, 1.0)
         val proto = ProtoBuf.encodeToByteArray(vec)
-        val decoded: GameMessageData.Vec3Data = ProtoBuf.decodeFromByteArray(proto)
+        val decoded: GameMessageData.Vec3 = ProtoBuf.decodeFromByteArray(proto)
         assertEquals(vec, decoded)
     }
 
@@ -19,5 +19,14 @@ class GameMessageDataTest {
     fun emptyTest() {
         val proto = ProtoBuf.encodeToByteArray(GameMessageData.Empty)
         assertEquals(GameMessageData.Empty, ProtoBuf.decodeFromByteArray(proto))
+    }
+
+    @Test
+    fun groundDataTest() {
+        val ground = GameMessageData.GroundData(
+            Array(10) { i -> DoubleArray(10) { j -> (i + j).toDouble() } }
+        )
+        val proto = ProtoBuf.encodeToByteArray(ground)
+        assertEquals(ground, ProtoBuf.decodeFromByteArray(proto))
     }
 }

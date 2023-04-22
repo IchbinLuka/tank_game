@@ -10,7 +10,10 @@ enum class MessageType {
     Death,
     Pos,
     Velocity,
-    Spawn
+    Spawn,
+    TankCreation,
+    GroundData,
+    Empty
 }
 
 @Serializable

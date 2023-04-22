@@ -17,7 +17,7 @@ fun Application.configureSockets() {
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
                 when (val messageData = GameMessageData.fromGameMessage(message)) {
-                    is GameMessageData.Vec3Data -> outgoing.send(Frame.Text("You sent position: $messageData on ${message.topic}"))
+                    is GameMessageData.Vec3 -> outgoing.send(frame)
                     is GameMessageData.Empty -> outgoing.send(Frame.Text("You sent an empty message"))
                     else -> outgoing.send(Frame.Text("You sent an unknown message"))
                 }
