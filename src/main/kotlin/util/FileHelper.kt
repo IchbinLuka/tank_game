@@ -1,8 +1,9 @@
 package util
 
 import ext.TAG
+import kotlinx.browser.window
+import kotlinx.coroutines.await
 import org.w3c.files.FileReader
-import org.w3c.xhr.XMLHttpRequest
 
 object FileHelper {
 
@@ -14,12 +15,10 @@ object FileHelper {
      * Thanks to https://stackoverflow.com/a/41133213
      */
     suspend fun readFile(path: String): String? {
-        val httpRequest = XMLHttpRequest()
-        httpRequest.open("GET", path, false)
-        httpRequest.send()
-        return if (httpRequest.status == 200.toShort()) {
+        val response = window.fetch(path).await()
+        return if (response.status == 200.toShort()) {
             Log.v(TAG, "Loaded $path")
-            httpRequest.responseText
+            response.text().await()
         } else {
             Log.e(TAG, "Failed to load $path")
             null

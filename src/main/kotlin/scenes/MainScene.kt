@@ -1,6 +1,7 @@
 package scenes
 
 import GameMessageData
+import MessageType
 import core.Game
 import core.Player
 import core.gameobjects.GameObject
@@ -19,7 +20,6 @@ import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import ui.MainTopBar
 import util.*
-import kotlin.collections.set
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
@@ -33,7 +33,7 @@ class MainScene(
     // region - Multiplayer -
 
     override val topic: String = "MainScene"
-    override fun onMessage(message: GameMessageData) {
+    override fun onMessage(message: GameMessageData, type: MessageType) {
         when (message) {
             is GameMessageData.TankCreationData -> {
                 addGameObject(
@@ -43,6 +43,7 @@ class MainScene(
                     )
                 )
             }
+
             else -> {}
         }
     }
@@ -159,8 +160,7 @@ class MainScene(
             if (currentBulletObject == null) {
                 currentBulletObject = currentTank.shoot(aimingStrengthValue * MAX_POINTER_DISTANCE)
                 currentBulletObject!!.let {
-                    _children["bullet"] = it
-                    scene.add(it.renderable)
+                    addGameObject(it, "bullet")
                     it.addImpactListener { v ->
                         onImpact()
                     }
@@ -215,12 +215,12 @@ class MainScene(
         // _children.values.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
         centerCamera()
+        BulletObject.initAssets()
+        scene.background = Color(0x64DBFF)
     }
 
-    override suspend fun loadAssets() {
-        super.loadAssets()
-        GUIHelper.pushReplacement(topBar)
-        scene.background = Color(0x64DBFF)
+    override fun onSceneReady() {
+        super.onSceneReady()
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
         }
@@ -231,6 +231,11 @@ class MainScene(
             tree.position.y = ground.heightAt(tree.position.x) ?: 0.0
         }
         centerCamera()
+    }
+
+    override suspend fun loadAssets() {
+        super.loadAssets()
+        GUIHelper.pushReplacement(topBar)
     }
 
     override fun update(delta: Double) {

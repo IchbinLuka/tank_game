@@ -14,7 +14,6 @@ import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.particles.Explosion
 import kotlinx.browser.window
-import kotlinx.coroutines.asPromise
 import org.khronos.webgl.Float32Array
 import three.js.*
 import util.AssetInitializer
@@ -100,20 +99,6 @@ open class BulletObject(
         get() = gravity
         set(_) {}
 
-    init {
-        ResourceManager.disc.asPromise().then {
-            renderable.add(Points(dots,
-                PointsMaterial().apply {
-                    color = Color(0xffffff)
-                    size = 1.5 * window.devicePixelRatio
-                    alphaMap = it
-                    map = it
-                    alphaTest = 0.5
-                }
-            ))
-        }
-    }
-
     protected open fun onIntersectionEnter(intersectingBox: Hittable) {
         if (intersectingBox !is BulletTarget) return
         ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
@@ -186,6 +171,16 @@ open class BulletObject(
 
     override suspend fun preloadAssets() {
         super.preloadAssets()
+        val disc = ResourceManager.disc.await()
+        renderable.add(Points(dots,
+            PointsMaterial().apply {
+                color = Color(0xffffff)
+                size = 1.5 * window.devicePixelRatio
+                alphaMap = disc
+                map = disc
+                alphaTest = 0.5
+            }
+        ))
         bulletMesh.add(hitBox.renderable)
     }
 

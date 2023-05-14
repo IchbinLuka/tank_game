@@ -1,8 +1,8 @@
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
+@JvmInline
 @Serializable
-data class ColorData(
-    val r: Int,
-    val g: Int,
-    val b: Int
+value class ColorData(
+    val value: Int
 )

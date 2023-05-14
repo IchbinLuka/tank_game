@@ -1,9 +1,12 @@
 package gameobjects
 
+import GameMessageData
+import MessageType
 import core.CuboidHitBox
 import core.Hittable
 import core.Player
 import core.gameobjects.GameObject
+import core.multiplayer.MultiplayerSynchronized
 import ext.*
 import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
@@ -23,7 +26,7 @@ class Tank(
     val startPosition: Vector3,
     private val startRotation: Euler = Euler(),
     val player: Player
-) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
+) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget, MultiplayerSynchronized {
     override fun onBulletImpact(bullet: BulletObject) {}
 
     override val hitBox: CuboidHitBox = CuboidHitBox(
@@ -235,11 +238,27 @@ class Tank(
 
     override fun update(delta: Double) {
         super.update(delta)
-        if (spawnedBullet) { spawnedBullet = false }
+        if (spawnedBullet) {
+            spawnedBullet = false
+        }
     }
 
     private fun switchDirection() {
         setDirection(direction.inverse)
+    }
+
+    override val topic: String = player.name
+
+    override fun onMessage(message: GameMessageData, type: MessageType) {
+        when (type) {
+            MessageType.Pos -> {
+                if (message is GameMessageData.Vec3) {
+                    position = message.toVector3()
+                }
+            }
+
+            else -> {}
+        }
     }
 
     override fun toString(): String {

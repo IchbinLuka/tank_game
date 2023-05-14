@@ -35,13 +35,13 @@ class ConnectionManager(
     }
 
 
-    private fun onMessage(message: MessageEvent) {
+    fun onMessage(message: MessageEvent) {
         val buffer = message.data.unsafeCast<ArrayBuffer>()
         val decodedMessage = ProtoBuf.decodeFromArrayBuffer<GameMessage>(buffer)
         val messageData = GameMessageData.fromGameMessage(decodedMessage)
         synchronizedObjects[decodedMessage.topic]?.let {
             for (o in it) {
-                o.onMessage(messageData)
+                o.onMessage(messageData, decodedMessage.type)
             }
         }
         Log.d("Websocket", "received $messageData on ${decodedMessage.topic}")

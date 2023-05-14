@@ -31,7 +31,7 @@ object ResourceManager {
     val skyBox get() = gltfAsync("models/skybox.glb")
 
     val sunnySky get() = textureAsync("textures/skies/sky_sunny.jpg")
-    val disc get() = textureAsync("textures/sprites/disc.png")
+    val disc by lazy { textureAsync("textures/sprites/disc.png") }
     val box get() = textureAsync("textures/sprites/box.png")
 
     val testLandscape get() = gltfAsync("models/test_landscape.glb")

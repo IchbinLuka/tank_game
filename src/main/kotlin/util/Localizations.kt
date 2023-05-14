@@ -30,11 +30,16 @@ object Localizations {
             Log.e(TAG, "could not load language with code $langCode")
             return
         }
-        translations = Json.parseToJsonElement(content).jsonObject.toMap().mapValues {
-            it.value.jsonPrimitive.content
+        try {
+            translations = Json.parseToJsonElement(content).jsonObject.toMap().mapValues {
+                it.value.jsonPrimitive.content
+            }
+            initialized = true
+        } catch (e: Throwable) {
+            Log.e(TAG, "Could not load language. Error: $e")
+        } finally {
+            langMutex.unlock()
         }
-        initialized = true
-        langMutex.unlock()
     }
 
     suspend fun ensureInitialized() {
