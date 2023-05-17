@@ -57,8 +57,6 @@ kotlin {
                 implementation("io.ktor:ktor-server-core:$ktor_version")
                 implementation("ch.qos.logback:logback-classic:$logback_version")
                 // Koin for Ktor
-                implementation("io.insert-koin:koin-core:$koin_ktor")
-                implementation("io.insert-koin:koin-ktor:$koin_ktor")
                 // SLF4J Logger
                 project(":common")
                 implementation("io.ktor:ktor-server-websockets:$ktor_version")

@@ -26,7 +26,7 @@ class Game(
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext = MainScope().coroutineContext
-    private val connectionManager = ConnectionManager()
+    // rivate val connectionManager = ConnectionManager(url = "http://localhost:8080/ws ")
 
     val settings: ValueNotifier<Settings> = ValueNotifier(Settings.fromCookies() ?: Settings()).apply {
         addListener { it.saveToCookies() }
@@ -49,7 +49,7 @@ class Game(
                 GUIHelper.resetGUI()
                 _currentScene = value
                 _currentScene!!.onSceneReady()
-                _currentScene!!.registerMultiplayerSynchronized(connectionManager)
+                // _currentScene!!.registerMultiplayerSynchronized(connectionManager)
                 updateComposer()
                 _currentScene!!.loadAssets()
                 updateRenderer()
