@@ -10,6 +10,7 @@ import core.multiplayer.MultiplayerSynchronized
 import ext.*
 import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
+import gameobjects.bullets.BulletObjectArgs
 import gameobjects.bullets.BulletTarget
 import gameobjects.particles.Fire
 import kotlinx.coroutines.MainScope
@@ -117,6 +118,7 @@ class Tank(
 
     override suspend fun preloadAssets() {
         Log.v(TAG, "Loading tank")
+        Bullet.initFactories()
         gltf = ResourceManager.tank.await()
         gltf?.scene?.apply {
             enableShadows()
@@ -168,8 +170,8 @@ class Tank(
         if (_bullets[currentBullet] != null) {
             _bullets[currentBullet] = _bullets[currentBullet]!! - 1
         }
-        val bulletObject =  currentBullet.createObject(
-            cannonDirection * velocity, this
+        val bulletObject =  currentBullet.createObject.newGameObject(
+            BulletObjectArgs(cannonDirection * velocity, this)
         )
         if ((_bullets[currentBullet] ?: 1) <= 0) {
             nextBullet()

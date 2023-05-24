@@ -1,24 +1,24 @@
 package gameobjects.bullets
 
+import gameobjects.GameObjectFactory
 import gameobjects.Tank
 import three.js.Vector3
 
 typealias BulletObjectFactory = (velocity: Vector3, tank: Tank) -> BulletObject
 
 enum class Bullet(
-    val createObject: BulletObjectFactory
+    val createObject: GameObjectFactory<BulletObject, BulletObjectArgs>
 ) {
-    Normal({ v, t ->
-        BulletObject(tank = t, startVelocity = v)
-    }),
-    NoGravity({ v, t ->
-        NoGravityBulletObject(tank = t, startVelocity = v)
-    }),
-    Big({ v, t  ->
-        BigBulletObject(tank = t, startVelocity = v)
-    }),
-    Teleport({
-        v, t ->
-        TeleportBullet(v, t)
-    })
+    Normal(BulletObject.Companion),
+    NoGravity(NoGravityBulletObject.Companion),
+    Big(BigBulletObject.Companion),
+    Teleport(TeleportBullet.Companion);
+
+    companion object {
+        suspend fun initFactories() {
+            for (item in values()) {
+                item.createObject.prepareAssets()
+            }
+        }
+    }
 }

@@ -6,12 +6,15 @@ import core.Hittable
 import core.currentScene
 import core.gameobjects.GameObject
 import core.gameobjects.MovingGameObject
+import core.gameobjects.SynchronizedInitializer
 import ext.TAG
 import ext.set
 import ext.times
 import ext.toFloatList
+import gameobjects.GameObjectFactory
 import gameobjects.Ground
 import gameobjects.Tank
+import gameobjects.bullets.BigBulletObject.Companion.disc
 import gameobjects.particles.Explosion
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
@@ -28,10 +31,24 @@ interface BulletTarget: Hittable {
     fun onBulletImpact(bullet: BulletObject)
 }
 
-open class BulletObject(
-    startVelocity: Vector3,
-    protected val tank: Tank,
-) : MovingGameObject(), Hittable {
+data class BulletObjectArgs(val startVelocity: Vector3, val tank: Tank)
+
+open class BulletObject protected constructor(
+    arg: BulletObjectArgs
+) : MovingGameObject(), Hittable, SynchronizedInitializer {
+
+    open class Factory: GameObjectFactory<BulletObject, BulletObjectArgs>() {
+        lateinit var disc: Texture
+        override suspend fun loadAssets() {
+            disc = ResourceManager.disc.await()
+        }
+
+        override fun createGameObject(arg: BulletObjectArgs): BulletObject {
+            return BulletObject(arg)
+        }
+    }
+
+    protected val tank: Tank = arg.tank
 
     // region - HitBox -
 
@@ -94,7 +111,7 @@ open class BulletObject(
 
     private val impactListeners: MutableList<ImpactListener> = mutableListOf()
 
-    override var velocity: Vector3 = startVelocity * 0.75
+    override var velocity: Vector3 = arg.startVelocity * 0.75
     override var acceleration: Vector3
         get() = gravity
         set(_) {}
@@ -168,10 +185,9 @@ open class BulletObject(
         }
     }
 
+    companion object : Factory()
 
-    override suspend fun preloadAssets() {
-        super.preloadAssets()
-        val disc = ResourceManager.disc.await()
+    override fun init() {
         renderable.add(Points(dots,
             PointsMaterial().apply {
                 color = Color(0xffffff)
@@ -182,13 +198,5 @@ open class BulletObject(
             }
         ))
         bulletMesh.add(hitBox.renderable)
-    }
-
-    companion object : AssetInitializer {
-
-
-        override suspend fun initAssets() {
-            ResourceManager.disc.await()
-        }
     }
 }

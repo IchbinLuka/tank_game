@@ -5,16 +5,26 @@ import gameobjects.Tank
 import three.js.Vector3
 
 class NoGravityBulletObject(
-    startVelocity: Vector3,
-    tank: Tank,
+    args: BulletObjectArgs
 ) : BulletObject(
-    if (startVelocity.length().toDouble() > 20) startVelocity else startVelocity.normalize() * 20.0,
-    tank = tank
+    args.copy(
+        startVelocity = args.startVelocity.let {
+            if (it.length().toDouble() > 20) it else it.normalize() * 20.0
+        }
+    )
 ) {
     override var acceleration: Vector3 = Vector3()
 
     override fun update(delta: Double) {
         super.update(delta)
-        if (position.y > 300) { die() }
+        if (position.y > 300) {
+            die()
+        }
+    }
+
+    companion object: Factory() {
+        override fun createGameObject(arg: BulletObjectArgs): BulletObject {
+            return NoGravityBulletObject(arg)
+        }
     }
 }
