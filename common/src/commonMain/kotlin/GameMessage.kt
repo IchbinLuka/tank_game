@@ -13,7 +13,8 @@ enum class MessageType {
     Spawn,
     TankCreation,
     GroundData,
-    Empty
+    Empty,
+    SessionStateChange
 }
 
 @Serializable

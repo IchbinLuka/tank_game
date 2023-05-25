@@ -48,7 +48,7 @@ sealed class GameMessageData {
         private inline fun <reified T> decode(array: ByteArray): T = ProtoBuf.decodeFromByteArray<T>(array)
 
         fun fromByteArray(array: ByteArray) = fromGameMessage(ProtoBuf.decodeFromByteArray(array))
-        @OptIn(ExperimentalSerializationApi::class)
+
         fun fromGameMessage(message: GameMessage): GameMessageData {
             val type = when (message.type) {
                 MessageType.Pos, MessageType.Velocity -> typeOf<Vec3>()

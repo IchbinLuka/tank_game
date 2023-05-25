@@ -2,15 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects.tank_game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects.tank_game.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects.tank_game.test.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects.tank_game.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/com.liorgonnen.tank_game.statsjs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/com.liorgonnen.tank_game.statsjs_kt.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/com.liorgonnen.tank_game.statsjs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/com.liorgonnen.tank_game.statsjs_kt.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/threejs_kt/com.liorgonnen.tank_game.threejs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/threejs_kt/com.liorgonnen.tank_game.threejs_kt.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/threejs_kt/com.liorgonnen.tank_game.threejs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/threejs_kt/com.liorgonnen.tank_game.threejs_kt.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kotlin_game.tank_game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/kotlin_game.tank_game.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kotlin_game.tank_game.test.iml" filepath="$PROJECT_DIR$/.idea/modules/kotlin_game.tank_game.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rust/rust.iml" filepath="$PROJECT_DIR$/rust/rust.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tank_game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tank_game.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.test.iml" />

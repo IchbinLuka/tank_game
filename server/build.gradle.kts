@@ -58,7 +58,8 @@ kotlin {
                 implementation("ch.qos.logback:logback-classic:$logback_version")
                 // Koin for Ktor
                 // SLF4J Logger
-                project(":common")
+                implementation(project(mapOf("path" to ":common")))
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
                 implementation("io.ktor:ktor-server-websockets:$ktor_version")
                 implementation("io.ktor:ktor-server-resources:$ktor_version")
                 implementation("io.ktor:ktor-server-cio:$ktor_version")
@@ -82,7 +83,7 @@ kotlin {
         if (!isMingwX64) {
             val nativeMain by getting {
                 dependencies {
-
+                    // project("common")
                 }
             }
             val nativeTest by getting
@@ -93,7 +94,4 @@ kotlin {
 tasks.named<JavaExec>("run") {
     dependsOn(tasks.named<Jar>("jvmJar"))
     classpath(tasks.named<Jar>("jvmJar"))
-}
-dependencies {
-    implementation(project(mapOf("path" to ":common")))
 }

@@ -1,7 +1,5 @@
 package com.ichbinluka.plugins
 
-import GameMessage
-import GameMessageData
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*

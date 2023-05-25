@@ -1,14 +1,17 @@
 package com.ichbinluka.services
 
 import Player
+import com.ichbinluka.routes.SessionCreationInfo
 import sessions.Session
 
+
 interface GameSessionService {
-    fun getSessionById(sessionId: Int): Session?
+    fun getSessionById(sessionId: Long): Session?
 
     fun getPublicSessions(): Collection<Session>
 
-    fun addSession(session: Session): Int
-    fun openSession(name: String, password: String?, player: Player): Int
-    fun closeSession(sessionId: Int)
+    fun addSession(session: Session): Long
+
+    fun createSession(info: SessionCreationInfo): Session
+    fun closeSession(sessionId: Long)
 }
