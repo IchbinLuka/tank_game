@@ -5,10 +5,10 @@
       <configuration version="5" platform="JavaScript " allPlatforms="JS []" useProjectSettings="false" isTestModule="true" externalProjectId=":threejs_kt" isHmppProject="true">
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>
-          <externalSystemTestTask>browserTest|:threejs_kt|js</externalSystemTestTask>
+          <externalSystemTestTask>browserTest|:threejs_kt|js|js</externalSystemTestTask>
         </externalSystemTestTasks>
         <compilerSettings>
-          <option name="additionalArguments" value="-Xir-only -Xir-per-module-output-name=tank_game-threejs_kt-test -Xir-produce-klib-dir -Xir-module-name=com.liorgonnen:threejs_kt_test -Xir-output-dir=C:\Users\Luka\IdeaProjects\kotlin_game\threejs_kt\build\classes\kotlin\test" />
+          <option name="additionalArguments" value="-Xir-module-name=com.liorgonnen:threejs_kt_test -Xir-only -Xir-per-module-output-name=tank_game-threejs_kt-test -Xir-produce-klib-dir -ir-output-name threejs_kt_test -ir-output-dir $MODULE_DIR$/../../../threejs_kt/build/classes/kotlin/test" />
         </compilerSettings>
         <compilerArguments>
           <flagArguments>

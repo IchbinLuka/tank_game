@@ -5,7 +5,7 @@
       <configuration version="5" platform="JavaScript " allPlatforms="JS []" useProjectSettings="false" isTestModule="false" externalProjectId=":threejs_kt" isHmppProject="true">
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <compilerSettings>
-          <option name="additionalArguments" value="-Xir-only -Xir-per-module-output-name=tank_game-threejs_kt -Xir-produce-klib-dir -Xir-module-name=com.liorgonnen:threejs_kt -Xir-output-dir=C:\Users\Luka\IdeaProjects\kotlin_game\threejs_kt\build\classes\kotlin\main" />
+          <option name="additionalArguments" value="-Xir-module-name=com.liorgonnen:threejs_kt -Xir-only -Xir-per-module-output-name=tank_game-threejs_kt -Xir-produce-klib-dir -ir-output-name threejs_kt -ir-output-dir $MODULE_DIR$/../../../threejs_kt/build/classes/kotlin/main" />
         </compilerSettings>
         <compilerArguments>
           <flagArguments>

@@ -160,7 +160,8 @@ class MainScene(
             if (currentBulletObject == null) {
                 currentBulletObject = currentTank.shoot(aimingStrengthValue * MAX_POINTER_DISTANCE)
                 currentBulletObject!!.let {
-                    addGameObject(it, "bullet")
+                    _children["bullet"] = it
+                    renderable?.add(it.renderable)
                     it.addImpactListener { v ->
                         onImpact()
                     }
@@ -215,7 +216,6 @@ class MainScene(
         // _children.values.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
         centerCamera()
-        BulletObject.initAssets()
         scene.background = Color(0x64DBFF)
     }
 
