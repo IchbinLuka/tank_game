@@ -62,7 +62,7 @@ object GUIHelper {
         translateDocument()
     }
 
-    private fun translateDocument() {
+    fun translateDocument() {
         val elements = document.querySelectorAll("[lang-key]")
         for (i in 0 until elements.length) {
             val element = elements[i]

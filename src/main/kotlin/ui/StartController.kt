@@ -24,13 +24,14 @@ class StartController: UIController() {
 
     private var playersSlider: HTMLInputElement? = null
     private var playersDisplay: Element? = null
-    private val multiplayerButton: Element? by lazy { Element.fromId("multiplayerButton") }
+    private var multiplayerButton: Element? = null
 
     private fun updatePlayersDisplay() {
         playersDisplay?.innerHTML = Localizations.getString("player_count", "count" to playersSlider!!.value)
     }
 
     private fun initListeners() {
+        multiplayerButton = Element.fromId("multiplayerButton")
         playersDisplay = Element.fromId("num_players_display")
         playersSlider = (Element.fromId("num_players_slider") as HTMLInputElement).apply {
             addEventListener("input", {

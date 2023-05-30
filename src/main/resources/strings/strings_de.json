@@ -3,6 +3,7 @@
   "language": "Sprache: ",
   "return_to_menu": "Zurück zum Hauptmenü",
   "back": "Zurück",
+  "next": "Weiter",
   "start_game": "Spiel starten",
   "current_player": "Aktueller Spieler: ",
   "bullet": "Kugel: ",
@@ -14,5 +15,9 @@
   "cookie_notice": "Diese Website benutzt Cookies um die Einstellungen zu speichern.",
   "fullscreen": "Vollbild",
   "multiplayer": "Mehrspieler",
-  "join": "Beitreten"
+  "join": "Beitreten",
+  "new_session": "Neues Spiel",
+  "create_player": "Spieler erstellen",
+  "player_name": "Name",
+  "player_color": "Farbe"
 }

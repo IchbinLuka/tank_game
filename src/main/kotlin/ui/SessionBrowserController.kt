@@ -1,15 +1,19 @@
 package ui
 
 import ext.fromId
-import kotlinx.browser.window
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.w3c.dom.Element
-import org.w3c.fetch.RequestInit
 import services.APIHelper
 import ui.components.SessionBrowserItem
+import util.GUIHelper
 
 class SessionBrowserController: UIController() {
 
     override val mainGUIName: String = "session_browser"
+
+    private val backButton by lazy { Element.fromId("backButton") }
+    private val newButton by lazy { Element.fromId("newSessionButton") }
 
 
     override suspend fun init() {
@@ -19,6 +23,12 @@ class SessionBrowserController: UIController() {
         for (session in sessions) {
             insertComponent(SessionBrowserItem(session), container)
         }
+        backButton?.addEventListener("click", {
+            MainScope().launch { GUIHelper.pop() }
+        })
+        newButton?.addEventListener("click", {
+
+        })
     }
 
     override fun rebuild() {}

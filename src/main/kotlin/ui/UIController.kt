@@ -1,8 +1,8 @@
 package ui
 
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
 import ui.components.UIComponent
+import util.GUIHelper
 
 abstract class UIController {
     open val topBarName: String? = null
@@ -14,6 +14,8 @@ abstract class UIController {
     suspend fun insertComponent(component: UIComponent, container: Element) {
         component.init()
         container.innerHTML += component.getHTMLString()
+        component.onMounted()
+        GUIHelper.translateDocument()
     }
 
     open fun dispose() {}

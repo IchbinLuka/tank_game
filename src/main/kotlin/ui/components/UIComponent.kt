@@ -1,6 +1,5 @@
 package ui.components
 
-import util.FileHelper
 import util.GUIHelper
 
 abstract class UIComponent {
@@ -12,6 +11,10 @@ abstract class UIComponent {
 
     open suspend fun init() {
         htmlString = GUIHelper.getContent("components/$componentSource") ?: "Error"
+    }
+
+    open fun onMounted() {
+
     }
 
     open fun getHTMLString(): String {

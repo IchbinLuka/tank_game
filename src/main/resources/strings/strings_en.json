@@ -3,6 +3,7 @@
   "language": "Language: ",
   "return_to_menu": "Return to Menu",
   "back": "Back",
+  "next": "Next",
   "start_game": "Start the game",
   "current_player": "Current Player: ",
   "bullet": "Bullet: ",
@@ -14,5 +15,9 @@
   "cookie_notice": "Note: This website uses cookies to persist the settings.",
   "fullscreen": "Fullscreen",
   "multiplayer": "Multiplayer",
-  "join": "Join"
+  "join": "Join",
+  "new_session": "New Session",
+  "create_player": "Create Player",
+  "player_name": "Name",
+  "player_color": "Color"
 }

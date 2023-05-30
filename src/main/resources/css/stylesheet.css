@@ -128,6 +128,7 @@ html, body, #full {
 }
 
 .menuContainer {
+    text-align: center;
     display: flex;
     justify-content: space-evenly;
     flex-direction: column;
@@ -146,6 +147,10 @@ html, body, #full {
 
 }
 
+input {
+    font-family: 'Mouse Memoirs', sans-serif;
+}
+
 input[type="checkbox"] {
     width: 25px;
     height: 25px;
@@ -154,5 +159,25 @@ input[type="checkbox"] {
 
 input[type="checkbox"]:checked {
     accent-color: black;
-
 }
+
+input[type="color"] {
+    outline: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+input[type="text"] {
+    background: whitesmoke;
+    outline: 0;
+    font-size: 30px;
+    border: none;
+    border-bottom: 3px solid black;
+}
+
+input[type="text"]:focus {
+    outline: 0;
+}
+
+
