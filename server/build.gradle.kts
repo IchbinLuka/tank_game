@@ -63,6 +63,7 @@ kotlin {
                 implementation("io.ktor:ktor-server-websockets:$ktor_version")
                 implementation("io.ktor:ktor-server-resources:$ktor_version")
                 implementation("io.ktor:ktor-server-cio:$ktor_version")
+                implementation("io.ktor:ktor-server-cors:$ktor_version")
                 implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.0")
@@ -94,4 +95,8 @@ kotlin {
 tasks.named<JavaExec>("run") {
     dependsOn(tasks.named<Jar>("jvmJar"))
     classpath(tasks.named<Jar>("jvmJar"))
+}
+dependencies {
+    implementation("io.ktor:ktor-server-cors-jvm:2.2.4")
+    implementation("io.ktor:ktor-server-default-headers-jvm:2.2.4")
 }

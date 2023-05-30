@@ -12,5 +12,7 @@
   "player_wins": "{name} gewinnt",
   "player_count": "Spieler: {count}",
   "cookie_notice": "Diese Website benutzt Cookies um die Einstellungen zu speichern.",
-  "fullscreen": "Vollbild"
+  "fullscreen": "Vollbild",
+  "multiplayer": "Mehrspieler",
+  "join": "Beitreten"
 }

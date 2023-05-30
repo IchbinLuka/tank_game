@@ -49,7 +49,7 @@ object GUIHelper {
         update(controller)
     }
 
-    private suspend fun getContent(name: String): String? = if (cachedGUIs.containsKey(name)) {
+    suspend fun getContent(name: String): String? = if (cachedGUIs.containsKey(name)) {
         cachedGUIs[name]!!
     } else {
         val s = FileHelper.readFile("GUIs/${name}.html")

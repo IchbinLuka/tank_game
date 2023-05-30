@@ -24,6 +24,7 @@ class StartController: UIController() {
 
     private var playersSlider: HTMLInputElement? = null
     private var playersDisplay: Element? = null
+    private val multiplayerButton: Element? by lazy { Element.fromId("multiplayerButton") }
 
     private fun updatePlayersDisplay() {
         playersDisplay?.innerHTML = Localizations.getString("player_count", "count" to playersSlider!!.value)
@@ -45,6 +46,9 @@ class StartController: UIController() {
         }
         Element.fromId("settingsButton")?.addEventListener("click", {
             MainScope().launch { GUIHelper.push(SettingsController()) }
+        })
+        multiplayerButton?.addEventListener("click", {
+            MainScope().launch { GUIHelper.push(SessionBrowserController()) }
         })
         updatePlayersDisplay()
     }

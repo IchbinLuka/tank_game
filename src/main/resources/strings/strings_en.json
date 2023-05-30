@@ -12,5 +12,7 @@
   "player_wins": "{name} Wins",
   "player_count": "Players: {count}",
   "cookie_notice": "Note: This website uses cookies to persist the settings.",
-  "fullscreen": "Fullscreen"
+  "fullscreen": "Fullscreen",
+  "multiplayer": "Multiplayer",
+  "join": "Join"
 }
