@@ -1,7 +1,7 @@
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Player(
+data class PlayerData(
     val name: String,
     val color: ColorData
 )

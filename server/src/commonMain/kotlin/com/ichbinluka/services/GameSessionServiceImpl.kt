@@ -1,9 +1,8 @@
 package com.ichbinluka.services
 
 import ColorData
-import Player
+import PlayerData
 import com.ichbinluka.routes.SessionCreationInfo
-import io.ktor.util.logging.*
 import sessions.Session
 
 
@@ -15,7 +14,7 @@ class GameSessionServiceImpl : GameSessionService {
     private val sessions = hashMapOf<Long, Session>(
         0L to Session(
             id = 0,
-            host = Player(name = "Bob", color = ColorData(0xffffff)),
+            host = PlayerData(name = "Bob", color = ColorData(0xffffff)),
             name = "Test"
         )
     )

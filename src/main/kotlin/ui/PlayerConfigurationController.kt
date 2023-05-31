@@ -1,7 +1,7 @@
 package ui
 
 import ColorData
-import Player
+import PlayerData
 import ext.fromId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -10,7 +10,7 @@ import org.w3c.dom.HTMLInputElement
 import util.GUIHelper
 
 class PlayerConfigurationController(
-    private val onSubmitted: (Player) -> Unit
+    private val onSubmitted: (PlayerData) -> Unit
 ) : UIController() {
     override val mainGUIName: String = "player_configuration"
 
@@ -26,7 +26,7 @@ class PlayerConfigurationController(
             MainScope().launch { GUIHelper.pop() }
         })
         submitButton?.addEventListener("click", {
-            onSubmitted(Player(nameTextField.value, ColorData(colorInput.value.substring(1).toInt(16))))
+            onSubmitted(PlayerData(nameTextField.value, ColorData(colorInput.value.substring(1).toInt(16))))
         })
     }
 

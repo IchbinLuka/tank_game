@@ -1,6 +1,5 @@
 package com.ichbinluka.services
 
-import Player
 import com.ichbinluka.routes.SessionCreationInfo
 import sessions.Session
 

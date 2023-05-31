@@ -2,6 +2,7 @@
 
 import kotlinx.serialization.*
 import kotlinx.serialization.protobuf.ProtoBuf
+import sessions.Session
 import kotlin.reflect.typeOf
 
 sealed class GameMessageData {
@@ -38,6 +39,11 @@ sealed class GameMessageData {
         val name: String,
         val color: ColorData
     ) : GameMessageData()
+
+    @Serializable
+    data class SessionStateUpdate(
+        val session: Session
+    ): GameMessageData()
 
     @Serializable
     object Empty : GameMessageData()

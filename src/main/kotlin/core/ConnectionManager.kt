@@ -18,8 +18,6 @@ class ConnectionManager(
     url: String
 ) {
 
-
-
     private val synchronizedObjects = hashMapOf<String, MutableList<MultiplayerSynchronized>>()
     private val socket = WebSocket(url).apply {
         binaryType = BinaryType.ARRAYBUFFER

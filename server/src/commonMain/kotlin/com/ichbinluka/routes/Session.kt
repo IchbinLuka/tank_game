@@ -1,6 +1,6 @@
 package com.ichbinluka.routes
 
-import Player
+import PlayerData
 import com.ichbinluka.services.GameSessionService
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SessionCreationInfo(
     val name: String,
-    val host: Player,
+    val host: PlayerData,
     val password: String? = null
 )
 

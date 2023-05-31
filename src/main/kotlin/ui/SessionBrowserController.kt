@@ -12,8 +12,8 @@ class SessionBrowserController: UIController() {
 
     override val mainGUIName: String = "session_browser"
 
-    private val backButton by lazy { Element.fromId("backButton") }
-    private val newButton by lazy { Element.fromId("newSessionButton") }
+    private val backButton get() = Element.fromId("backButton")
+    private val newButton get() = Element.fromId("newSessionButton")
 
 
     override suspend fun init() {

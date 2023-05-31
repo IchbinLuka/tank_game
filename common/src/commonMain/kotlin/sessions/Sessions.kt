@@ -1,6 +1,6 @@
 package sessions
 
-import Player
+import PlayerData
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -10,7 +10,7 @@ class Session(
     val id: Long,
     @Transient val password: String? = null,
     val name: String,
-    val host: Player
+    val host: PlayerData
 ) {
-    val players: MutableList<Player> = mutableListOf(host)
+    val players: MutableList<PlayerData> = mutableListOf(host)
 }
