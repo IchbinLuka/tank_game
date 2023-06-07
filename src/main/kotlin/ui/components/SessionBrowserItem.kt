@@ -4,13 +4,13 @@ import ext.fromId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
-import sessions.Session
+import sessions.SessionInfo
 import ui.PlayerConfigurationController
 import util.GUIHelper
 import util.Log
 
 class SessionBrowserItem(
-    private val info: Session
+    private val info: SessionInfo
 ): UIComponent() {
     override val componentSource: String = "session_browser_item"
 

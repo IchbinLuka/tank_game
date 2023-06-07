@@ -1,7 +1,11 @@
 package com.ichbinluka.services
 
-import com.ichbinluka.routes.SessionCreationInfo
-import sessions.Session
+import GameMessage
+import PlayerData
+import com.ichbinluka.model.Session
+import io.ktor.websocket.*
+import sessions.SessionCreationInfo
+import sessions.SessionInfo
 
 
 interface GameSessionService {
@@ -13,4 +17,5 @@ interface GameSessionService {
 
     fun createSession(info: SessionCreationInfo): Session
     fun closeSession(sessionId: Long)
+
 }

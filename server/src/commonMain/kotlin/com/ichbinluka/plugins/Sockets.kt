@@ -11,22 +11,6 @@ fun Application.configureSockets() {
         masking = false
     }
     routing {
-        webSocket("/ws") { // websocketSession
-            for (frame in incoming) {
-                val message = GameMessage.fromByteArray(frame.data)
-                when (val messageData = GameMessageData.fromGameMessage(message)) {
-                    is GameMessageData.Vec3 -> outgoing.send(frame)
-                    is GameMessageData.Empty -> outgoing.send(Frame.Text("You sent an empty message"))
-                    else -> outgoing.send(Frame.Text("You sent an unknown message"))
-                }
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    outgoing.send(Frame.Text("YOU SAID: $text"))
-                    if (text.equals("bye", ignoreCase = true)) {
-                        close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
-                    }
-                }
-            }
-        }
+
     }
 }

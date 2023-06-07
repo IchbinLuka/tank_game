@@ -8,11 +8,11 @@ import ext.fromId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
-import sessions.Session
+import sessions.SessionInfo
 import ui.components.SessionInfoItem
 
 class SessionViewController(
-    private var session: Session
+    private var session: SessionInfo
 ) : UIController(), MultiplayerSynchronized {
 
     override val mainGUIName: String = "session_view"
@@ -26,7 +26,7 @@ class SessionViewController(
         updatePlayers(session)
     }
 
-    private suspend fun updatePlayers(session: Session) {
+    private suspend fun updatePlayers(session: SessionInfo) {
         val container = Element.fromId("playerInfoContainer") ?: return
         container.innerHTML = ""
         for (player in session.players) {

@@ -12,7 +12,7 @@ import io.ktor.server.plugins.cors.routing.*
 fun Application.module() {
     configurePlugins()
     val service = GameSessionServiceImpl()
-    configureSockets()
+    // configureSockets()
     configureRouting(service)
 }
 
@@ -26,7 +26,6 @@ fun Application.configurePlugins() {
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
-        allowHeader("MyCustomHeader")
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
 }

@@ -2,22 +2,18 @@ package services
 
 import kotlinx.browser.window
 import kotlinx.coroutines.await
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromDynamic
-import sessions.Session
-import util.Log
-import kotlin.reflect.typeOf
+import sessions.SessionInfo
 
 object APIHelper {
 
-    suspend fun fetchSessions(): Collection<Session> {
+    suspend fun fetchSessions(): Collection<SessionInfo> {
         val response = window.fetch("http://localhost:8081/sessions").await()
         if (response.status != 200.toShort()) {
             throw IllegalStateException(response.body.toString())
         }
-        return Json.decodeFromString<List<Session>>(response.text().await())
+        return Json.decodeFromString<List<SessionInfo>>(response.text().await())
     }
 
     private const val TAG = "APIHelper"

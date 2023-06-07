@@ -26,7 +26,6 @@ class Game(
 ) : CoroutineScope {
 
     override val coroutineContext: CoroutineContext = MainScope().coroutineContext
-    val connectionManager = ConnectionManager(url = "http://localhost:8080/ws ")
 
     val settings: ValueNotifier<Settings> = ValueNotifier(Settings.fromCookies() ?: Settings()).apply {
         addListener { it.saveToCookies() }

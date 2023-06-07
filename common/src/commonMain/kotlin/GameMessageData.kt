@@ -2,7 +2,7 @@
 
 import kotlinx.serialization.*
 import kotlinx.serialization.protobuf.ProtoBuf
-import sessions.Session
+import sessions.SessionInfo
 import kotlin.reflect.typeOf
 
 sealed class GameMessageData {
@@ -41,8 +41,20 @@ sealed class GameMessageData {
     ) : GameMessageData()
 
     @Serializable
+    data class ConnectionRequest(
+        val playerData: PlayerData,
+        val password: String? = null,
+        val sessionId: Long
+    ) : GameMessageData()
+
+    @Serializable
+    data class ConnectionResponse(
+        val successful: Boolean
+    ): GameMessageData()
+
+    @Serializable
     data class SessionStateUpdate(
-        val session: Session
+        val session: SessionInfo
     ): GameMessageData()
 
     @Serializable
@@ -60,6 +72,8 @@ sealed class GameMessageData {
                 MessageType.Pos, MessageType.Velocity -> typeOf<Vec3>()
                 MessageType.TankCreation -> typeOf<TankCreationData>()
                 MessageType.GroundData -> typeOf<GroundData>()
+                MessageType.ConnectionRequest -> typeOf<ConnectionRequest>()
+                MessageType.ConnectionResponse -> typeOf<ConnectionResponse>()
                 else -> typeOf<Empty>()
             }
             return ProtoBuf.decodeFromByteArray(serializer(type), message.data) as GameMessageData

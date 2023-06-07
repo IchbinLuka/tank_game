@@ -14,7 +14,9 @@ enum class MessageType {
     TankCreation,
     GroundData,
     Empty,
-    SessionStateChange
+    SessionStateChange,
+    ConnectionRequest,
+    ConnectionResponse;
 }
 
 @Serializable
