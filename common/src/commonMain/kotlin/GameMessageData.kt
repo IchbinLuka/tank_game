@@ -5,6 +5,7 @@ import kotlinx.serialization.protobuf.ProtoBuf
 import sessions.SessionInfo
 import kotlin.reflect.typeOf
 
+@Serializable
 sealed class GameMessageData {
 
     @Serializable
@@ -67,6 +68,7 @@ sealed class GameMessageData {
 
         fun fromByteArray(array: ByteArray) = fromGameMessage(ProtoBuf.decodeFromByteArray(array))
 
+        @OptIn(ExperimentalSerializationApi::class)
         fun fromGameMessage(message: GameMessage): GameMessageData {
             val type = when (message.type) {
                 MessageType.Pos, MessageType.Velocity -> typeOf<Vec3>()

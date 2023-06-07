@@ -1,11 +1,15 @@
 package ui.components
 
+import core.ConnectionManager
+import exceptions.ConnectionFailedException
+import ext.TAG
 import ext.fromId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
 import sessions.SessionInfo
 import ui.PlayerConfigurationController
+import ui.SessionViewController
 import util.GUIHelper
 import util.Log
 
@@ -25,6 +29,14 @@ class SessionBrowserItem(
         Element.fromId("button_${info.id}")?.addEventListener("click", {
             MainScope().launch {
                 GUIHelper.push(PlayerConfigurationController {
+                    MainScope().launch {
+                        try {
+                            ConnectionManager.connect(info.id, it)
+                            GUIHelper.push(SessionViewController(info))
+                        } catch (e: ConnectionFailedException) {
+                            Log.e(TAG, "Could not connect to session")
+                        }
+                    }
                     Log.d("SessionBrowserItem", it.toString())
                 })
             }

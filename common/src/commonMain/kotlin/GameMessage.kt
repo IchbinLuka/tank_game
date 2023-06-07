@@ -48,5 +48,11 @@ data class GameMessage(
 
     companion object {
         fun fromByteArray(bytes: ByteArray): GameMessage = ProtoBuf.decodeFromByteArray(bytes)
+
+        fun fromGameMessageData(data: GameMessageData,type: MessageType, topic: String) = GameMessage(
+                data = data.toByteArray(),
+                topic =  topic,
+                type = type
+        )
     }
 }

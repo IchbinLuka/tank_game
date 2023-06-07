@@ -14,7 +14,7 @@ import sessions.SessionCreationInfo
 fun Route.sessions(sessionService: GameSessionService) {
     route("sessions") {
         get {
-            call.respond(sessionService.getPublicSessions())
+            call.respond(sessionService.getPublicSessions().map { it.info })
         }
         post {
             val info = call.receive<SessionCreationInfo>()

@@ -4,12 +4,13 @@ import kotlinx.browser.window
 import kotlinx.coroutines.await
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import sessions.HTTP_URL
 import sessions.SessionInfo
 
 object APIHelper {
 
     suspend fun fetchSessions(): Collection<SessionInfo> {
-        val response = window.fetch("http://localhost:8081/sessions").await()
+        val response = window.fetch("${HTTP_URL}/sessions").await()
         if (response.status != 200.toShort()) {
             throw IllegalStateException(response.body.toString())
         }

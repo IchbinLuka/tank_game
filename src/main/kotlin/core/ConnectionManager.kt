@@ -6,6 +6,9 @@ import PlayerData
 import core.multiplayer.MultiplayerSynchronized
 import decodeFromArrayBuffer
 import exceptions.ConnectionFailedException
+import ext.component1
+import ext.component2
+import ext.component3
 import ext.send
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,12 +19,13 @@ import org.w3c.dom.ARRAYBUFFER
 import org.w3c.dom.BinaryType
 import org.w3c.dom.MessageEvent
 import org.w3c.dom.WebSocket
+import sessions.Topic
+import sessions.WEBSOCKET_URL
+import three.js.Vector3
 import util.Log
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-
-const val WEBSOCKET_URL = "ws://localhost:8081/sessions/connect"
 
 object ConnectionManager {
 
@@ -51,7 +55,15 @@ object ConnectionManager {
             socket!!.onclose = {
                 continuation.resumeWithException(ConnectionFailedException())
             }
-            socket!!.send(GameMessageData.ConnectionRequest(playerData = playerData, sessionId =  sessionId).toByteArray())
+            socket!!.send(GameMessage(
+                Topic.CONNECTION_RESPONSE,
+                MessageType.ConnectionRequest,
+                GameMessageData.ConnectionRequest(playerData = playerData, sessionId =  sessionId).toByteArray()
+            ).toByteArray())
+            socket!!.onmessage = {
+                it.data as js.buffer.ArrayBuffer
+                
+            }
         }
         socket!!.onmessage = ::onMessage
         socket!!.onclose = {}

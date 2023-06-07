@@ -2,16 +2,18 @@ package com.ichbinluka.routes
 
 import GameMessage
 import GameMessageData
+import MessageType
+import com.benasher44.uuid.uuid4
 import com.ichbinluka.model.Player
 import com.ichbinluka.services.GameSessionService
-import com.ichbinluka.services.PlayerConnectionService
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.time.Duration
+import sessions.Topic
+import sessions.WEBSOCKET_ROUTE
 
 fun Application.webSocketRoute(
     sessionService: GameSessionService,
@@ -21,10 +23,7 @@ fun Application.webSocketRoute(
         masking = false
     }
     routing {
-        webSocket("session/{id}/connect") {
-            // websocketSession
-            val id = call.parameters["id"]?.toLong() ?: throw BadRequestException("missing session id in url")
-            // val token = call.parameters["token"]?.toLong() ?: throw BadRequestException("missing token in url")
+        webSocket(WEBSOCKET_ROUTE) {
             val message = withTimeoutOrNull(2000L) {
                 GameMessage.fromByteArray(incoming.receive().data)
             } ?: return@webSocket
@@ -32,13 +31,27 @@ fun Application.webSocketRoute(
             val messageData = GameMessageData.fromGameMessage(message)
             if (messageData !is GameMessageData.ConnectionRequest) return@webSocket
 
-            val session = sessionService.getSessionById(id) ?: throw NotFoundException("Session not found")
+            val session = sessionService.getSessionById(messageData.sessionId) ?: throw NotFoundException("Session not found")
             session.info.password?.let { if (it != messageData.password) return@webSocket }
-            val player = Player(messageData.playerData, this)
+
+            val player = Player(messageData.playerData, uuid4().leastSignificantBits, this)
             session.addPlayer(player)
-            outgoing.send(Frame.Binary(true, GameMessageData.ConnectionResponse(
+            outgoing.send(Frame.Binary(true, GameMessage(
+                Topic.CONNECTION_RESPONSE,
+                MessageType.ConnectionResponse,
+                GameMessageData.ConnectionResponse(
                     successful = true
+                ).toByteArray()
             ).toByteArray()))
+
+            session.broadcast(
+                    GameMessage.fromGameMessageData(
+                            GameMessageData.SessionStateUpdate(session.info),
+                            MessageType.SessionStateChange,
+                            Topic.SESSION_STATE
+                    ),
+                    player
+            )
 
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)

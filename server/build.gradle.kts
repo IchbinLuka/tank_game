@@ -56,8 +56,8 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-server-core:$ktor_version")
                 implementation("ch.qos.logback:logback-classic:$logback_version")
-                // Koin for Ktor
-                // SLF4J Logger
+
+                implementation("com.benasher44:uuid:0.7.1")
                 implementation(project(mapOf("path" to ":common")))
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
                 implementation("io.ktor:ktor-server-websockets:$ktor_version")
@@ -95,8 +95,4 @@ kotlin {
 tasks.named<JavaExec>("run") {
     dependsOn(tasks.named<Jar>("jvmJar"))
     classpath(tasks.named<Jar>("jvmJar"))
-}
-dependencies {
-    implementation("io.ktor:ktor-server-cors-jvm:2.2.4")
-    implementation("io.ktor:ktor-server-default-headers-jvm:2.2.4")
 }
