@@ -61,8 +61,6 @@ sealed class GameMessageData {
     @Serializable
     object Empty : GameMessageData()
 
-    fun toByteArray(): ByteArray = ProtoBuf.encodeToByteArray(this)
-
     companion object {
         private inline fun <reified T> decode(array: ByteArray): T = ProtoBuf.decodeFromByteArray<T>(array)
 

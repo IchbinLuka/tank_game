@@ -22,6 +22,17 @@ class GameMessageDataTest {
     }
 
     @Test
+    fun connectionRequestTest() {
+        val message = GameMessageData.ConnectionRequest(
+            PlayerData("foo", ColorData(9)),
+            "password",
+            69
+        )
+        val proto = ProtoBuf.encodeToByteArray(message)
+        assertEquals(message, ProtoBuf.decodeFromByteArray(proto))
+    }
+
+    @Test
     fun groundDataTest() {
         val ground = GameMessageData.GroundData(
             Array(10) { i -> DoubleArray(10) { j -> (i + j).toDouble() } }

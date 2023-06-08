@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package com.ichbinluka.routes
 
 import GameMessage
@@ -12,6 +14,9 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 import sessions.Topic
 import sessions.WEBSOCKET_ROUTE
 
@@ -39,18 +44,20 @@ fun Application.webSocketRoute(
             outgoing.send(Frame.Binary(true, GameMessage(
                 Topic.CONNECTION_RESPONSE,
                 MessageType.ConnectionResponse,
-                GameMessageData.ConnectionResponse(
-                    successful = true
-                ).toByteArray()
+                ProtoBuf.encodeToByteArray(
+                    GameMessageData.ConnectionResponse(
+                        successful = true
+                    )
+                )
             ).toByteArray()))
 
             session.broadcast(
-                    GameMessage.fromGameMessageData(
-                            GameMessageData.SessionStateUpdate(session.info),
-                            MessageType.SessionStateChange,
-                            Topic.SESSION_STATE
-                    ),
-                    player
+                GameMessage.fromGameMessageData(
+                    GameMessageData.SessionStateUpdate(session.info),
+                    MessageType.SessionStateChange,
+                    Topic.SESSION_STATE
+                ),
+                player
             )
 
             for (frame in incoming) {

@@ -1,27 +1,28 @@
+@file:OptIn(ExperimentalSerializationApi::class, ExperimentalSerializationApi::class)
+
 package core
 
 import GameMessage
 import GameMessageData
+import MessageType
 import PlayerData
 import core.multiplayer.MultiplayerSynchronized
 import decodeFromArrayBuffer
 import exceptions.ConnectionFailedException
-import ext.component1
-import ext.component2
-import ext.component3
-import ext.send
+import ext.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 import org.khronos.webgl.ArrayBuffer
 import org.w3c.dom.ARRAYBUFFER
 import org.w3c.dom.BinaryType
 import org.w3c.dom.MessageEvent
 import org.w3c.dom.WebSocket
+import org.w3c.dom.events.Event
 import sessions.Topic
 import sessions.WEBSOCKET_URL
-import three.js.Vector3
 import util.Log
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -35,34 +36,47 @@ object ConnectionManager {
     private val connectMutex = Mutex()
 
     suspend fun connect(sessionId: Long, playerData: PlayerData) = connectMutex.withLock {
-        suspendCoroutine { continuation ->
+        suspendCoroutine<Event> { continuation ->
             socket = WebSocket(WEBSOCKET_URL).apply {
                 binaryType = BinaryType.ARRAYBUFFER
-                onmessage = ::onMessage
-            }
-            socket!!.onopen = {
-                continuation.resume(Unit)
-            }
-            socket!!.onerror = {
-                continuation.resumeWithException(ConnectionFailedException())
+                onopen = continuation::resume
+
+                onerror = {
+                    Log.d(TAG, "Onerror called")
+                    continuation.resumeWithException(ConnectionFailedException())
+                    socket?.onerror = {}
+                    Unit
+                }
             }
 
         }
-        suspendCoroutine { continuation ->
-            socket!!.onopen = {
-                continuation.resume(Unit);
-            }
+        suspendCoroutine<Boolean> { continuation ->
             socket!!.onclose = {
                 continuation.resumeWithException(ConnectionFailedException())
             }
-            socket!!.send(GameMessage(
-                Topic.CONNECTION_RESPONSE,
-                MessageType.ConnectionRequest,
-                GameMessageData.ConnectionRequest(playerData = playerData, sessionId =  sessionId).toByteArray()
-            ).toByteArray())
+            socket!!.send(
+                GameMessage(
+                    Topic.CONNECTION_RESPONSE,
+                    MessageType.ConnectionRequest,
+                    ProtoBuf.encodeToByteArray(
+                        GameMessageData.ConnectionRequest(
+                            playerData = playerData,
+                            sessionId = sessionId
+                        )
+                    )
+                ).toByteArray()
+            )
             socket!!.onmessage = {
-                it.data as js.buffer.ArrayBuffer
-                
+                // it.data as js.buffer.ArrayBuffer
+                val buffer = it.data.unsafeCast<ArrayBuffer>()
+                val decodedMessage = ProtoBuf.decodeFromArrayBuffer<GameMessage>(buffer)
+                val messageData = GameMessageData.fromGameMessage(decodedMessage)
+                if (messageData is GameMessageData.ConnectionResponse && messageData.successful) {
+                    continuation.resume(true)
+                } else {
+                    continuation.resumeWithException(ConnectionFailedException())
+                }
+
             }
         }
         socket!!.onmessage = ::onMessage
