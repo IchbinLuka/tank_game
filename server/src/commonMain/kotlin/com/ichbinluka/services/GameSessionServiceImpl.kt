@@ -1,10 +1,8 @@
 package com.ichbinluka.services
 
 import ColorData
-import GameMessage
 import PlayerData
 import com.ichbinluka.model.Session
-import io.ktor.websocket.*
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
 
@@ -16,9 +14,12 @@ class GameSessionServiceImpl : GameSessionService {
 
     private val sessions = hashMapOf<Long, Session>(
         0L to Session(
-            info = SessionInfo(id = 0,
-                    host = PlayerData(name = "Bob", color = ColorData(0xffffff)),
-                    name = "Test")
+            info = SessionInfo(
+                id = 0,
+                host = PlayerData(name = "Bob", color = ColorData(0x00ff00)),
+                name = "Test",
+                players = listOf(PlayerData(name = "Bob", color = ColorData(0x00ff00)))
+            )
         )
     )
 
@@ -34,7 +35,17 @@ class GameSessionServiceImpl : GameSessionService {
 
     override fun createSession(info: SessionCreationInfo): Session {
         val id = nextId
-        val session = info.run { Session(info = SessionInfo(id, password = password, name = name, host = host)) }
+        val session = info.run {
+            Session(
+                info = SessionInfo(
+                    id,
+                    password = password,
+                    name = name,
+                    host = host,
+                    players = listOf()
+                )
+            )
+        }
         sessions[id] = session
         return session
     }

@@ -17,5 +17,13 @@ object APIHelper {
         return Json.decodeFromString<List<SessionInfo>>(response.text().await())
     }
 
+    suspend fun fetchSessionById(id: Long): SessionInfo {
+        val response = window.fetch("${HTTP_URL}/sessions/${id}").await()
+        if (response.status != 200.toShort()) {
+            throw IllegalStateException(response.body.toString())
+        }
+        return Json.decodeFromString<SessionInfo>(response.text().await())
+    }
+
     private const val TAG = "APIHelper"
 }

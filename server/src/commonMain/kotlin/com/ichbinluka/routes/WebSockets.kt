@@ -57,7 +57,7 @@ fun Application.webSocketRoute(
                     MessageType.SessionStateChange,
                     Topic.SESSION_STATE
                 ),
-                player
+                null
             )
 
             for (frame in incoming) {

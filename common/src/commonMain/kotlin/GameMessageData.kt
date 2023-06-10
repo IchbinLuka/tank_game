@@ -74,6 +74,7 @@ sealed class GameMessageData {
                 MessageType.GroundData -> typeOf<GroundData>()
                 MessageType.ConnectionRequest -> typeOf<ConnectionRequest>()
                 MessageType.ConnectionResponse -> typeOf<ConnectionResponse>()
+                MessageType.SessionStateChange -> typeOf<SessionStateUpdate>()
                 else -> typeOf<Empty>()
             }
             return ProtoBuf.decodeFromByteArray(serializer(type), message.data) as GameMessageData

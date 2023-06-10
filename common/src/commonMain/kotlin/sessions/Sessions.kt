@@ -12,11 +12,10 @@ data class SessionCreationInfo(
 )
 
 @Serializable
-class SessionInfo(
+data class SessionInfo(
     val id: Long,
     @Transient val password: String? = null,
     val name: String,
-    val host: PlayerData
-) {
-    val players: MutableList<PlayerData> = mutableListOf(host)
-}
+    val host: PlayerData,
+    val players: Collection<PlayerData>
+)

@@ -7,14 +7,12 @@ import kotlinx.serialization.protobuf.ProtoBuf
 import org.w3c.dom.ARRAYBUFFER
 import org.w3c.dom.BinaryType
 import org.w3c.dom.WebSocket
+import sessions.WEBSOCKET_URL
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-fun initWebSocket() {
-    val socket = WebSocket("ws://127.0.0.1:8081/ws")
-    socket.binaryType = BinaryType.ARRAYBUFFER
-    socket.onmessage = {
-
-        // Log.d("Websocket", it.data)
-    }
+suspend fun initWebSocket() {
+    val socket = WebSocket(WEBSOCKET_URL)
     val message = ProtoBuf.encodeToByteArray(
         GameMessage(
             "topic",
@@ -26,7 +24,21 @@ fun initWebSocket() {
             )
         )
     )
-    socket.onopen = {
-        socket.send(message)
+    suspendCoroutine<Unit> { continuation ->
+
+        socket.binaryType = BinaryType.ARRAYBUFFER
+        socket.onmessage = {
+
+            // Log.d("Websocket", it.data)
+        }
+
+        socket.onerror = {
+            continuation.resume(Unit)
+        }
+        socket.onopen = {
+            socket.send(message)
+            continuation.resume(Unit)
+        }
     }
+    // socket.send(message)
 }

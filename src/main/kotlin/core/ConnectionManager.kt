@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalSerializationApi::class, ExperimentalSerializationApi::class)
+@file:OptIn(ExperimentalSerializationApi::class)
 
 package core
 
@@ -50,6 +50,8 @@ object ConnectionManager {
             }
 
         }
+        socket!!.onerror = {}
+        socket!!.onopen = {}
         suspendCoroutine<Boolean> { continuation ->
             socket!!.onclose = {
                 continuation.resumeWithException(ConnectionFailedException())
@@ -67,6 +69,7 @@ object ConnectionManager {
                 ).toByteArray()
             )
             socket!!.onmessage = {
+                socket!!.onmessage = {}
                 // it.data as js.buffer.ArrayBuffer
                 val buffer = it.data.unsafeCast<ArrayBuffer>()
                 val decodedMessage = ProtoBuf.decodeFromArrayBuffer<GameMessage>(buffer)
@@ -78,6 +81,9 @@ object ConnectionManager {
                 }
 
             }
+        }
+        socket!!.onclose = {
+            Log.d(TAG, "Connection closed")
         }
         socket!!.onmessage = ::onMessage
         socket!!.onclose = {}

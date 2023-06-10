@@ -7,6 +7,7 @@ import ext.fromId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
+import services.APIHelper
 import sessions.SessionInfo
 import ui.PlayerConfigurationController
 import ui.SessionViewController
@@ -32,7 +33,8 @@ class SessionBrowserItem(
                     MainScope().launch {
                         try {
                             ConnectionManager.connect(info.id, it)
-                            GUIHelper.push(SessionViewController(info))
+                            val updatedSession = APIHelper.fetchSessionById(info.id)
+                            GUIHelper.push(SessionViewController(updatedSession))
                         } catch (e: ConnectionFailedException) {
                             Log.e(TAG, "Could not connect to session")
                         }

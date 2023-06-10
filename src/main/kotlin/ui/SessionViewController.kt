@@ -5,6 +5,7 @@ import MessageType
 import core.ConnectionManager
 import core.Game
 import core.multiplayer.MultiplayerSynchronized
+import ext.TAG
 import ext.fromId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -12,6 +13,7 @@ import org.w3c.dom.Element
 import sessions.SessionInfo
 import sessions.Topic
 import ui.components.SessionInfoItem
+import util.Log
 
 class SessionViewController(
     private var session: SessionInfo
@@ -37,8 +39,10 @@ class SessionViewController(
     }
 
     override fun rebuild() {
-        MainScope().launch { updatePlayers(session) }
+        Log.d(TAG, "rebuilding")
+
     }
+
     override val topic: String = Topic.SESSION_STATE
 
     override fun onMessage(message: GameMessageData, type: MessageType) {
@@ -46,7 +50,7 @@ class SessionViewController(
             MessageType.SessionStateChange -> {
                 if (message is GameMessageData.SessionStateUpdate) {
                     session = message.session
-                    rebuild()
+                    MainScope().launch { updatePlayers(session) }
                 }
             }
             else -> {}

@@ -19,5 +19,6 @@
   "new_session": "Neues Spiel",
   "create_player": "Spieler erstellen",
   "player_name": "Name",
-  "player_color": "Farbe"
+  "player_color": "Farbe",
+  "waiting_room": "Warteraum"
 }

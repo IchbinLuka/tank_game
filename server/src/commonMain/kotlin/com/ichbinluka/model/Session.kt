@@ -18,10 +18,12 @@ class Session(
         players.remove(player)
     }
 
-    suspend fun broadcast(message: GameMessage, player: Player) {
+    suspend fun broadcast(message: GameMessage, player: Player?) {
         for (p in players) {
-            if (p.id == player.id) continue
+            if (p.id == player?.id) continue
             p.session.outgoing.send(Frame.Binary(true, message.toByteArray()))
         }
     }
+
+    fun toInfo(): SessionInfo = info.copy(players = players.map { it.data })
 }
