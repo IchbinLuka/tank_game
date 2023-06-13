@@ -38,22 +38,23 @@ fun Application.webSocketRoute(
 
             val session = sessionService.getSessionById(messageData.sessionId) ?: throw NotFoundException("Session not found")
             session.info.password?.let { if (it != messageData.password) return@webSocket }
-
-            val player = Player(messageData.playerData, uuid4().leastSignificantBits, this)
+            val token = uuid4().leastSignificantBits
+            val player = Player(messageData.playerData, token, this)
             session.addPlayer(player)
             outgoing.send(Frame.Binary(true, GameMessage(
                 Topic.CONNECTION_RESPONSE,
                 MessageType.ConnectionResponse,
                 ProtoBuf.encodeToByteArray(
                     GameMessageData.ConnectionResponse(
-                        successful = true
+                        successful = true,
+                        authToken = token
                     )
                 )
             ).toByteArray()))
 
             session.broadcast(
-                GameMessage.fromGameMessageData(
-                    GameMessageData.SessionStateUpdate(session.info),
+                GameMessage.fromGameMessageData<GameMessageData.SessionStateUpdate>(
+                    GameMessageData.SessionStateUpdate(session.toInfo()),
                     MessageType.SessionStateChange,
                     Topic.SESSION_STATE
                 ),
@@ -62,7 +63,16 @@ fun Application.webSocketRoute(
 
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
-                session.broadcast(message, player)
+                val messageData = GameMessageData.fromGameMessage(message)
+                when (messageData) {
+                    is GameMessageData.Disconnect -> {
+                        session.removePlayer(player)
+                        session.broadcastUpdate()
+                    }
+                    else -> {
+                        session.broadcast(message, player)
+                    }
+                }
             }
         }
     }

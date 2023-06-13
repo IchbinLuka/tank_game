@@ -10,6 +10,7 @@ import core.multiplayer.MultiplayerSynchronized
 import decodeFromArrayBuffer
 import exceptions.ConnectionFailedException
 import ext.*
+import kotlinx.browser.window
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -32,8 +33,26 @@ object ConnectionManager {
 
     private val synchronizedObjects = hashMapOf<String, MutableList<MultiplayerSynchronized>>()
     private var socket: WebSocket? = null
+    private var shouldReconnect = false
 
     private val connectMutex = Mutex()
+
+    init {
+        window.onbeforeunload = {
+            shouldReconnect = true
+            socket?.send(GameMessage(
+                Topic.DISCONNECT,
+                MessageType.Disconnect,
+                ProtoBuf.encodeToByteArray(GameMessageData.Disconnect)
+            ).toByteArray())
+            socket?.close()
+            ""
+        }
+        window.onload = {
+            shouldReconnect = false
+            ""
+        }
+    }
 
     suspend fun connect(sessionId: Long, playerData: PlayerData) = connectMutex.withLock {
         suspendCoroutine<Event> { continuation ->
@@ -86,10 +105,10 @@ object ConnectionManager {
             Log.d(TAG, "Connection closed")
         }
         socket!!.onmessage = ::onMessage
-        socket!!.onclose = {}
     }
 
     fun register(m: MultiplayerSynchronized) {
+        Log.d(TAG, "registering $m")
         val list = synchronizedObjects[m.topic]
         if (list == null) {
             synchronizedObjects[m.topic] = mutableListOf()

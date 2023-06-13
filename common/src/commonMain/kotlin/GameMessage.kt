@@ -16,7 +16,8 @@ enum class MessageType {
     Empty,
     SessionStateChange,
     ConnectionRequest,
-    ConnectionResponse;
+    ConnectionResponse,
+    Disconnect;
 }
 
 @Serializable
@@ -49,8 +50,8 @@ data class GameMessage(
     companion object {
         fun fromByteArray(bytes: ByteArray): GameMessage = ProtoBuf.decodeFromByteArray(bytes)
 
-        fun fromGameMessageData(data: GameMessageData,type: MessageType, topic: String) = GameMessage(
-            data = ProtoBuf.encodeToByteArray(data),
+        inline fun <reified T: GameMessageData> fromGameMessageData(data: T,type: MessageType, topic: String) = GameMessage(
+            data = ProtoBuf.encodeToByteArray<T>(data),
             topic = topic,
             type = type
         )

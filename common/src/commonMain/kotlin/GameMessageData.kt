@@ -44,19 +44,24 @@ sealed class GameMessageData {
     @Serializable
     data class ConnectionRequest(
         val playerData: PlayerData,
+        val authToken: Long? = null,
         val password: String? = null,
         val sessionId: Long
     ) : GameMessageData()
 
     @Serializable
     data class ConnectionResponse(
-        val successful: Boolean
+        val successful: Boolean,
+        val authToken: Long?
     ): GameMessageData()
 
     @Serializable
     data class SessionStateUpdate(
         val session: SessionInfo
     ): GameMessageData()
+
+    @Serializable
+    object Disconnect : GameMessageData()
 
     @Serializable
     object Empty : GameMessageData()
@@ -75,6 +80,7 @@ sealed class GameMessageData {
                 MessageType.ConnectionRequest -> typeOf<ConnectionRequest>()
                 MessageType.ConnectionResponse -> typeOf<ConnectionResponse>()
                 MessageType.SessionStateChange -> typeOf<SessionStateUpdate>()
+                MessageType.Disconnect -> typeOf<Disconnect>()
                 else -> typeOf<Empty>()
             }
             return ProtoBuf.decodeFromByteArray(serializer(type), message.data) as GameMessageData

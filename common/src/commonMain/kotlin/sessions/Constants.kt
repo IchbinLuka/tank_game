@@ -10,4 +10,5 @@ const val WEBSOCKET_URL = "ws://${HOST}:${PORT}/${WEBSOCKET_ROUTE}"
 object Topic {
     const val CONNECTION_RESPONSE = "connection_response"
     const val SESSION_STATE = "session_state"
+    const val DISCONNECT = "disconnect"
 }

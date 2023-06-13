@@ -21,11 +21,9 @@ class SessionViewController(
 
     override val mainGUIName: String = "session_view"
 
-    init {
-        ConnectionManager.register(this)
-    }
 
     override suspend fun init() {
+        ConnectionManager.register(this)
         super.init()
         updatePlayers(session)
     }
@@ -39,7 +37,6 @@ class SessionViewController(
     }
 
     override fun rebuild() {
-        Log.d(TAG, "rebuilding")
 
     }
 

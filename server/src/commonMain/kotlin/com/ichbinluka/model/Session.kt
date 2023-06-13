@@ -2,7 +2,9 @@ package com.ichbinluka.model
 
 import GameMessage
 import io.ktor.websocket.*
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import sessions.SessionInfo
+import sessions.Topic
 
 
 class Session(
@@ -19,10 +21,31 @@ class Session(
     }
 
     suspend fun broadcast(message: GameMessage, player: Player?) {
-        for (p in players) {
+        val iter = players.iterator()
+        var playersChanged = false
+        for (p in iter) {
             if (p.id == player?.id) continue
-            p.session.outgoing.send(Frame.Binary(true, message.toByteArray()))
+            try {
+                p.session.outgoing.send(Frame.Binary(true, message.toByteArray()))
+            } catch (e: ClosedSendChannelException) {
+                iter.remove()
+                playersChanged = true
+            }
         }
+        if (playersChanged) {
+            broadcastUpdate()
+        }
+    }
+
+    suspend fun broadcastUpdate() {
+        broadcast(
+            GameMessage.fromGameMessageData<GameMessageData.SessionStateUpdate>(
+                GameMessageData.SessionStateUpdate(toInfo()),
+                MessageType.SessionStateChange,
+                Topic.SESSION_STATE
+            ),
+            null
+        )
     }
 
     fun toInfo(): SessionInfo = info.copy(players = players.map { it.data })
