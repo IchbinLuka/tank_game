@@ -20,5 +20,6 @@
   "create_player": "Create Player",
   "player_name": "Name",
   "player_color": "Color",
-  "waiting_room": "Waiting Room"
+  "waiting_room": "Waiting Room",
+  "session_name": "Session Name"
 }

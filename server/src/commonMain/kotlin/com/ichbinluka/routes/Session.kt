@@ -18,8 +18,10 @@ fun Route.sessions(sessionService: GameSessionService) {
         }
         post {
             val info = call.receive<SessionCreationInfo>()
-            sessionService.createSession(info)
-            call.respond(info)
+            if (info.name.trim() == "") {
+                throw BadRequestException("Invalid name")
+            }
+            call.respond(sessionService.createSession(info).toInfo())
         }
     }
 

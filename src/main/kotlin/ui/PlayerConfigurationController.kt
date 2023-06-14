@@ -26,7 +26,9 @@ class PlayerConfigurationController(
             MainScope().launch { GUIHelper.pop() }
         })
         submitButton?.addEventListener("click", {
-            onSubmitted(PlayerData(nameTextField.value, ColorData(colorInput.value.substring(1).toInt(16))))
+            if (nameTextField.value.trim() != "") {
+                onSubmitted(PlayerData(nameTextField.value, ColorData(colorInput.value.substring(1).toInt(16))))
+            }
         })
     }
 
