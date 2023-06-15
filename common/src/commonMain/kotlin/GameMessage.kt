@@ -5,19 +5,25 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
-enum class MessageType {
-    Death,
-    Pos,
-    Velocity,
-    Spawn,
-    TankCreation,
-    GroundData,
-    Empty,
-    SessionStateChange,
-    ConnectionRequest,
-    ConnectionResponse,
-    Disconnect;
+
+enum class MessageType(val type: KType) {
+    Death(typeOf<GameMessageData.Empty>()),
+    Pos(typeOf<GameMessageData.Vec3>()),
+    Velocity(typeOf<GameMessageData.Vec3>()),
+    Spawn(typeOf<GameMessageData.Empty>()),
+    TankCreation(typeOf<GameMessageData.TankCreationData>()),
+    GroundData(typeOf<GameMessageData.GroundData>()),
+    Empty(typeOf<GameMessageData.Empty>()),
+    SessionStateChange(typeOf<GameMessageData.SessionStateUpdate>()),
+    ConnectionRequest(typeOf<GameMessageData.ConnectionRequest>()),
+    ConnectionResponse(typeOf<GameMessageData.ConnectionResponse>()),
+    Disconnect(typeOf<GameMessageData.Disconnect>()),
+    GameStateChange(typeOf<GameMessageData.GameStateData>()),
+    GameStart(typeOf<GameMessageData.GameStartData>()),
+    GameObjectMoveUpdate(typeOf<GameMessageData.GameObjectMoveUpdate>())
 }
 
 @Serializable

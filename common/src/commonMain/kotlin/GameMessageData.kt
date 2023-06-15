@@ -42,6 +42,38 @@ sealed class GameMessageData {
     ) : GameMessageData()
 
     @Serializable
+    data class GameStateData(
+        val tanks: List<TankData>
+    ) : GameMessageData()
+
+    @Serializable
+    data class GameStartData(
+        val state: GameStateData,
+        val groundData: GroundData
+    ) : GameMessageData()
+
+    @Serializable
+    data class TankData(
+        val player: PlayerData,
+        val pos: Vec3,
+        val rot: Vec3,
+        val health: Double
+    ) : GameMessageData()
+
+    @Serializable
+    data class BulletCreationData(
+        val type: String
+    ) : GameMessageData()
+
+    @Serializable
+    data class GameObjectMoveUpdate(
+        val pos: Vec3,
+        val rot: Vec3,
+        val velocity: Vec3,
+        val acceleration: Vec3
+    ) : GameMessageData()
+
+    @Serializable
     data class ConnectionRequest(
         val playerData: PlayerData,
         val authToken: Long? = null,
@@ -73,17 +105,7 @@ sealed class GameMessageData {
 
         @OptIn(ExperimentalSerializationApi::class)
         fun fromGameMessage(message: GameMessage): GameMessageData {
-            val type = when (message.type) {
-                MessageType.Pos, MessageType.Velocity -> typeOf<Vec3>()
-                MessageType.TankCreation -> typeOf<TankCreationData>()
-                MessageType.GroundData -> typeOf<GroundData>()
-                MessageType.ConnectionRequest -> typeOf<ConnectionRequest>()
-                MessageType.ConnectionResponse -> typeOf<ConnectionResponse>()
-                MessageType.SessionStateChange -> typeOf<SessionStateUpdate>()
-                MessageType.Disconnect -> typeOf<Disconnect>()
-                else -> typeOf<Empty>()
-            }
-            return ProtoBuf.decodeFromByteArray(serializer(type), message.data) as GameMessageData
+            return ProtoBuf.decodeFromByteArray(serializer(message.type.type), message.data) as GameMessageData
         }
     }
 }
