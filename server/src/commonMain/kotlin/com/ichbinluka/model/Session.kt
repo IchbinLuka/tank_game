@@ -20,7 +20,7 @@ class Session(
         players.remove(player)
     }
 
-    suspend fun broadcast(message: GameMessage, player: Player?) {
+    suspend fun broadcast(message: GameMessage, player: Player? = null) {
         val iter = players.iterator()
         var playersChanged = false
         for (p in iter) {

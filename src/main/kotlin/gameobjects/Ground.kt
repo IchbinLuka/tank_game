@@ -10,13 +10,13 @@ import ext.plus
 import ext.toFloatList
 import gameobjects.bullets.BulletObject
 import gameobjects.bullets.BulletTarget
+import noise.GroundNoise
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.js.*
 import util.Log
 import util.angleFromAscent
 import util.getLinearGradient
-import util.noise.GroundNoise
 import kotlin.math.*
 
 private const val BACK_SMOOTHING_WIDTH = 3

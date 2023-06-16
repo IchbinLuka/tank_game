@@ -36,6 +36,7 @@ sealed class GameMessageData {
 
     @Serializable
     data class TankCreationData(
+        val topic: String,
         val pos: Vec3,
         val name: String,
         val color: ColorData

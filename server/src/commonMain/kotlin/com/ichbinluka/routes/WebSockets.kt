@@ -8,6 +8,7 @@ import MessageType
 import com.benasher44.uuid.uuid4
 import com.ichbinluka.model.Player
 import com.ichbinluka.services.GameSessionService
+import createGame
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.routing.*
@@ -64,10 +65,21 @@ fun Application.webSocketRoute(
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
                 val messageData = GameMessageData.fromGameMessage(message)
-                when (messageData) {
-                    is GameMessageData.Disconnect -> {
+                when (message.type) {
+                    MessageType.Disconnect -> {
                         session.removePlayer(player)
                         session.broadcastUpdate()
+                    }
+                    MessageType.GameStartRequest -> {
+                        if (player.data == session.info.host) {
+                            session.broadcast(
+                                GameMessage.fromGameMessageData(
+                                    data = createGame(session.toInfo().players),
+                                    topic = Topic.GLOBAL,
+                                    type = MessageType.GameStart
+                                )
+                            )
+                        }
                     }
                     else -> {
                         session.broadcast(message, player)

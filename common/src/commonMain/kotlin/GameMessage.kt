@@ -23,6 +23,7 @@ enum class MessageType(val type: KType) {
     Disconnect(typeOf<GameMessageData.Disconnect>()),
     GameStateChange(typeOf<GameMessageData.GameStateData>()),
     GameStart(typeOf<GameMessageData.GameStartData>()),
+    GameStartRequest(typeOf<GameMessageData.Empty>()),
     GameObjectMoveUpdate(typeOf<GameMessageData.GameObjectMoveUpdate>())
 }
 

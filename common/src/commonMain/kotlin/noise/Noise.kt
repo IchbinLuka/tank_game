@@ -1,6 +1,6 @@
-package util.noise
+package noise
 
-import core.HeightMap
+import HeightMap
 
 interface Noise {
     fun valueAt(x: Double, y: Double): Double?

@@ -1,0 +1,16 @@
+import noise.GroundNoise
+
+fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
+    val heightMap = GroundNoise().allValues()
+    return GameMessageData.GameStartData(
+        state = GameMessageData.GameStateData(
+            players.map { GameMessageData.TankData(
+                it,
+                GameMessageData.Vec3(0.0, 0.0,0.0),
+                GameMessageData.Vec3(0.0, 0.0,0.0),
+                1.0)
+            }
+        ),
+        groundData = GameMessageData.GroundData(heightMap)
+    )
+}

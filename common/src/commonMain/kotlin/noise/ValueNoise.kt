@@ -1,7 +1,7 @@
-package util.noise
-
-import core.HeightMap
+package noise
+import HeightMap
 import util.getLinearGradient
+
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -19,7 +19,7 @@ class ValueNoise(
 
     private val random = Random.Default
 
-    /** Calculates a 2D Value Noise using the given parameters. */
+    /** Calculates a 2D Value noise.Noise using the given parameters. */
     override fun calculate(): HeightMap {
         var xFrequency = startFrequencyX
         var yFrequency = startFrequencyY

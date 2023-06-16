@@ -253,12 +253,11 @@ class Tank(
 
     override fun onMessage(message: GameMessageData, type: MessageType) {
         when (type) {
-            MessageType.Pos -> {
-                if (message is GameMessageData.Vec3) {
-                    position = message.toVector3()
-                }
+            MessageType.GameObjectMoveUpdate -> {
+                message as GameMessageData.GameObjectMoveUpdate
+                position = message.pos.toVector3()
+                rotation = Euler().setFromVector3(message.rot.toVector3())
             }
-
             else -> {}
         }
     }

@@ -1,6 +1,6 @@
-package util.noise
+package noise
 
-import core.HeightMap
+import HeightMap
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow

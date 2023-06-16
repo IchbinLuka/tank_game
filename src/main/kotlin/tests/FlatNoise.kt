@@ -1,7 +1,7 @@
 package tests
 
 import core.HeightMap
-import util.noise.BoundedNoise
+import noise.BoundedNoise
 
 class FlatNoise(
     private val width: Int,

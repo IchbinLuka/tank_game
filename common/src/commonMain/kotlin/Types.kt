@@ -1,0 +1,1 @@
+typealias HeightMap = Array<DoubleArray>
