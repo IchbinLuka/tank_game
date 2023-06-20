@@ -4,6 +4,7 @@ import ext.fromId
 import gameobjects.bullets.Bullet
 import org.w3c.dom.Element
 import scenes.MainScene
+import scenes.MainSceneSingleplayer
 import kotlin.math.roundToInt
 
 class MainTopBar(

@@ -2,6 +2,7 @@ package gameobjects
 
 import GameMessageData
 import MessageType
+import core.ConnectionManager
 import core.CuboidHitBox
 import core.Hittable
 import core.Player
@@ -23,11 +24,11 @@ import kotlin.properties.Delegates
 
 typealias Count = Int
 
-class Tank(
+open class Tank(
     val startPosition: Vector3,
     private val startRotation: Euler = Euler(),
-    val player: Player
-) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget, MultiplayerSynchronized {
+    val player: Player,
+) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
     override fun onBulletImpact(bullet: BulletObject) {}
 
     override val hitBox: CuboidHitBox = CuboidHitBox(
@@ -247,19 +248,6 @@ class Tank(
 
     private fun switchDirection() {
         setDirection(direction.inverse)
-    }
-
-    override val topic: String = player.name
-
-    override fun onMessage(message: GameMessageData, type: MessageType) {
-        when (type) {
-            MessageType.GameObjectMoveUpdate -> {
-                message as GameMessageData.GameObjectMoveUpdate
-                position = message.pos.toVector3()
-                rotation = Euler().setFromVector3(message.rot.toVector3())
-            }
-            else -> {}
-        }
     }
 
     override fun toString(): String {

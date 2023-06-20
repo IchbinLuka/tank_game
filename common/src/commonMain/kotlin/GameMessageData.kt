@@ -94,6 +94,11 @@ sealed class GameMessageData {
     ): GameMessageData()
 
     @Serializable
+    data class PlayerHealthUpdate(
+        val newHealth: Double
+    ) : GameMessageData()
+
+    @Serializable
     object Disconnect : GameMessageData()
 
     @Serializable

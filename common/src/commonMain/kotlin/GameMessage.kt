@@ -24,7 +24,8 @@ enum class MessageType(val type: KType) {
     GameStateChange(typeOf<GameMessageData.GameStateData>()),
     GameStart(typeOf<GameMessageData.GameStartData>()),
     GameStartRequest(typeOf<GameMessageData.Empty>()),
-    GameObjectMoveUpdate(typeOf<GameMessageData.GameObjectMoveUpdate>())
+    GameObjectMoveUpdate(typeOf<GameMessageData.GameObjectMoveUpdate>()),
+    PlayerHealthUpdate(typeOf<GameMessageData.PlayerHealthUpdate>())
 }
 
 @Serializable

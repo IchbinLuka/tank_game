@@ -6,7 +6,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLInputElement
-import scenes.MainScene
+import scenes.MainSceneSingleplayer
 import util.GUIHelper
 import util.Localizations
 
@@ -37,12 +37,12 @@ class StartController: UIController() {
             addEventListener("input", {
                 updatePlayersDisplay()
             })
-            max = MainScene.tankColors.size.toString()
+            max = MainSceneSingleplayer.tankColors.size.toString()
         }
 
         Element.fromId("startButton")?.apply {
             addEventListener("click", {
-                Game.instance.currentScene = MainScene(numPlayers = playersSlider?.value?.toIntOrNull() ?: 3)
+                Game.instance.currentScene = MainSceneSingleplayer(numPlayers = playersSlider?.value?.toIntOrNull() ?: 3)
             })
         }
         Element.fromId("settingsButton")?.addEventListener("click", {

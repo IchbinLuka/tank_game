@@ -1,11 +1,8 @@
 package scenes
 
-import GameMessageData
-import MessageType
 import core.Game
 import core.Player
 import core.gameobjects.GameObject
-import core.multiplayer.MultiplayerSynchronized
 import ext.*
 import gameobjects.Background
 import gameobjects.Ground
@@ -24,32 +21,9 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
-data class GameState(val currentTank: Tank)
-
-class MainScene(
-    private val numPlayers: Int = 3
-) : GameScene(), Observable<GameState> by DefaultObservable(), MultiplayerSynchronized {
-
-    // region - Multiplayer -
-
-    override val topic: String = "MainScene"
-    override fun onMessage(message: GameMessageData, type: MessageType) {
-        when (message) {
-            is GameMessageData.TankCreationData -> {
-                addGameObject(
-                    Tank(
-                        startPosition = message.pos.toVector3(),
-                        player = Player(color = message.color.toColor(), name = message.name),
-                    )
-                )
-            }
-
-            else -> {}
-        }
-    }
-
-    // endregion
-
+abstract class MainScene(
+    val startData: GameMessageData.GameStartData
+) : GameScene() {
     override val scene: Scene = Scene().apply {
         background = Color(0x3333ff)
         val light = DirectionalLight(0xFDFFD9, 1).apply {
@@ -88,12 +62,12 @@ class MainScene(
 
     private var freeCamera = true
 
-    private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0)
+    private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0, data = startData.groundData.data)
     private val groundRenderable = ground.renderable
 
     private val deadPlayers = ArrayDeque<Player>()
 
-    private val tanks = MutableList(numPlayers) {
+    /*private val tanks = MutableList(numPlayers) {
         val data = tankColors[it]
         Tank(
             player = Player(
@@ -108,7 +82,16 @@ class MainScene(
             ),
             startPosition = Vector3(x = (200 / (numPlayers - 1)) * it - 100, z = 1.5),
         ).apply { addDeathListener { deadPlayers.addFirst(player) } }
-    }
+    }*/
+
+    protected val tanks = startData.state.tanks.map {
+        Tank(
+            player = Player.fromPlayerData(it.player),
+            startPosition = it.pos.toVector3(),
+        ).apply { addDeathListener { deadPlayers.addFirst(player) } }
+    }.toMutableList()
+
+    abstract fun isProxy(tank: GameMessageData.TankData): Boolean
 
     private var currentTankIndex: Int = 0
     private val currentTank get() = tanks[currentTankIndex]
@@ -157,7 +140,7 @@ class MainScene(
         }
         clickListener = { event ->
             event as MouseEvent
-            if (currentBulletObject == null) {
+            if (currentBulletObject == null && hasTurn) {
                 currentBulletObject = currentTank.shoot(aimingStrengthValue * MAX_POINTER_DISTANCE)
                 currentBulletObject!!.let {
                     _children["bullet"] = it
@@ -184,7 +167,7 @@ class MainScene(
         camera.lookAt(Vector3(camera.position.x * 0.5, y = 100))
     }
 
-    private fun onImpact() {
+    protected open fun onImpact() {
         currentBulletObject = null
         nextTank()
     }
@@ -238,11 +221,13 @@ class MainScene(
         GUIHelper.pushReplacement(topBar)
     }
 
+    abstract val hasTurn: Boolean
+
     override fun update(delta: Double) {
         super.update(delta)
+        if (!hasTurn) return
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {
-            if (currentBulletObject != null) return@forEach
             when (it.code) {
                 KeyCodes.KEY_A, KeyCodes.ARROW_LEFT -> {
                     currentTank?.move(Vector3(-6, 0, 0), delta, ground)
