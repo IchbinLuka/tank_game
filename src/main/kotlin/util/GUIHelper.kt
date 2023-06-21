@@ -34,7 +34,8 @@ object GUIHelper {
     }
 
     suspend fun pushReplacement(controller: UIController) {
-        pop()
+        val popped = controllerStack.removeFirstOrNull()
+        popped?.dispose()
         push(controller)
     }
 
