@@ -10,15 +10,15 @@ import kotlin.test.assertIs
 class GameMessageTest {
     @Test
     fun encodeDecode() {
-        val vec = GameMessageData.Vec3(1.0, 1.0, 1.0)
+        val vec = GameMessageData.Spawn
         val message = GameMessage(
-            "test", MessageType.Pos, ProtoBuf.encodeToByteArray(vec)
+            "test", MessageType.Spawn, ProtoBuf.encodeToByteArray(vec)
         )
         val data = ProtoBuf.encodeToByteArray(value = message)
         val decoded = ProtoBuf.decodeFromByteArray<GameMessage>(data)
         assertEquals(message, decoded)
         val decodedMessage = GameMessageData.fromGameMessage(decoded)
-        assertIs<GameMessageData.Vec3>(decodedMessage)
+        assertIs<GameMessageData.Spawn>(decodedMessage)
         assertEquals(vec, decodedMessage)
     }
 }

@@ -24,10 +24,9 @@ class Player(
 
     override val topic: String = "player_$name"
 
-    override fun onMessage(message: GameMessageData, type: MessageType) {
-        when (type) {
-            MessageType.PlayerHealthUpdate -> {
-                message as GameMessageData.PlayerHealthUpdate
+    override fun onMessage(message: GameMessageData) {
+        when (message) {
+            is GameMessageData.PlayerHealthUpdate -> {
                 health = message.newHealth
             }
             else -> {}

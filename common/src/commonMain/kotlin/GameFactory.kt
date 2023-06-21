@@ -9,7 +9,8 @@ fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
                 GameMessageData.Vec3(0.0, 0.0,0.0),
                 GameMessageData.Vec3(0.0, 0.0,0.0),
                 1.0)
-            }
+            },
+            currentTurn = players.first().name
         ),
         groundData = GameMessageData.GroundData(heightMap)
     )

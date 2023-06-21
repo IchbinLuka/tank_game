@@ -1,10 +1,30 @@
 package scenes
 
+import GameMessageData
 import PlayerData
+import core.multiplayer.MultiplayerSynchronized
+import gameobjects.Tank
+import sessions.Topic
 
 class MainSceneMultiplayer(
     startData: GameMessageData.GameStartData,
     private val player: PlayerData
-) : MainScene(startData) {
+) : MainScene(startData), MultiplayerSynchronized {
     override fun isProxy(tank: GameMessageData.TankData): Boolean = tank.player == player
+    override val hasTurn: Boolean
+        get() = currentTank?.player?.let { it.name == player.name } ?: false
+    override val topic: String = Topic.MAIN_SCENE
+
+    private var currentTank: Tank? = null
+
+    override fun onMessage(message: GameMessageData) {
+        when (message) {
+            is GameMessageData.GameStateData -> {
+                currentTank = findObject(message.currentTurn)
+            }
+            else -> {}
+        }
+    }
+
+
 }

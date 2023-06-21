@@ -1,7 +1,6 @@
 package scenes
 
 import GameMessageData
-import MessageType
 import core.Game
 import core.Player
 import core.gameobjects.GameObject
@@ -33,7 +32,7 @@ class MainSceneSingleplayer(
     // region - Multiplayer -
 
     override val topic: String = "MainScene"
-    override fun onMessage(message: GameMessageData, type: MessageType) {
+    override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.TankCreationData -> {
                 addGameObject(
@@ -120,7 +119,7 @@ class MainSceneSingleplayer(
 
     val currentTankNotifier = ValueNotifier(currentTank)
 
-    private val topBar = MainTopBar(this)
+    private val topBar: MainTopBar = TODO() //MainTopBar(this)
 
     init {
         initListeners()

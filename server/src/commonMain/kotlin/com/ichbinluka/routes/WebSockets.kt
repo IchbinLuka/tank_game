@@ -56,7 +56,6 @@ fun Application.webSocketRoute(
             session.broadcast(
                 GameMessage.fromGameMessageData<GameMessageData.SessionStateUpdate>(
                     GameMessageData.SessionStateUpdate(session.toInfo()),
-                    MessageType.SessionStateChange,
                     Topic.SESSION_STATE
                 ),
                 null
@@ -65,18 +64,17 @@ fun Application.webSocketRoute(
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
                 val messageData = GameMessageData.fromGameMessage(message)
-                when (message.type) {
-                    MessageType.Disconnect -> {
+                when (messageData) {
+                    is GameMessageData.Disconnect -> {
                         session.removePlayer(player)
                         session.broadcastUpdate()
                     }
-                    MessageType.GameStartRequest -> {
+                    is GameMessageData.GameStartRequest -> {
                         if (player.data == session.info.host) {
                             session.broadcast(
                                 GameMessage.fromGameMessageData(
                                     data = createGame(session.toInfo().players),
-                                    topic = Topic.GLOBAL,
-                                    type = MessageType.GameStart
+                                    topic = Topic.GLOBAL
                                 )
                             )
                         }

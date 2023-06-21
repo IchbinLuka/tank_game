@@ -16,11 +16,9 @@ suspend fun initWebSocket() {
     val message = ProtoBuf.encodeToByteArray(
         GameMessage(
             "topic",
-            MessageType.Pos,
+            MessageType.Spawn,
             data = ProtoBuf.encodeToByteArray(
-                GameMessageData.Vec3(
-                    1.0, 1.0, 1.0
-                )
+                GameMessageData.Spawn
             )
         )
     )

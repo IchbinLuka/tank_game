@@ -24,10 +24,9 @@ class MultiplayerTank(
         }
     }
 
-    override fun onMessage(message: GameMessageData, type: MessageType) {
-        when (type) {
-            MessageType.GameObjectMoveUpdate -> {
-                message as GameMessageData.GameObjectMoveUpdate
+    override fun onMessage(message: GameMessageData) {
+        when (message) {
+            is GameMessageData.GameObjectMoveUpdate -> {
                 position = message.pos.toVector3()
                 rotation = Euler().setFromVector3(message.rot.toVector3())
             }

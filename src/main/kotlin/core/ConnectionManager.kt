@@ -4,7 +4,6 @@ package core
 
 import GameMessage
 import GameMessageData
-import MessageType
 import PlayerData
 import core.multiplayer.MultiplayerSynchronized
 import decodeFromArrayBuffer
@@ -14,7 +13,6 @@ import kotlinx.browser.window
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 import org.khronos.webgl.ArrayBuffer
 import org.w3c.dom.ARRAYBUFFER
@@ -40,11 +38,12 @@ object ConnectionManager {
     init {
         window.onbeforeunload = {
             shouldReconnect = true
-            socket?.send(GameMessage(
-                Topic.DISCONNECT,
-                MessageType.Disconnect,
-                ProtoBuf.encodeToByteArray(GameMessageData.Disconnect)
-            ).toByteArray())
+            socket?.send(
+                GameMessage.fromGameMessageData(
+                    GameMessageData.Disconnect,
+                    Topic.DISCONNECT
+                ).toByteArray()
+            )
             socket?.close()
             ""
         }
@@ -76,15 +75,12 @@ object ConnectionManager {
                 continuation.resumeWithException(ConnectionFailedException())
             }
             socket!!.send(
-                GameMessage(
+                GameMessage.fromGameMessageData(
+                    GameMessageData.ConnectionRequest(
+                        playerData = playerData,
+                        sessionId = sessionId
+                    ),
                     Topic.CONNECTION_RESPONSE,
-                    MessageType.ConnectionRequest,
-                    ProtoBuf.encodeToByteArray(
-                        GameMessageData.ConnectionRequest(
-                            playerData = playerData,
-                            sessionId = sessionId
-                        )
-                    )
                 ).toByteArray()
             )
             socket!!.onmessage = {
@@ -124,7 +120,7 @@ object ConnectionManager {
         val messageData = GameMessageData.fromGameMessage(decodedMessage)
         synchronizedObjects[decodedMessage.topic]?.let {
             for (o in it) {
-                o.onMessage(messageData, decodedMessage.type)
+                o.onMessage(messageData)
             }
         }
         Log.d("Websocket", "received $messageData on ${decodedMessage.topic}")

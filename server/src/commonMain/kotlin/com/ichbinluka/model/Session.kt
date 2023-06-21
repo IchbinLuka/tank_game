@@ -41,7 +41,6 @@ class Session(
         broadcast(
             GameMessage.fromGameMessageData<GameMessageData.SessionStateUpdate>(
                 GameMessageData.SessionStateUpdate(toInfo()),
-                MessageType.SessionStateChange,
                 Topic.SESSION_STATE
             ),
             null

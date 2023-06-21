@@ -12,4 +12,5 @@ object Topic {
     const val SESSION_STATE = "session_state"
     const val DISCONNECT = "disconnect"
     const val GLOBAL = "global"
+    const val MAIN_SCENE = "main_scene"
 }

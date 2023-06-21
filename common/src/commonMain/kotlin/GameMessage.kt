@@ -10,23 +10,23 @@ import kotlin.reflect.typeOf
 
 
 enum class MessageType(val type: KType) {
-    Death(typeOf<GameMessageData.Empty>()),
-    Pos(typeOf<GameMessageData.Vec3>()),
-    Velocity(typeOf<GameMessageData.Vec3>()),
-    Spawn(typeOf<GameMessageData.Empty>()),
+    Death(typeOf<GameMessageData.Death>()),
+    TransformationUpdate(typeOf<GameMessageData.TransformationUpdate>()),
+    Spawn(typeOf<GameMessageData.Spawn>()),
     TankCreation(typeOf<GameMessageData.TankCreationData>()),
     GroundData(typeOf<GameMessageData.GroundData>()),
-    Empty(typeOf<GameMessageData.Empty>()),
     SessionStateChange(typeOf<GameMessageData.SessionStateUpdate>()),
     ConnectionRequest(typeOf<GameMessageData.ConnectionRequest>()),
     ConnectionResponse(typeOf<GameMessageData.ConnectionResponse>()),
     Disconnect(typeOf<GameMessageData.Disconnect>()),
     GameStateChange(typeOf<GameMessageData.GameStateData>()),
     GameStart(typeOf<GameMessageData.GameStartData>()),
-    GameStartRequest(typeOf<GameMessageData.Empty>()),
+    GameStartRequest(typeOf<GameMessageData.GameStartRequest>()),
     GameObjectMoveUpdate(typeOf<GameMessageData.GameObjectMoveUpdate>()),
     PlayerHealthUpdate(typeOf<GameMessageData.PlayerHealthUpdate>())
 }
+
+val typeMessageTypeMap: Map<KType, MessageType> = MessageType.values().associateBy { it.type }
 
 @Serializable
 data class GameMessage(
@@ -58,10 +58,10 @@ data class GameMessage(
     companion object {
         fun fromByteArray(bytes: ByteArray): GameMessage = ProtoBuf.decodeFromByteArray(bytes)
 
-        inline fun <reified T: GameMessageData> fromGameMessageData(data: T,type: MessageType, topic: String) = GameMessage(
+        inline fun <reified T: GameMessageData> fromGameMessageData(data: T,topic: String) = GameMessage(
             data = ProtoBuf.encodeToByteArray<T>(data),
             topic = topic,
-            type = type
+            type = typeMessageTypeMap[typeOf<T>()]!!
         )
     }
 }

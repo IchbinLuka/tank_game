@@ -3,7 +3,6 @@
 import kotlinx.serialization.*
 import kotlinx.serialization.protobuf.ProtoBuf
 import sessions.SessionInfo
-import kotlin.reflect.typeOf
 
 @Serializable
 sealed class GameMessageData {
@@ -44,7 +43,8 @@ sealed class GameMessageData {
 
     @Serializable
     data class GameStateData(
-        val tanks: List<TankData>
+        val tanks: List<TankData>,
+        val currentTurn: String
     ) : GameMessageData()
 
     @Serializable
@@ -99,10 +99,25 @@ sealed class GameMessageData {
     ) : GameMessageData()
 
     @Serializable
+    data class TransformationUpdate(
+        val pos: Vec3,
+        val rot: Vec3,
+    ) : GameMessageData()
+
+    @Serializable
     object Disconnect : GameMessageData()
 
     @Serializable
     object Empty : GameMessageData()
+
+    @Serializable
+    object Spawn : GameMessageData()
+
+    @Serializable
+    object Death : GameMessageData()
+
+    @Serializable
+    object GameStartRequest : GameMessageData()
 
     companion object {
         private inline fun <reified T> decode(array: ByteArray): T = ProtoBuf.decodeFromByteArray<T>(array)
