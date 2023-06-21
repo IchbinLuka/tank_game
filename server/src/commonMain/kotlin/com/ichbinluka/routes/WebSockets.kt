@@ -67,7 +67,14 @@ fun Application.webSocketRoute(
                 when (messageData) {
                     is GameMessageData.Disconnect -> {
                         session.removePlayer(player)
-                        session.broadcastUpdate()
+                        if (session.isEmpty()) {
+                            sessionService.closeSession(session.toInfo().id)
+                        } else {
+                            if (player.data == session.info.host) {
+                                session.host = player.data
+                            }
+                            session.broadcastUpdate()
+                        }
                     }
                     is GameMessageData.GameStartRequest -> {
                         if (player.data == session.info.host) {

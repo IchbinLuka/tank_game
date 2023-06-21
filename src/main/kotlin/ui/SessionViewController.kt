@@ -2,14 +2,17 @@ package ui
 
 import GameMessageData
 import core.ConnectionManager
+import core.Game
 import core.multiplayer.MultiplayerSynchronized
 import ext.fromId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
+import scenes.MultiplayerGameScene
 import sessions.SessionInfo
 import sessions.Topic
 import ui.components.SessionInfoItem
+import util.GUIHelper
 
 class SessionViewController(
     private var session: SessionInfo
@@ -45,7 +48,10 @@ class SessionViewController(
                 MainScope().launch { updatePlayers(session) }
             }
             is GameMessageData.GameStartData -> {
-
+                Game.instance.currentScene = MultiplayerGameScene(message)
+            }
+            is GameMessageData.Disconnect -> {
+                MainScope().launch { GUIHelper.pop() }
             }
             else -> {}
         }

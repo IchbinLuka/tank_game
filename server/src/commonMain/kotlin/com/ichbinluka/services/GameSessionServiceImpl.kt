@@ -1,10 +1,14 @@
 package com.ichbinluka.services
 
 import ColorData
+import GameMessage
 import PlayerData
 import com.ichbinluka.model.Session
+import io.ktor.websocket.*
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
+import sessions.Topic
+import com.ichbinluka.extensions.send
 
 
 class GameSessionServiceImpl : GameSessionService {
@@ -12,16 +16,7 @@ class GameSessionServiceImpl : GameSessionService {
     private var currentId: Long = 1L
     private val nextId: Long get() = currentId++
 
-    private val sessions = hashMapOf<Long, Session>(
-        0L to Session(
-            info = SessionInfo(
-                id = 0,
-                host = PlayerData(name = "Bob", color = ColorData(0x00ff00)),
-                name = "Test",
-                players = listOf(PlayerData(name = "Bob", color = ColorData(0x00ff00)))
-            )
-        )
-    )
+    private val sessions = hashMapOf<Long, Session>()
 
     override fun getSessionById(sessionId: Long): Session? = sessions[sessionId]
 
@@ -50,8 +45,12 @@ class GameSessionServiceImpl : GameSessionService {
         return session
     }
 
-    override fun closeSession(sessionId: Long) {
-        TODO("Not yet implemented")
+    override suspend fun closeSession(sessionId: Long) {
+        val session = sessions.remove(sessionId) ?: return
+        session.broadcast(GameMessage.fromGameMessageData(
+            GameMessageData.Disconnect,
+            Topic.GLOBAL
+        ))
     }
 
 }

@@ -16,6 +16,6 @@ interface GameSessionService {
     fun addSession(session: Session): Long
 
     fun createSession(info: SessionCreationInfo): Session
-    fun closeSession(sessionId: Long)
+    suspend fun closeSession(sessionId: Long)
 
 }

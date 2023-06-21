@@ -1,6 +1,7 @@
 package com.ichbinluka.model
 
 import GameMessage
+import PlayerData
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import sessions.SessionInfo
@@ -10,7 +11,9 @@ import sessions.Topic
 class Session(
     val info: SessionInfo,
 ) {
-    private val players = mutableListOf<Player>()
+    val players = mutableListOf<Player>()
+
+    var host: PlayerData = info.host
 
     fun addPlayer(player: Player) {
         players.add(player)
@@ -47,5 +50,7 @@ class Session(
         )
     }
 
-    fun toInfo(): SessionInfo = info.copy(players = players.map { it.data })
+    fun toInfo(): SessionInfo = info.copy(players = players.map { it.data }, host = host)
+
+    fun isEmpty(): Boolean = players.isEmpty()
 }
