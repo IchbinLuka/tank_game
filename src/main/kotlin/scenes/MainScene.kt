@@ -65,7 +65,7 @@ abstract class MainScene(
     private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0, data = startData.groundData.data)
     private val groundRenderable = ground.renderable
 
-    private val deadPlayers = ArrayDeque<Player>()
+    protected val deadPlayers = ArrayDeque<Player>()
 
     /*private val tanks = MutableList(numPlayers) {
         val data = tankColors[it]
@@ -82,9 +82,10 @@ abstract class MainScene(
             ),
             startPosition = Vector3(x = (200 / (numPlayers - 1)) * it - 100, z = 1.5),
         ).apply { addDeathListener { deadPlayers.addFirst(player) } }
+        ).apply { addDeathListener { deadPlayers.addFirst(player) } }
     }*/
 
-    protected val tanks = startData.state.tanks.map {
+    protected open val tanks = startData.state.tanks.map {
         Tank(
             player = Player.fromPlayerData(it.player),
             startPosition = it.pos.toVector3(),
