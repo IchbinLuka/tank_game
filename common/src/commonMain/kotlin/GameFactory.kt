@@ -2,6 +2,9 @@ import noise.GroundNoise
 
 fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
     val heightMap = GroundNoise().allValues()
+    val ground = GameMessageData.GroundData(
+        Array(10) { i -> DoubleArray(10) { j -> (i + j).toDouble() } }
+    )
     return GameMessageData.GameStartData(
         state = GameMessageData.GameStateData(
             players.map { GameMessageData.TankData(
@@ -12,6 +15,6 @@ fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
             },
             currentTurn = players.first().name
         ),
-        groundData = GameMessageData.GroundData(heightMap)
+        groundData = ground // GameMessageData.GroundData(heightMap)
     )
 }

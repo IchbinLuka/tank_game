@@ -27,7 +27,7 @@ class Session(
         val iter = players.iterator()
         var playersChanged = false
         for (p in iter) {
-            if (p.id == player?.id) continue
+            if (p.id == player?.id) continue // Skip broadcaster
             try {
                 p.session.outgoing.send(Frame.Binary(true, message.toByteArray()))
             } catch (e: ClosedSendChannelException) {

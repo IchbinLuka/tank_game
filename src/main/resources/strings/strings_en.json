@@ -21,5 +21,6 @@
   "player_name": "Name",
   "player_color": "Color",
   "waiting_room": "Waiting Room",
-  "session_name": "Session Name"
+  "session_name": "Session Name",
+  "start_session": "Start Session"
 }

@@ -125,4 +125,8 @@ object ConnectionManager {
         }
         Log.d("Websocket", "received $messageData on ${decodedMessage.topic}")
     }
+
+    fun sendMessage(message: GameMessage) {
+        socket?.send(message.toByteArray())
+    }
 }

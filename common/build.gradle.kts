@@ -25,6 +25,11 @@ kotlin {
                     enabled.set(true)
                 }
             }
+            testTask {
+                useKarma {
+                    useFirefox()
+                }
+            }
         }
     }
     val hostOs = System.getProperty("os.name")

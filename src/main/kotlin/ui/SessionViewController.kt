@@ -1,13 +1,19 @@
 package ui
 
 import GameMessageData
+import PlayerData
 import core.ConnectionManager
 import core.Game
 import core.multiplayer.MultiplayerSynchronized
+import ext.addClickListener
 import ext.fromId
+import ext.tryCast
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLInputElement
+import scenes.MainSceneMultiplayer
 import scenes.MultiplayerGameScene
 import sessions.SessionInfo
 import sessions.Topic
@@ -15,7 +21,8 @@ import ui.components.SessionInfoItem
 import util.GUIHelper
 
 class SessionViewController(
-    private var session: SessionInfo
+    private var session: SessionInfo,
+    private val self: PlayerData
 ) : UIController(), MultiplayerSynchronized {
 
     override val mainGUIName: String = "session_view"
@@ -36,7 +43,17 @@ class SessionViewController(
     }
 
     override fun rebuild() {
-
+        if (session.host == self) {
+            Element.fromId("startButton")?.tryCast<HTMLElement>()?.let {
+                it.style.visibility = "visible"
+                it.addClickListener {
+                    ConnectionManager.sendMessage(GameMessage.fromGameMessageData(
+                        GameMessageData.GameStartRequest,
+                        Topic.GLOBAL
+                    ))
+                }
+            }
+        }
     }
 
     override val topic: String = Topic.SESSION_STATE
@@ -48,7 +65,7 @@ class SessionViewController(
                 MainScope().launch { updatePlayers(session) }
             }
             is GameMessageData.GameStartData -> {
-                Game.instance.currentScene = MultiplayerGameScene(message)
+                Game.instance.currentScene = MainSceneMultiplayer(message, self)
             }
             is GameMessageData.Disconnect -> {
                 MainScope().launch { GUIHelper.pop() }

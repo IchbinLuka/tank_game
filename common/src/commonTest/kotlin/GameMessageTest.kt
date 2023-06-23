@@ -21,4 +21,17 @@ class GameMessageTest {
         assertIs<GameMessageData.Spawn>(decodedMessage)
         assertEquals(vec, decodedMessage)
     }
+
+    @Test
+    fun encodeDecodeGameStart() {
+        val ground = GameMessageData.GroundData(
+            Array(10) { i -> DoubleArray(10) { j -> (i + j).toDouble() } }
+        )
+        val data = GameMessageData.GameStartData(
+            state = GameMessageData.GameStateData(listOf(), ""),
+            groundData = ground
+        )
+        val message = GameMessage.fromGameMessageData(data, "")
+        assertEquals(message, ProtoBuf.decodeFromByteArray(ProtoBuf.encodeToByteArray(message)))
+    }
 }

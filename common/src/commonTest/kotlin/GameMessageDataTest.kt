@@ -25,8 +25,9 @@ class GameMessageDataTest {
     fun connectionRequestTest() {
         val message = GameMessageData.ConnectionRequest(
             PlayerData("foo", ColorData(9)),
+            69,
             "password",
-            69
+            sessionId = 10
         )
         val proto = ProtoBuf.encodeToByteArray(message)
         assertEquals(message, ProtoBuf.decodeFromByteArray(proto))
@@ -39,5 +40,18 @@ class GameMessageDataTest {
         )
         val proto = ProtoBuf.encodeToByteArray(ground)
         assertEquals(ground, ProtoBuf.decodeFromByteArray(proto))
+    }
+
+    @Test
+    fun gameStartDataTest() {
+        val ground = GameMessageData.GroundData(
+            Array(10) { i -> DoubleArray(10) { j -> (i + j).toDouble() } }
+        )
+        val data = GameMessageData.GameStartData(
+            state = GameMessageData.GameStateData(listOf(), ""),
+            groundData = ground
+        )
+        val proto = ProtoBuf.encodeToByteArray(data)
+        assertEquals(data, ProtoBuf.decodeFromByteArray<GameMessageData.GameStartData>(proto))
     }
 }

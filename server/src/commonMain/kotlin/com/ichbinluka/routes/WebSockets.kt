@@ -78,8 +78,9 @@ fun Application.webSocketRoute(
                     }
                     is GameMessageData.GameStartRequest -> {
                         if (player.data == session.info.host) {
+                            println("Got start request")
                             session.broadcast(
-                                GameMessage.fromGameMessageData(
+                                GameMessage.fromGameMessageData<GameMessageData.GameStartData>(
                                     data = createGame(session.toInfo().players),
                                     topic = Topic.GLOBAL
                                 )

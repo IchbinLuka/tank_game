@@ -27,7 +27,7 @@ class SessionBrowserController: UIController() {
             try {
                 ConnectionManager.connect(info.id, playerData)
                 val updatedSession = APIHelper.fetchSessionById(info.id)
-                GUIHelper.push(SessionViewController(updatedSession))
+                GUIHelper.push(SessionViewController(updatedSession, playerData))
             } catch (e: ConnectionFailedException) {
                 Log.e(TAG, "Could not connect to session")
             }

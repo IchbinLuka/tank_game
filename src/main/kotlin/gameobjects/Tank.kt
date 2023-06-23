@@ -181,7 +181,7 @@ open class Tank(
         return bulletObject
     }
 
-    fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
+    open fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
         mainBone?.position?.let {
             val ascend = abs(ground.rotationAt(it.x))
             var newPos = it.clone()
