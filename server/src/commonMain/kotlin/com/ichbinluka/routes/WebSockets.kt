@@ -37,21 +37,27 @@ fun Application.webSocketRoute(
             val messageData = GameMessageData.fromGameMessage(message)
             if (messageData !is GameMessageData.ConnectionRequest) return@webSocket
 
-            val session = sessionService.getSessionById(messageData.sessionId) ?: throw NotFoundException("Session not found")
+            val session =
+                sessionService.getSessionById(messageData.sessionId) ?: throw NotFoundException("Session not found")
             session.info.password?.let { if (it != messageData.password) return@webSocket }
             val token = uuid4().leastSignificantBits
             val player = Player(messageData.playerData, token, this)
             session.addPlayer(player)
-            outgoing.send(Frame.Binary(true, GameMessage(
-                Topic.CONNECTION_RESPONSE,
-                MessageType.ConnectionResponse,
-                ProtoBuf.encodeToByteArray(
-                    GameMessageData.ConnectionResponse(
-                        successful = true,
-                        authToken = token
-                    )
+            send(
+                Frame.Binary(
+                    true, GameMessage(
+                        Topic.CONNECTION_RESPONSE,
+                        MessageType.ConnectionResponse,
+                        ProtoBuf.encodeToByteArray(
+                            GameMessageData.ConnectionResponse(
+                                successful = true,
+                                authToken = token
+                            )
+                        )
+                    ).toByteArray()
                 )
-            ).toByteArray()))
+            )
+
 
             session.broadcast(
                 GameMessage.fromGameMessageData<GameMessageData.SessionStateUpdate>(
@@ -80,7 +86,7 @@ fun Application.webSocketRoute(
                         if (player.data == session.info.host) {
                             println("Got start request")
                             session.broadcast(
-                                GameMessage.fromGameMessageData<GameMessageData.GameStartData>(
+                                GameMessage.fromGameMessageData(
                                     data = createGame(session.toInfo().players),
                                     topic = Topic.GLOBAL
                                 )

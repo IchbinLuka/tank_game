@@ -28,7 +28,7 @@ fun Route.sessions(sessionService: GameSessionService) {
     route("sessions/{id}/join") {
         post {
             val playerData = call.receive<PlayerData>()
-            val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("")
+            val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("Invalid id")
             val session = sessionService.getSessionById(id) ?: throw NotFoundException()
         }
     }
@@ -38,7 +38,7 @@ fun Route.sessions(sessionService: GameSessionService) {
 
         }
         get {
-            val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("")
+            val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("Invalid id")
             call.respond(sessionService.getSessionById(id)?.toInfo() ?: throw NotFoundException())
         }
     }

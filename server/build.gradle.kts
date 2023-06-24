@@ -66,7 +66,7 @@ kotlin {
                 implementation("io.ktor:ktor-server-cors:$ktor_version")
                 implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
             }
         }
         val commonTest by getting {

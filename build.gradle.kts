@@ -27,8 +27,8 @@ kotlin {
         binaries.executable()
         dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.6.4")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
             implementation(enforcedPlatform("org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:$kotlinWrappersVersion"))
             implementation("org.jetbrains.kotlin-wrappers:kotlin-js")
             testImplementation(kotlin("test-js"))

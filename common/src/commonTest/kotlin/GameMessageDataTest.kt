@@ -3,6 +3,7 @@ import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -36,10 +37,14 @@ class GameMessageDataTest {
     @Test
     fun groundDataTest() {
         val ground = GameMessageData.GroundData(
-            Array(10) { i -> DoubleArray(10) { j -> (i + j).toDouble() } }
+            Array(100) { i -> DoubleArray(50) { j -> (i + j).toDouble() } }
         )
         val proto = ProtoBuf.encodeToByteArray(ground)
-        assertEquals(ground, ProtoBuf.decodeFromByteArray(proto))
+        val decoded = ProtoBuf.decodeFromByteArray<GameMessageData.GroundData>(proto)
+        for ((a, b) in decoded.data zip ground.data) {
+            assertContentEquals(a, b)
+        }
+        assertEquals(ground, decoded)
     }
 
     @Test
