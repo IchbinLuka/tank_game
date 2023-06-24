@@ -88,7 +88,7 @@ fun Application.webSocketRoute(
                             session.broadcast(
                                 GameMessage.fromGameMessageData(
                                     data = createGame(session.toInfo().players),
-                                    topic = Topic.GLOBAL
+                                    topic = Topic.SESSION_STATE
                                 )
                             )
                         }

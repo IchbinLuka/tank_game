@@ -15,10 +15,9 @@ class MainSceneMultiplayer(
 ) : MainScene(startData), MultiplayerSynchronized {
     override fun isProxy(tank: GameMessageData.TankData): Boolean = tank.player == player
     override val hasTurn: Boolean
-        get() = currentTank?.player?.let { it.name == player.name } ?: false
+        get() = currentTank.player.name == player.name
     override val topic: String = Topic.MAIN_SCENE
 
-    private var currentTank: Tank? = null
 
     override val tanks: MutableList<Tank> = startData.state.tanks.map {
         MultiplayerTank(
@@ -31,7 +30,7 @@ class MainSceneMultiplayer(
     override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.GameStateData -> {
-                currentTank = findObject(message.currentTurn)
+                // currentTank = findObject(message.currentTurn)
             }
             else -> {}
         }

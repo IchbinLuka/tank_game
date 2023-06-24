@@ -1,10 +1,12 @@
 import noise.GroundNoise
+import kotlin.random.Random
+
+const val TREE_COUNT = 40
 
 fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
     val heightMap = GroundNoise().allValues()
-//    val ground = GameMessageData.GroundData(
-//        Array(10) { i -> DoubleArray(10) { j -> (i + j).toDouble() } }
-//    )
+    val random = Random.Default
+    val trees = List(TREE_COUNT) { random.nextDouble() * 600 - 300 }
     return GameMessageData.GameStartData(
         state = GameMessageData.GameStateData(
             players.map {
@@ -17,6 +19,9 @@ fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
             },
             currentTurn = players.first().name
         ),
-        groundData = GameMessageData.GroundData(heightMap)
+        groundData = GameMessageData.GroundData(
+            heightMap,
+        ),
+        treePositions = trees
     )
 }

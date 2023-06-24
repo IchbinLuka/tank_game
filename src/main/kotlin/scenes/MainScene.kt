@@ -1,5 +1,6 @@
 package scenes
 
+import GameMessageData
 import core.Game
 import core.Player
 import core.gameobjects.GameObject
@@ -8,7 +9,6 @@ import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.Tree
-import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import org.w3c.dom.events.Event
@@ -19,7 +19,6 @@ import ui.MainTopBar
 import util.*
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.random.Random
 
 abstract class MainScene(
     val startData: GameMessageData.GameStartData
@@ -49,7 +48,7 @@ abstract class MainScene(
             for (tank in tanks) {
                 set(tank.player.name, tank)
             }
-            repeat(25) {
+            repeat(startData.treePositions.size) {
                 set("tree$it", Tree(Vector3(z = 2)))
             }
         }
@@ -95,14 +94,14 @@ abstract class MainScene(
     abstract fun isProxy(tank: GameMessageData.TankData): Boolean
 
     private var currentTankIndex: Int = 0
-    private val currentTank get() = tanks[currentTankIndex]
+    protected val currentTank get() = tanks[currentTankIndex]
 
     private var currentBulletObject: BulletObject? = null
 
     val aimingStrength = ValueNotifier<Double>(0.0)
     private var aimingStrengthValue: Double by aimingStrength
 
-    val currentTankNotifier = ValueNotifier(currentTank)
+    val currentTankNotifier by lazy { ValueNotifier(currentTank) }
 
     private val topBar = MainTopBar(this)
 
@@ -208,10 +207,8 @@ abstract class MainScene(
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
         }
-        val random = Random.Default
-        for (tree in findObjects<Tree>()) {
-            val x = random.nextDouble() * 600 - 300
-            tree.position.x = x
+        for ((tree, pos) in findObjects<Tree>() zip startData.treePositions) {
+            tree.position.x = pos
             tree.position.y = ground.heightAt(tree.position.x) ?: 0.0
         }
         centerCamera()

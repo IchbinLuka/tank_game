@@ -1,7 +1,7 @@
 package gameobjects
 
+import GameMessage
 import GameMessageData
-import MessageType
 import core.ConnectionManager
 import core.Player
 import core.multiplayer.MultiplayerSynchronized
@@ -21,9 +21,7 @@ class MultiplayerTank(
 
 
     init {
-        if (proxy) {
-            ConnectionManager.register(this)
-        }
+        ConnectionManager.register(this)
     }
 
     

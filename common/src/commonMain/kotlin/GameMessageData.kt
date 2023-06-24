@@ -50,7 +50,8 @@ sealed class GameMessageData {
     @Serializable
     data class GameStartData(
         val state: GameStateData,
-        val groundData: GroundData
+        val groundData: GroundData,
+        val treePositions: List<Double>
     ) : GameMessageData()
 
     @Serializable
