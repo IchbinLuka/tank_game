@@ -1,5 +1,6 @@
 package ui
 
+import GameMessage
 import GameMessageData
 import PlayerData
 import core.ConnectionManager
@@ -12,9 +13,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLInputElement
 import scenes.MainSceneMultiplayer
-import scenes.MultiplayerGameScene
 import sessions.SessionInfo
 import sessions.Topic
 import ui.components.SessionInfoItem
@@ -47,10 +46,12 @@ class SessionViewController(
             Element.fromId("startButton")?.tryCast<HTMLElement>()?.let {
                 it.style.visibility = "visible"
                 it.addClickListener {
-                    ConnectionManager.sendMessage(GameMessage.fromGameMessageData(
-                        GameMessageData.GameStartRequest,
-                        Topic.GLOBAL
-                    ))
+                    ConnectionManager.broadcast(
+                        GameMessage.fromGameMessageData(
+                            GameMessageData.GameStartRequest,
+                            Topic.GLOBAL
+                        )
+                    )
                 }
             }
         }

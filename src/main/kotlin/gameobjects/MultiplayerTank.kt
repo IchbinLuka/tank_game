@@ -5,9 +5,11 @@ import GameMessageData
 import core.ConnectionManager
 import core.Player
 import core.multiplayer.MultiplayerSynchronized
+import core.multiplayer.RateLimitedBroadcaster
 import ext.fromVector3
 import ext.toVector3
 import three.js.Euler
+import three.js.Vector2
 import three.js.Vector3
 
 class MultiplayerTank(
@@ -19,12 +21,14 @@ class MultiplayerTank(
 
     override val topic: String = player.name
 
+    private val broadcaster = RateLimitedBroadcaster(10)
+    private val urgentBroadcaster = ConnectionManager
+
 
     init {
         ConnectionManager.register(this)
     }
 
-    
 
     override fun onMessage(message: GameMessageData) {
         when (message) {
@@ -32,22 +36,40 @@ class MultiplayerTank(
                 position = message.pos.toVector3()
                 rotation = Euler().setFromVector3(message.rot.toVector3())
             }
+
             is GameMessageData.Death -> {
                 die()
             }
+
+            is GameMessageData.CannonUpdateData -> {
+                cannon?.rotation?.x = message.angle
+            }
+
             else -> {}
         }
+    }
+
+    override fun aim(point: Vector2) {
+        super.aim(point)
+        broadcaster.broadcast(
+            GameMessage.fromGameMessageData(
+                GameMessageData.CannonUpdateData(
+                    angle = cannon?.rotation?.x?.toDouble() ?: 0.0
+                ),
+                topic
+            )
+        )
     }
 
     override fun onDeath() {
         super.onDeath()
         if (proxy) return
-        ConnectionManager.sendMessage(GameMessage.fromGameMessageData(GameMessageData.Death, topic))
+        urgentBroadcaster.broadcast(GameMessage.fromGameMessageData(GameMessageData.Death, topic))
     }
 
     override fun move(vector3: Vector3, deltaTime: Double, ground: Ground) {
         super.move(vector3, deltaTime, ground)
-        ConnectionManager.sendMessage(
+        broadcaster.broadcast(
             GameMessage.fromGameMessageData(
                 GameMessageData.TransformationUpdate(
                     pos = GameMessageData.Vec3.fromVector3(position),

@@ -32,6 +32,11 @@ sealed class GameMessageData {
         }
     }
 
+    @Serializable
+    data class CannonUpdateData(
+        val angle: Double,
+    ) : GameMessageData()
+
 
     @Serializable
     data class TankCreationData(

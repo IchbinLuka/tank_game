@@ -23,7 +23,8 @@ enum class MessageType(val type: KType) {
     GameStart(typeOf<GameMessageData.GameStartData>()),
     GameStartRequest(typeOf<GameMessageData.GameStartRequest>()),
     GameObjectMoveUpdate(typeOf<GameMessageData.GameObjectMoveUpdate>()),
-    PlayerHealthUpdate(typeOf<GameMessageData.PlayerHealthUpdate>())
+    PlayerHealthUpdate(typeOf<GameMessageData.PlayerHealthUpdate>()),
+    CannonUpdate(typeOf<GameMessageData.CannonUpdateData>()),
 }
 
 val typeMessageTypeMap: Map<KType, MessageType> = MessageType.values().associateBy { it.type }

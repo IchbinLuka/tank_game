@@ -1,13 +1,9 @@
 package gameobjects
 
-import GameMessageData
-import MessageType
-import core.ConnectionManager
 import core.CuboidHitBox
 import core.Hittable
 import core.Player
 import core.gameobjects.GameObject
-import core.multiplayer.MultiplayerSynchronized
 import ext.*
 import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
@@ -86,8 +82,8 @@ open class Tank(
 
     private var direction = Direction.Right
 
-    private var cannon: Object3D? = null
-    private var cannonTip: Object3D? = null
+    protected var cannon: Object3D? = null
+    protected var cannonTip: Object3D? = null
 
     val cannonTipPos: Vector3? get() = cannonTip?.getWorldPosition(Vector3())
 
@@ -144,7 +140,7 @@ open class Tank(
         super.preloadAssets()
     }
 
-    fun aim(point: Vector2) {
+    open fun aim(point: Vector2) {
         if (cannon?.rotation == null) return
         val globalpos = cannon!!.getWorldPosition(Vector3())
         val delta = Vector2(point.x - globalpos.x, point.y - globalpos.y)

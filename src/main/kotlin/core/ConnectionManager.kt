@@ -5,6 +5,7 @@ package core
 import GameMessage
 import GameMessageData
 import PlayerData
+import core.multiplayer.MessageBroadcaster
 import core.multiplayer.MultiplayerSynchronized
 import decodeFromArrayBuffer
 import exceptions.ConnectionFailedException
@@ -27,7 +28,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-object ConnectionManager {
+object ConnectionManager : MessageBroadcaster {
 
     private val synchronizedObjects = hashMapOf<String, MutableList<MultiplayerSynchronized>>()
     private var socket: WebSocket? = null
@@ -126,7 +127,7 @@ object ConnectionManager {
         Log.d("Websocket", "received $messageData on ${decodedMessage.topic}")
     }
 
-    fun sendMessage(message: GameMessage) {
+    override fun broadcast(message: GameMessage) {
         socket?.send(message.toByteArray())
     }
 }
