@@ -1,7 +1,7 @@
 package sessions
 
 const val HOST = "localhost"
-const val PORT = 8080
+const val PORT = 8081
 const val WEBSOCKET_ROUTE = "sessions/connect"
 
 const val HTTP_URL = "http://${HOST}:${PORT}"

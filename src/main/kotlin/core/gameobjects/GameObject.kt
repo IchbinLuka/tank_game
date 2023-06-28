@@ -4,6 +4,7 @@ import core.ConnectionManager
 import core.currentScene
 import ext.getWorldEuler
 import ext.set
+import gameobjects.GameObjectFactory
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import three.js.Euler
@@ -62,6 +63,12 @@ abstract class GameObject {
             gameObject.renderable?.let { renderable?.add(it) }
             gameObject.onSceneReady()
         }
+    }
+
+    fun <A: GameObject, B, T: GameObjectFactory<A, B>> addSynchronized(factory: T, args: B, name: String? = null): A {
+        val o = factory.newGameObject(args)
+        _children[name ?: o.uuid.toString()] = o
+        return o
     }
 
     open fun damage(amount: Double) {

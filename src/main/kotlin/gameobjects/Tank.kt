@@ -80,7 +80,7 @@ open class Tank(
     private var gltf: GLTF? = null
     private var mainBone: Object3D? = null
 
-    private var direction = Direction.Right
+    protected var direction = Direction.Right
 
     protected var cannon: Object3D? = null
     protected var cannonTip: Object3D? = null
@@ -223,7 +223,7 @@ open class Tank(
         fire?.renderable?.lookAt(fire!!.globalPosition + Vector3(z = 1))
     }
 
-    private fun setDirection(direction: Direction) {
+    protected fun setDirection(direction: Direction) {
         if (direction != this.direction) {
             mainBone?.rotateX(PI)
         }
@@ -242,7 +242,7 @@ open class Tank(
         }
     }
 
-    private fun switchDirection() {
+    protected fun switchDirection() {
         setDirection(direction.inverse)
     }
 

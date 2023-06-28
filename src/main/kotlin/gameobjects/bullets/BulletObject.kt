@@ -1,16 +1,14 @@
 package gameobjects.bullets
 
-import core.Game
-import core.HitBox
-import core.Hittable
-import core.currentScene
+import GameMessage
+import GameMessageData
+import core.*
 import core.gameobjects.GameObject
 import core.gameobjects.MovingGameObject
 import core.gameobjects.SynchronizedInitializer
-import ext.TAG
-import ext.set
-import ext.times
-import ext.toFloatList
+import core.multiplayer.MultiplayerSynchronized
+import core.multiplayer.RateLimitedBroadcaster
+import ext.*
 import gameobjects.GameObjectFactory
 import gameobjects.Ground
 import gameobjects.Tank
@@ -27,17 +25,22 @@ import kotlin.math.pow
 
 typealias ImpactListener = (Vector3) -> Unit
 
-interface BulletTarget: Hittable {
+interface BulletTarget : Hittable {
     fun onBulletImpact(bullet: BulletObject)
 }
 
-data class BulletObjectArgs(val startVelocity: Vector3, val tank: Tank)
+data class BulletObjectArgs(
+    val startVelocity: Vector3,
+    val tank: Tank,
+    val proxy: Boolean = false,
+    val synchronized: Boolean = false,
+)
 
 open class BulletObject protected constructor(
     arg: BulletObjectArgs
-) : MovingGameObject(), Hittable, SynchronizedInitializer {
+) : MovingGameObject(), Hittable, SynchronizedInitializer, MultiplayerSynchronized {
 
-    open class Factory: GameObjectFactory<BulletObject, BulletObjectArgs>() {
+    open class Factory : GameObjectFactory<BulletObject, BulletObjectArgs>() {
         lateinit var disc: Texture
         override suspend fun loadAssets() {
             disc = ResourceManager.disc.await()
@@ -50,9 +53,12 @@ open class BulletObject protected constructor(
 
     protected val tank: Tank = arg.tank
 
+    protected val broadcaster: RateLimitedBroadcaster? =
+        if (arg.synchronized) RateLimitedBroadcaster(10, ConnectionManager) else null
+
     // region - HitBox -
 
-    final override val hitBox: HitBox = object: HitBox() {
+    final override val hitBox: HitBox = object : HitBox() {
         override val associatedObject: Hittable
             get() = this@BulletObject
 
@@ -154,7 +160,6 @@ open class BulletObject protected constructor(
     }
 
 
-
     private fun updateGeometry() {
         dots.setAttribute("position", BufferAttribute(Float32Array(dotVertices.toTypedArray()).asDynamic(), 3))
     }
@@ -183,6 +188,18 @@ open class BulletObject protected constructor(
         if (isNew) {
             isNew = false
         }
+
+        broadcaster?.broadcast(
+            GameMessage.fromGameMessageData(
+                GameMessageData.GameObjectMoveUpdate(
+                    pos = GameMessageData.Vec3.fromVector3(position),
+                    velocity = GameMessageData.Vec3.fromVector3(velocity),
+                    acceleration = GameMessageData.Vec3.fromVector3(acceleration),
+                    rot = GameMessageData.Vec3.fromVector3(globalRotation.toVector3()),
+                ),
+                topic = topic
+            ),
+        )
     }
 
     companion object : Factory()
@@ -198,5 +215,25 @@ open class BulletObject protected constructor(
             }
         ))
         bulletMesh.add(hitBox.renderable)
+    }
+
+    override val topic: String = "${tank.player.name}_bullet"
+
+    override fun onMessage(message: GameMessageData) {
+        when (message) {
+            is GameMessageData.GameObjectMoveUpdate -> {
+                position.set(message.pos.toVector3())
+                velocity.set(message.velocity.toVector3())
+                acceleration.set(message.acceleration.toVector3())
+            }
+
+            is GameMessageData.GameObjectMoveStart -> {
+                position.set(message.pos.toVector3())
+                velocity.set(message.velocity.toVector3())
+                acceleration.set(message.acceleration.toVector3())
+            }
+
+            else -> {}
+        }
     }
 }

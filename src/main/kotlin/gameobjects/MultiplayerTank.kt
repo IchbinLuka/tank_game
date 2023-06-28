@@ -21,7 +21,7 @@ class MultiplayerTank(
 
     override val topic: String = player.name
 
-    private val broadcaster = RateLimitedBroadcaster(10)
+    private val broadcaster = RateLimitedBroadcaster(10, ConnectionManager)
     private val urgentBroadcaster = ConnectionManager
 
 
@@ -42,7 +42,8 @@ class MultiplayerTank(
             }
 
             is GameMessageData.CannonUpdateData -> {
-                cannon?.rotation?.x = message.angle
+                cannon?.rotation?.z = message.angle
+                setDirection(message.direction)
             }
 
             else -> {}
@@ -54,7 +55,8 @@ class MultiplayerTank(
         broadcaster.broadcast(
             GameMessage.fromGameMessageData(
                 GameMessageData.CannonUpdateData(
-                    angle = cannon?.rotation?.x?.toDouble() ?: 0.0
+                    angle = cannon?.rotation?.z?.toDouble() ?: 0.0,
+                    direction = direction
                 ),
                 topic
             )

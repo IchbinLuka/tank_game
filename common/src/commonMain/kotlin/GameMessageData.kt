@@ -3,6 +3,7 @@
 import kotlinx.serialization.*
 import kotlinx.serialization.protobuf.ProtoBuf
 import sessions.SessionInfo
+import util.Direction
 
 @Serializable
 sealed class GameMessageData {
@@ -35,6 +36,13 @@ sealed class GameMessageData {
     @Serializable
     data class CannonUpdateData(
         val angle: Double,
+        val direction: Direction
+    ) : GameMessageData()
+
+    @Serializable
+    data class Explosion(
+        val pos: Vec3,
+        val strength: Double
     ) : GameMessageData()
 
 
@@ -69,7 +77,22 @@ sealed class GameMessageData {
 
     @Serializable
     data class BulletCreationData(
-        val type: String
+        val type: String,
+        val velocity: Vec3
+    ) : GameMessageData()
+
+    @Serializable
+    data class BulletImpact(
+        val strength: Double,
+        val pos: Double
+    ) : GameMessageData()
+
+    @Serializable
+    data class GameObjectMoveStart(
+        val pos: Vec3,
+        val rot: Vec3,
+        val velocity: Vec3,
+        val acceleration: Vec3
     ) : GameMessageData()
 
     @Serializable
@@ -78,6 +101,12 @@ sealed class GameMessageData {
         val rot: Vec3,
         val velocity: Vec3,
         val acceleration: Vec3
+    ) : GameMessageData()
+
+    @Serializable
+    data class GameObjectMoveEnd(
+        val pos: Vec3,
+        val rot: Vec3,
     ) : GameMessageData()
 
     @Serializable

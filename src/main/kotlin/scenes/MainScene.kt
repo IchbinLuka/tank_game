@@ -9,6 +9,7 @@ import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.Tree
+import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import org.w3c.dom.events.Event
@@ -61,7 +62,7 @@ abstract class MainScene(
 
     private var freeCamera = true
 
-    private val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0, data = startData.groundData.data)
+    protected val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0, data = startData.groundData.data)
     private val groundRenderable = ground.renderable
 
     protected val deadPlayers = ArrayDeque<Player>()
@@ -96,7 +97,7 @@ abstract class MainScene(
     private var currentTankIndex: Int = 0
     protected val currentTank get() = tanks[currentTankIndex]
 
-    private var currentBulletObject: BulletObject? = null
+    protected var currentBulletObject: BulletObject? = null
 
     val aimingStrength = ValueNotifier<Double>(0.0)
     private var aimingStrengthValue: Double by aimingStrength
@@ -115,8 +116,10 @@ abstract class MainScene(
     private lateinit var clickListener: (Event) -> Unit
 
     private fun initListeners() {
-        pointerMove = {
+        pointerMove = pointerMove@ {
             it as PointerEvent
+            if (!hasTurn) return@pointerMove
+
             val aimingPoint = Vector2()
             val containerBox = Game.instance.gameContainer.getBoundingClientRect()
             val x = it.clientX.toDouble() - containerBox.left
@@ -149,6 +152,7 @@ abstract class MainScene(
                         onImpact()
                     }
                 }
+                onBulletCreation(currentTank.currentBullet, currentBulletObject!!.velocity)
             }
         }
         window.addEventListener("pointermove", pointerMove)
@@ -236,6 +240,8 @@ abstract class MainScene(
             }
         }
     }
+
+    open protected fun onBulletCreation(type: Bullet, velocity: Vector3) {}
 
     override fun dispose() {
         super.dispose()

@@ -2,12 +2,17 @@ package scenes
 
 import GameMessageData
 import PlayerData
+import core.ConnectionManager
 import core.Player
 import core.multiplayer.MultiplayerSynchronized
+import ext.fromVector3
 import ext.toVector3
 import gameobjects.MultiplayerTank
 import gameobjects.Tank
+import gameobjects.bullets.Bullet
+import gameobjects.bullets.BulletObjectArgs
 import sessions.Topic
+import three.js.Vector3
 
 class MainSceneMultiplayer(
     startData: GameMessageData.GameStartData,
@@ -27,10 +32,50 @@ class MainSceneMultiplayer(
         ).apply { addDeathListener { deadPlayers.addFirst(player) } }
     }.toMutableList()
 
+    override fun onImpact() {
+        ConnectionManager.broadcast(
+            GameMessage.fromGameMessageData(
+                GameMessageData.BulletImpact(
+                    strength = currentBulletObject!!.explosionWidth,
+                    pos = currentBulletObject!!.position.x
+                ),
+                Topic.MAIN_SCENE
+            )
+        )
+        super.onImpact()
+    }
+
+    override fun onBulletCreation(type: Bullet, velocity: Vector3) {
+        super.onBulletCreation(type, velocity)
+        ConnectionManager.broadcast(
+            GameMessage.fromGameMessageData(
+                GameMessageData.BulletCreationData(
+                    type = type.name,
+                    velocity = GameMessageData.Vec3.fromVector3(velocity)
+                ),
+                Topic.MAIN_SCENE
+            )
+        )
+    }
+
     override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.GameStateData -> {
                 // currentTank = findObject(message.currentTurn)
+            }
+            is GameMessageData.BulletCreationData -> {
+                val bullet = Bullet.valueOf(message.type)
+                currentBulletObject = addSynchronized(
+                    bullet.createObject,
+                    BulletObjectArgs(
+                        message.velocity.toVector3(),
+                        currentTank
+                    ),
+                    "bullet"
+                )
+            }
+            is GameMessageData.Explosion -> {
+                ground.destroy(message.pos.x, message.strength)
             }
             else -> {}
         }

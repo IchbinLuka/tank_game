@@ -21,5 +21,6 @@
   "player_name": "Name",
   "player_color": "Farbe",
   "waiting_room": "Warteraum",
-  "session_name": "Name"
+  "session_name": "Name",
+  "start_session": "Spiel starten"
 }

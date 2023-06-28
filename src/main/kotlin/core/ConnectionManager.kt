@@ -10,6 +10,7 @@ import core.multiplayer.MultiplayerSynchronized
 import decodeFromArrayBuffer
 import exceptions.ConnectionFailedException
 import ext.*
+import js.core.WeakRef
 import kotlinx.browser.window
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -30,7 +31,7 @@ import kotlin.coroutines.suspendCoroutine
 
 object ConnectionManager : MessageBroadcaster {
 
-    private val synchronizedObjects = hashMapOf<String, MutableList<MultiplayerSynchronized>>()
+    private val synchronizedObjects = hashMapOf<String, MutableList<WeakRef<MultiplayerSynchronized>>>()
     private var socket: WebSocket? = null
     private var shouldReconnect = false
 
@@ -38,7 +39,7 @@ object ConnectionManager : MessageBroadcaster {
 
     init {
         window.onbeforeunload = {
-            shouldReconnect = true
+            shouldReconnect = false
             socket?.send(
                 GameMessage.fromGameMessageData(
                     GameMessageData.Disconnect,
@@ -110,7 +111,7 @@ object ConnectionManager : MessageBroadcaster {
         if (list == null) {
             synchronizedObjects[m.topic] = mutableListOf()
         }
-        synchronizedObjects[m.topic]!!.add(m)
+        synchronizedObjects[m.topic]!!.add(WeakRef(m))
     }
 
 
@@ -120,8 +121,9 @@ object ConnectionManager : MessageBroadcaster {
         val decodedMessage = ProtoBuf.decodeFromArrayBuffer<GameMessage>(buffer)
         val messageData = GameMessageData.fromGameMessage(decodedMessage)
         synchronizedObjects[decodedMessage.topic]?.let {
-            for (o in it) {
-                o.onMessage(messageData)
+            val iterator = it.iterator()
+            for (o in iterator) {
+                o.deref()?.onMessage(messageData) ?: iterator.remove()
             }
         }
         Log.d("Websocket", "received $messageData on ${decodedMessage.topic}")

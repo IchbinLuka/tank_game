@@ -4,6 +4,7 @@ import core.gameobjects.GameObject
 import ext.plusAssign
 import ext.times
 import ext.toDoubleList
+import ext.vector3
 import gameobjects.particles.emitter.ParticleEmitter
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
