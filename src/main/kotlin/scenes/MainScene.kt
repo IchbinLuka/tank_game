@@ -94,7 +94,7 @@ abstract class MainScene(
 
     abstract fun isProxy(tank: GameMessageData.TankData): Boolean
 
-    private var currentTankIndex: Int = 0
+    protected var currentTankIndex: Int = 0
     protected val currentTank get() = tanks[currentTankIndex]
 
     protected var currentBulletObject: BulletObject? = null
@@ -118,7 +118,7 @@ abstract class MainScene(
     private fun initListeners() {
         pointerMove = pointerMove@ {
             it as PointerEvent
-            if (!hasTurn) return@pointerMove
+            if (!hasTurn || currentBulletObject != null) return@pointerMove
 
             val aimingPoint = Vector2()
             val containerBox = Game.instance.gameContainer.getBoundingClientRect()
@@ -173,7 +173,7 @@ abstract class MainScene(
 
     protected open fun onImpact() {
         currentBulletObject = null
-        nextTank()
+        // nextTank()
     }
 
     private fun nextTank() {
@@ -241,7 +241,7 @@ abstract class MainScene(
         }
     }
 
-    open protected fun onBulletCreation(type: Bullet, velocity: Vector3) {}
+    protected open fun onBulletCreation(type: Bullet, velocity: Vector3) {}
 
     override fun dispose() {
         super.dispose()

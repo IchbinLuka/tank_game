@@ -15,6 +15,7 @@ enum class MessageType(val type: KType) {
     Spawn(typeOf<GameMessageData.Spawn>()),
     TankCreation(typeOf<GameMessageData.TankCreationData>()),
     GroundData(typeOf<GameMessageData.GroundData>()),
+    GroundDestruction(typeOf<GameMessageData.GroundDestruction>()),
     SessionStateChange(typeOf<GameMessageData.SessionStateUpdate>()),
     ConnectionRequest(typeOf<GameMessageData.ConnectionRequest>()),
     ConnectionResponse(typeOf<GameMessageData.ConnectionResponse>()),
@@ -28,6 +29,7 @@ enum class MessageType(val type: KType) {
     PlayerHealthUpdate(typeOf<GameMessageData.PlayerHealthUpdate>()),
     CannonUpdate(typeOf<GameMessageData.CannonUpdateData>()),
     BulletImpact(typeOf<GameMessageData.BulletImpact>()),
+    BulletCreation(typeOf<GameMessageData.BulletCreationData>()),
     Explosion(typeOf<GameMessageData.Explosion>()),
 
 }

@@ -8,6 +8,7 @@ import core.multiplayer.MultiplayerSynchronized
 import core.multiplayer.RateLimitedBroadcaster
 import ext.fromVector3
 import ext.toVector3
+import gameobjects.bullets.BulletObjectArgs
 import three.js.Euler
 import three.js.Vector2
 import three.js.Vector3
@@ -29,6 +30,9 @@ class MultiplayerTank(
         ConnectionManager.register(this)
     }
 
+    override fun createBulletArgs(velocity: Double): BulletObjectArgs {
+        return super.createBulletArgs(velocity).copy(synchronized = true)
+    }
 
     override fun onMessage(message: GameMessageData) {
         when (message) {

@@ -168,7 +168,7 @@ open class Tank(
             _bullets[currentBullet] = _bullets[currentBullet]!! - 1
         }
         val bulletObject =  currentBullet.createObject.newGameObject(
-            BulletObjectArgs(cannonDirection * velocity, this)
+            createBulletArgs(velocity)
         )
         if ((_bullets[currentBullet] ?: 1) <= 0) {
             nextBullet()
@@ -176,6 +176,11 @@ open class Tank(
         spawnedBullet = true
         return bulletObject
     }
+
+    open protected fun createBulletArgs(velocity: Double): BulletObjectArgs = BulletObjectArgs(
+        cannonDirection * velocity,
+        this
+    )
 
     open fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
         mainBone?.position?.let {

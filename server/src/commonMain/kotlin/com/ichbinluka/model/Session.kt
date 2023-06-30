@@ -7,6 +7,7 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import sessions.SessionInfo
 import sessions.Topic
+import util.ScrollableList
 
 
 class Session(
@@ -16,12 +17,31 @@ class Session(
 
     var host: PlayerData = info.host
 
+    var currentTurn: Player? = null
+    private set
+
+    var currentState: GameMessageData.GameStateData? = null
+    private set
+
+    private var turnIterator: Iterator<Player>? = null
+
     fun addPlayer(player: Player) {
         players.add(player)
     }
 
     fun removePlayer(player: Player) {
         players.remove(player)
+    }
+
+    fun begin(stateData: GameMessageData.GameStartData) {
+        currentState = stateData.state
+        turnIterator = ScrollableList(players)
+        nextTurn()
+    }
+
+    fun nextTurn() {
+        currentTurn = turnIterator?.next()
+        currentState = currentState?.copy(currentTurn = currentTurn!!.data.name)
     }
 
     suspend fun broadcast(message: GameMessage, player: Player? = null) {

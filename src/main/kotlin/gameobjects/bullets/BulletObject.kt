@@ -51,10 +51,14 @@ open class BulletObject protected constructor(
         }
     }
 
+
     protected val tank: Tank = arg.tank
 
+    override val topic: String = "${tank.player.name}_bullet"
+    val proxy = arg.proxy
+
     protected val broadcaster: RateLimitedBroadcaster? =
-        if (arg.synchronized) RateLimitedBroadcaster(10, ConnectionManager) else null
+        if (arg.synchronized) RateLimitedBroadcaster(3, ConnectionManager) else null
 
     // region - HitBox -
 
@@ -122,9 +126,22 @@ open class BulletObject protected constructor(
         get() = gravity
         set(_) {}
 
+
+    init {
+        initConnection(arg)
+    }
+
+    private fun initConnection(arg: BulletObjectArgs) {
+        if (arg.proxy) {
+            ConnectionManager.register(this)
+        }
+    }
+
     protected open fun onIntersectionEnter(intersectingBox: Hittable) {
         if (intersectingBox !is BulletTarget) return
-        ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
+        if (!proxy) {
+            ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
+        }
         currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
         intersectingBox.onBulletImpact(this)
         for (o in Game.instance.currentScene.children.values) {
@@ -217,20 +234,18 @@ open class BulletObject protected constructor(
         bulletMesh.add(hitBox.renderable)
     }
 
-    override val topic: String = "${tank.player.name}_bullet"
-
     override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.GameObjectMoveUpdate -> {
-                position.set(message.pos.toVector3())
-                velocity.set(message.velocity.toVector3())
-                acceleration.set(message.acceleration.toVector3())
+                position = message.pos.toVector3()
+                velocity = message.velocity.toVector3()
+                acceleration = message.acceleration.toVector3()
             }
 
             is GameMessageData.GameObjectMoveStart -> {
-                position.set(message.pos.toVector3())
-                velocity.set(message.velocity.toVector3())
-                acceleration.set(message.acceleration.toVector3())
+                position = message.pos.toVector3()
+                velocity = message.velocity.toVector3()
+                acceleration = message.acceleration.toVector3()
             }
 
             else -> {}

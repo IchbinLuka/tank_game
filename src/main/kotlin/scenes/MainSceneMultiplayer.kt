@@ -5,6 +5,7 @@ import PlayerData
 import core.ConnectionManager
 import core.Player
 import core.multiplayer.MultiplayerSynchronized
+import ext.TAG
 import ext.fromVector3
 import ext.toVector3
 import gameobjects.MultiplayerTank
@@ -13,6 +14,7 @@ import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObjectArgs
 import sessions.Topic
 import three.js.Vector3
+import util.Log
 
 class MainSceneMultiplayer(
     startData: GameMessageData.GameStartData,
@@ -21,7 +23,13 @@ class MainSceneMultiplayer(
     override fun isProxy(tank: GameMessageData.TankData): Boolean = tank.player == player
     override val hasTurn: Boolean
         get() = currentTank.player.name == player.name
+
     override val topic: String = Topic.MAIN_SCENE
+
+
+    init {
+        ConnectionManager.register(this)
+    }
 
 
     override val tanks: MutableList<Tank> = startData.state.tanks.map {
@@ -33,15 +41,17 @@ class MainSceneMultiplayer(
     }.toMutableList()
 
     override fun onImpact() {
-        ConnectionManager.broadcast(
-            GameMessage.fromGameMessageData(
-                GameMessageData.BulletImpact(
-                    strength = currentBulletObject!!.explosionWidth,
-                    pos = currentBulletObject!!.position.x
-                ),
-                Topic.MAIN_SCENE
+        if (currentBulletObject?.proxy == false) {
+            ConnectionManager.broadcast(
+                GameMessage.fromGameMessageData(
+                    GameMessageData.BulletImpact(
+                        strength = currentBulletObject!!.explosionWidth,
+                        pos = currentBulletObject!!.position.x
+                    ),
+                    Topic.MAIN_SCENE
+                )
             )
-        )
+        }
         super.onImpact()
     }
 
@@ -61,21 +71,27 @@ class MainSceneMultiplayer(
     override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.GameStateData -> {
-                // currentTank = findObject(message.currentTurn)
+                currentTankIndex = tanks.indexOf(findObject<Tank>(message.currentTurn))
+                currentTankNotifier.value = currentTank
             }
             is GameMessageData.BulletCreationData -> {
                 val bullet = Bullet.valueOf(message.type)
+                Log.d(TAG, "Creating bullet ${bullet.name}")
                 currentBulletObject = addSynchronized(
                     bullet.createObject,
                     BulletObjectArgs(
                         message.velocity.toVector3(),
-                        currentTank
+                        currentTank,
+                        proxy = true,
+                        synchronized = true
                     ),
                     "bullet"
                 )
             }
-            is GameMessageData.Explosion -> {
-                ground.destroy(message.pos.x, message.strength)
+            is GameMessageData.BulletImpact -> {
+                currentBulletObject?.die()
+                onImpact()
+                // ground.destroy(message.pos.x, message.strength)
             }
             else -> {}
         }

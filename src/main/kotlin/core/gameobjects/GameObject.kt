@@ -68,6 +68,7 @@ abstract class GameObject {
     fun <A: GameObject, B, T: GameObjectFactory<A, B>> addSynchronized(factory: T, args: B, name: String? = null): A {
         val o = factory.newGameObject(args)
         _children[name ?: o.uuid.toString()] = o
+        o.renderable?.let { renderable?.add(it) }
         return o
     }
 

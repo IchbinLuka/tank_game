@@ -85,13 +85,25 @@ fun Application.webSocketRoute(
                     is GameMessageData.GameStartRequest -> {
                         if (player.data == session.info.host) {
                             println("Got start request")
+                            val startData = createGame(session.toInfo().players)
+                            session.begin(startData)
                             session.broadcast(
                                 GameMessage.fromGameMessageData(
-                                    data = createGame(session.toInfo().players),
+                                    data = startData,
                                     topic = Topic.SESSION_STATE
                                 )
                             )
                         }
+                    }
+                    is GameMessageData.BulletImpact -> {
+                        session.broadcast(message, player)
+                        session.nextTurn()
+                        session.broadcast(
+                            GameMessage.fromGameMessageData(
+                                session.currentState!!,
+                                Topic.MAIN_SCENE
+                            )
+                        )
                     }
                     else -> {
                         session.broadcast(message, player)

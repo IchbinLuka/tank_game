@@ -13,4 +13,5 @@ object Topic {
     const val DISCONNECT = "disconnect"
     const val GLOBAL = "global"
     const val MAIN_SCENE = "main_scene"
+    const val GROUND = "ground"
 }

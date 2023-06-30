@@ -106,7 +106,7 @@ object ConnectionManager : MessageBroadcaster {
     }
 
     fun register(m: MultiplayerSynchronized) {
-        Log.d(TAG, "registering $m")
+        Log.d(TAG, "registering $m on ${m.topic}")
         val list = synchronizedObjects[m.topic]
         if (list == null) {
             synchronizedObjects[m.topic] = mutableListOf()

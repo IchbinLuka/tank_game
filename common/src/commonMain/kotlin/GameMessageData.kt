@@ -118,6 +118,12 @@ sealed class GameMessageData {
     ) : GameMessageData()
 
     @Serializable
+    data class GroundDestruction(
+        val pos: Double,
+        val strength: Double
+    ) : GameMessageData()
+
+    @Serializable
     data class ConnectionResponse(
         val successful: Boolean,
         val authToken: Long?

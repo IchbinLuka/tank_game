@@ -1,17 +1,19 @@
 package gameobjects
 
+import GameMessageData
+import core.ConnectionManager
 import core.HeightMap
 import core.HitBox
 import core.Hittable
 import core.gameobjects.GameObject
-import ext.TAG
-import ext.minus
-import ext.plus
-import ext.toFloatList
+import core.multiplayer.MessageBroadcaster
+import core.multiplayer.MultiplayerSynchronized
+import ext.*
 import gameobjects.bullets.BulletObject
 import gameobjects.bullets.BulletTarget
 import noise.GroundNoise
 import org.khronos.webgl.Float32Array
+import sessions.Topic
 import three.DoubleSide
 import three.js.*
 import util.Log
@@ -27,8 +29,9 @@ class Ground(
     private val heightScale: Double = 1.0,
     private val pointDistance: Double = 1.0,
     data: HeightMap = GroundNoise(width = 150, depth = 20, min = -40.0).allValues()
-) : GameObject(), BulletTarget, Hittable {
+) : GameObject(), BulletTarget, Hittable, MultiplayerSynchronized {
 
+    override val topic: String = Topic.GROUND
 
     // region - HitBox -
 
@@ -40,6 +43,8 @@ class Ground(
             heightAt(point.x)?.let { it > point.y } ?: false
 
     }
+
+    private val broadcaster: MessageBroadcaster = ConnectionManager
 
     override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
 
@@ -89,7 +94,7 @@ class Ground(
     private fun getIndex(x: Int, y: Int): Int = x * (groundVertices.first().size + BACK_SMOOTHING_WIDTH) + y
 
     //region PUBLIC
-    fun destroy(position: Double, strength: Double) {
+    fun destroy(position: Double, strength: Double, broadcast: Boolean = true) {
         val maxDistance = strength / pointDistance
         val height = heightAt(position) ?: return
         val function2: (Vector3) -> Double = {
@@ -133,6 +138,17 @@ class Ground(
         attribute.needsUpdate = true
         geometry.setAttribute("position", attribute)
         geometry.computeVertexNormals()
+        if (broadcast) {
+            broadcaster.broadcast(
+                GameMessage.fromGameMessageData(
+                    GameMessageData.GroundDestruction(
+                        pos = position,
+                        strength = strength
+                    ),
+                    Topic.GROUND
+                )
+            )
+        }
     }
 
     fun heightAt(position: Double): Double? {
@@ -234,5 +250,14 @@ class Ground(
 
     companion object {
         const val TAG = "Ground"
+    }
+
+    override fun onMessage(message: GameMessageData) {
+        when (message) {
+            is GameMessageData.GroundDestruction -> {
+                destroy(message.pos, message.strength, false)
+            }
+            else -> {}
+        }
     }
 }
