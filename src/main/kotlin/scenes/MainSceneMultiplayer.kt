@@ -27,11 +27,6 @@ class MainSceneMultiplayer(
     override val topic: String = Topic.MAIN_SCENE
 
 
-    init {
-        ConnectionManager.register(this)
-    }
-
-
     override val tanks: MutableList<Tank> = startData.state.tanks.map {
         MultiplayerTank(
             player = Player.fromPlayerData(it.player),
@@ -40,20 +35,15 @@ class MainSceneMultiplayer(
         ).apply { addDeathListener { deadPlayers.addFirst(player) } }
     }.toMutableList()
 
-    override fun onImpact() {
-        if (currentBulletObject?.proxy == false) {
-            ConnectionManager.broadcast(
-                GameMessage.fromGameMessageData(
-                    GameMessageData.BulletImpact(
-                        strength = currentBulletObject!!.explosionWidth,
-                        pos = currentBulletObject!!.position.x
-                    ),
-                    Topic.MAIN_SCENE
-                )
-            )
-        }
-        super.onImpact()
+    init {
+        ConnectionManager.register(this)
+        currentTankIndex = tanks.indexOf(findObject<Tank>(startData.state.currentTurn))
+        currentTankNotifier.value = currentTank
     }
+
+
+
+
 
     override fun onBulletCreation(type: Bullet, velocity: Vector3) {
         super.onBulletCreation(type, velocity)
@@ -85,7 +75,6 @@ class MainSceneMultiplayer(
                         proxy = true,
                         synchronized = true
                     ),
-                    "bullet"
                 )
             }
             is GameMessageData.BulletImpact -> {

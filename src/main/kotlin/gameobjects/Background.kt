@@ -6,7 +6,8 @@ import three.js.*
 import kotlin.random.Random
 
 class Background(
-    private val offset: Vector3 = Vector3()
+    private val offset: Vector3 = Vector3(),
+    override val name: String = "background"
 ) : GameObject() {
     override val renderable: Object3D = Scene().apply {
         position.set(offset)
@@ -15,7 +16,7 @@ class Background(
     private val cloudSpeed = 1f
     private val random = Random(1)
 
-    private val clouds = Array<Cloud>(20) {
+    private val clouds = List<Cloud>(20) {
         Cloud(
             speed = cloudSpeed,
             min = -400.0,
@@ -28,9 +29,7 @@ class Background(
         )
     }
 
-    override val _children: MutableMap<String, GameObject> = hashMapOf<String, GameObject>().apply {
-        putAll(clouds.map { it.uuid.toString() to it })
-    }
+    override val initialChildren: Collection<GameObject> = clouds
 
     override suspend fun preloadAssets() {
         super.preloadAssets()

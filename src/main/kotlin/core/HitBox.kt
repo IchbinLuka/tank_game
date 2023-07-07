@@ -1,12 +1,13 @@
 package core
 
 import core.gameobjects.GameObject
+import core.gameobjects.Nameable
 import ext.*
 import org.khronos.webgl.Float32Array
 import three.js.*
 import util.Log
 
-interface Hittable {
+interface Hittable : Nameable {
     val hitBox: HitBox
     val position: Vector3
 }

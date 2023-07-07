@@ -66,20 +66,6 @@ class MainSceneSingleplayer(
         lookAt(Vector3(y = 100))
     }
 
-    override val _children: HashMap<String, GameObject> by lazy {
-        hashMapOf(
-            "ground" to ground,
-            "background" to Background()
-        ).apply {
-            for (tank in tanks) {
-                set(tank.player.name, tank)
-            }
-            repeat(25) {
-                set("tree$it", Tree(Vector3(z = 2)))
-            }
-        }
-    }
-
     private val aimingAidPlane = Mesh(PlaneGeometry(500, 500), MeshPhongMaterial().apply { visible = false })
     private val aimingCaster = Raycaster()
     private var aimIntersection = Vector3()

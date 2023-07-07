@@ -34,6 +34,7 @@ data class BulletObjectArgs(
     val tank: Tank,
     val proxy: Boolean = false,
     val synchronized: Boolean = false,
+    val name: String = "bullet"
 )
 
 open class BulletObject protected constructor(
@@ -51,6 +52,7 @@ open class BulletObject protected constructor(
         }
     }
 
+    override val name: String = arg.name
 
     protected val tank: Tank = arg.tank
 
@@ -63,6 +65,7 @@ open class BulletObject protected constructor(
     // region - HitBox -
 
     final override val hitBox: HitBox = object : HitBox() {
+        override val name: String = "hitBox"
         override val associatedObject: Hittable
             get() = this@BulletObject
 
@@ -79,7 +82,9 @@ open class BulletObject protected constructor(
         }
     }
 
-    override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
+    override val initialChildren: Collection<GameObject> = listOf(
+        hitBox
+    )
 
     // endregion
 
@@ -140,8 +145,15 @@ open class BulletObject protected constructor(
     protected open fun onIntersectionEnter(intersectingBox: Hittable) {
         if (intersectingBox !is BulletTarget) return
         if (!proxy) {
-            ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
+            ConnectionManager.broadcast(GameMessage.fromGameMessageData(
+                GameMessageData.BulletImpact(
+                    pos = GameMessageData.Vec3.fromVector3(position),
+                    intersectingName = intersectingBox.name
+                ),
+                topic)
+            )
         }
+        ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
         currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
         intersectingBox.onBulletImpact(this)
         for (o in Game.instance.currentScene.children.values) {
@@ -237,15 +249,21 @@ open class BulletObject protected constructor(
     override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.GameObjectMoveUpdate -> {
-                position = message.pos.toVector3()
-                velocity = message.velocity.toVector3()
+                // position = message.pos.toVector3()
+                velocity = message.velocity.toVector3() + (message.pos.toVector3() - position) * 0.5
                 acceleration = message.acceleration.toVector3()
             }
 
             is GameMessageData.GameObjectMoveStart -> {
                 position = message.pos.toVector3()
-                velocity = message.velocity.toVector3()
+                velocity = message.velocity.toVector3() + (position - message.pos.toVector3()) * 0.5
                 acceleration = message.acceleration.toVector3()
+            }
+
+            is GameMessageData.BulletImpact -> {
+                currentScene.findObject<Hittable>(message.intersectingName)?.let {
+                    onIntersectionEnter(it)
+                } ?: Log.w(TAG, "could not find intersecting object ${message.intersectingName}")
             }
 
             else -> {}

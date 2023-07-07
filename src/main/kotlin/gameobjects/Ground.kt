@@ -28,6 +28,7 @@ class Ground(
     showVertex: Boolean = false,
     private val heightScale: Double = 1.0,
     private val pointDistance: Double = 1.0,
+    override val name: String = "ground",
     data: HeightMap = GroundNoise(width = 150, depth = 20, min = -40.0).allValues()
 ) : GameObject(), BulletTarget, Hittable, MultiplayerSynchronized {
 
@@ -46,7 +47,7 @@ class Ground(
 
     private val broadcaster: MessageBroadcaster = ConnectionManager
 
-    override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
+    override val initialChildren: Collection<GameObject> = listOf(hitBox)
 
     override fun onBulletImpact(bullet: BulletObject) {
         hitBox.onIntersectionEnter(bullet)
@@ -92,6 +93,10 @@ class Ground(
     }
 
     private fun getIndex(x: Int, y: Int): Int = x * (groundVertices.first().size + BACK_SMOOTHING_WIDTH) + y
+
+    init {
+        ConnectionManager.register(this)
+    }
 
     //region PUBLIC
     fun destroy(position: Double, strength: Double, broadcast: Boolean = true) {

@@ -83,8 +83,8 @@ sealed class GameMessageData {
 
     @Serializable
     data class BulletImpact(
-        val strength: Double,
-        val pos: Double
+        val pos: Vec3,
+        val intersectingName: String
     ) : GameMessageData()
 
     @Serializable

@@ -1,5 +1,6 @@
 package core.gameobjects
 
+import GameMessage
 import core.ConnectionManager
 import core.currentScene
 import ext.getWorldEuler
@@ -16,14 +17,18 @@ import kotlin.collections.set
 import kotlin.math.max
 import kotlin.reflect.KClass
 
-abstract class GameObject {
+abstract class GameObject : Nameable {
     abstract val renderable: Object3D?
 
     /** A unique Identifier for the GameObject */
     val uuid = Uuid.next()
 
+    override val name: String = uuid.toString()
+
+    protected open val initialChildren: Collection<GameObject> = listOf()
+
     /** [MutableMap] containing the relevant GameObjects */
-    protected open val _children: MutableMap<String, GameObject> = hashMapOf()
+    protected val _children: MutableMap<String, GameObject> = hashMapOf()
     val children: Map<String, GameObject> by ::_children
     // open val _children: MutableSet<GameObject> = hashSetOf()
 
@@ -56,8 +61,8 @@ abstract class GameObject {
 
     fun createAudio(): PositionalAudio = PositionalAudio(currentScene.audioListener)
 
-    fun addGameObject(gameObject: GameObject, name: String? = null) {
-        _children[name ?: gameObject.uuid.toString()] = gameObject
+    fun addGameObject(gameObject: GameObject) {
+        _children[gameObject.name] = gameObject
         MainScope().launch {
             gameObject.preloadAssets()
             gameObject.renderable?.let { renderable?.add(it) }
@@ -65,9 +70,9 @@ abstract class GameObject {
         }
     }
 
-    fun <A: GameObject, B, T: GameObjectFactory<A, B>> addSynchronized(factory: T, args: B, name: String? = null): A {
+    fun <A: GameObject, B, T: GameObjectFactory<A, B>> addSynchronized(factory: T, args: B): A {
         val o = factory.newGameObject(args)
-        _children[name ?: o.uuid.toString()] = o
+        _children[o.name] = o
         o.renderable?.let { renderable?.add(it) }
         return o
     }
@@ -107,6 +112,9 @@ abstract class GameObject {
 
     /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
     open suspend fun preloadAssets() {
+        for (child in initialChildren) {
+            _children[child.name] = child
+        }
         _children.values.forEach { it.preloadAssets() }
         _children.values.forEach { o -> o.renderable?.let { renderable?.add(it) } }
     }

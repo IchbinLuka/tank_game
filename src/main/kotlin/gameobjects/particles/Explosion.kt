@@ -20,7 +20,9 @@ class Explosion(
     startDirectionRandomness = 0.2,
     particleLifetimeRandomness = 0.3,
     velocityRandomness = 0.3,
-) /*{
+) {
+    override val name: String = "Explosion$uuid"
+}/*{
 
     private val explosionSound: PositionalAudio by lazy { createAudio() }
 

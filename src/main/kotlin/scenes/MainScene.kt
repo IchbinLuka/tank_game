@@ -41,17 +41,12 @@ abstract class MainScene(
         lookAt(Vector3(y = 100))
     }
 
-    override val _children: HashMap<String, GameObject> by lazy {
-        hashMapOf(
-            "ground" to ground,
-            "background" to Background()
+    override val initialChildren: Collection<GameObject> by lazy {
+        mutableListOf(
+            ground,
+            Background(name = "background"),
         ).apply {
-            for (tank in tanks) {
-                set(tank.player.name, tank)
-            }
-            repeat(startData.treePositions.size) {
-                set("tree$it", Tree(Vector3(z = 2)))
-            }
+            addAll(tanks)
         }
     }
 
