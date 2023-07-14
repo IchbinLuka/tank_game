@@ -3,6 +3,7 @@ package core.gameobjects
 import GameMessage
 import core.ConnectionManager
 import core.currentScene
+import ext.TAG
 import ext.getWorldEuler
 import ext.set
 import gameobjects.GameObjectFactory
@@ -12,6 +13,7 @@ import three.js.Euler
 import three.js.Object3D
 import three.js.PositionalAudio
 import three.js.Vector3
+import util.Log
 import util.Uuid
 import kotlin.collections.set
 import kotlin.math.max
@@ -152,6 +154,7 @@ abstract class GameObject : Nameable {
                 obj.update(delta)
             }
             if (!obj.alive) {
+                Log.d(TAG, "Removing dead object ${obj.name}")
                 iterator.remove() // Remove items via the iterator to avoid a [ConcurrentModificationException]
                 obj.renderable?.let { renderable?.remove(it) }
                 obj.dispose()

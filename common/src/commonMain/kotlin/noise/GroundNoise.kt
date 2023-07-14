@@ -8,7 +8,7 @@ import kotlin.math.pow
 class GroundNoise(
     private val width: Int = 200,
     private val depth: Int = 20,
-    private val min: Double = 0.0
+    private val min: Double = -50.0
 ) : BoundedNoise() {
     override fun calculate(): HeightMap {
         val data = ValueNoise(

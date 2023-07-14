@@ -24,6 +24,8 @@ class SessionViewController(
     private val self: PlayerData
 ) : UIController(), MultiplayerSynchronized {
 
+    override val name: String = "session_view_controller"
+
     override val mainGUIName: String = "session_view"
 
 

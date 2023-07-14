@@ -10,7 +10,7 @@ import three.js.Color
 
 class Player(
     val color: Color,
-    val name: String,
+    override val name: String,
     startInventory: Map<Bullet, UInt?> = mapOf()
 ) : MultiplayerSynchronized {
     val inventory: MutableMap<Bullet, Int?> = hashMapOf<Bullet, Int?>(

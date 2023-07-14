@@ -155,7 +155,9 @@ open class BulletObject protected constructor(
                 topic)
             )
         }
-        ground.destroy(this@BulletObject.position.x, strength = explosionWidth)
+        if (!proxy) {
+            ground.destroy(this@BulletObject.position.x, strength = explosionWidth, broadcast = true)
+        }
         currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
         intersectingBox.onBulletImpact(this)
         for (o in Game.instance.currentScene.children.values) {
@@ -172,6 +174,7 @@ open class BulletObject protected constructor(
                 o.adjustTransformToGround(ground)
             }
         }
+        Log.d(TAG, "destroying bullet")
         die()
     }
 
@@ -190,6 +193,10 @@ open class BulletObject protected constructor(
         }
     }
 
+    override fun dispose() {
+        super.dispose()
+        ConnectionManager.unregister(this)
+    }
 
     private fun updateGeometry() {
         dots.setAttribute("position", BufferAttribute(Float32Array(dotVertices.toTypedArray()).asDynamic(), 3))

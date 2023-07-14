@@ -80,6 +80,7 @@ class MainSceneMultiplayer(
                         synchronized = true
                     ),
                 )
+                currentBulletObject?.addImpactListener { onImpact() }
             }
             is GameMessageData.BulletImpact -> {
                 currentBulletObject?.die()

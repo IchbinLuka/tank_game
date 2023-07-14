@@ -114,6 +114,17 @@ object ConnectionManager : MessageBroadcaster {
         synchronizedObjects[m.topic]!!.add(WeakRef(m))
     }
 
+    fun unregister(m: MultiplayerSynchronized) {
+        Log.d(TAG, "unregistering $m on ${m.topic}")
+        val iterator = synchronizedObjects[m.topic]?.iterator() ?: return
+        for (o in iterator) {
+            if (o.deref()?.name == m.name) {
+                iterator.remove()
+                return
+            }
+        }
+    }
+
 
     @OptIn(ExperimentalSerializationApi::class)
     fun onMessage(message: MessageEvent) {
