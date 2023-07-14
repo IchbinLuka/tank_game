@@ -27,9 +27,7 @@ class ParticleTestScene(
         position.z = 20.0
     }
 
-    override val _children: MutableMap<String, GameObject> = hashMapOf(
-        "particleSystem" to particleSystem
-    )
+    override val initialChildren: Collection<GameObject> = listOf(particleSystem)
 
     override val scene = Scene().apply {
         add(AmbientLight(color = Color(0xffffff)))

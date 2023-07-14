@@ -31,7 +31,7 @@ class MultiplayerTank(
     }
 
     override fun createBulletArgs(velocity: Double): BulletObjectArgs {
-        return super.createBulletArgs(velocity).copy(synchronized = true)
+        return super.createBulletArgs(velocity).copy(synchronized = true, proxy = false)
     }
 
     override fun onMessage(message: GameMessageData) {

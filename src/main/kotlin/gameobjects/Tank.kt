@@ -24,17 +24,19 @@ open class Tank(
     val startPosition: Vector3,
     private val startRotation: Euler = Euler(),
     val player: Player,
+    override val name: String = player.name
 ) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
     override fun onBulletImpact(bullet: BulletObject) {}
 
-    override val hitBox: CuboidHitBox = CuboidHitBox(
+    final override val hitBox: CuboidHitBox = CuboidHitBox(
         size = Vector3(5, 10, 5),
         associatedObject = this
     ).apply {
         position.x = -2.5
     }
 
-    override val _children: MutableMap<String, GameObject> = hashMapOf("hitBox" to hitBox)
+
+    override val initialChildren: Collection<GameObject> = listOf(hitBox)
 
     private val _bullets: MutableMap<Bullet, Count?> by player::inventory
 
@@ -177,7 +179,7 @@ open class Tank(
         return bulletObject
     }
 
-    open protected fun createBulletArgs(velocity: Double): BulletObjectArgs = BulletObjectArgs(
+    protected open fun createBulletArgs(velocity: Double): BulletObjectArgs = BulletObjectArgs(
         cannonDirection * velocity,
         this
     )

@@ -12,12 +12,11 @@ import util.ResourceManager
 abstract class TankPresentingScene(
     private val tanks: Collection<Tank>
 ): GameScene() {
-    override val _children: HashMap<String, GameObject> = hashMapOf<String, GameObject>(
-        "Background" to Background(offset = Vector3(z = -150, y = -115))
+
+    override val initialChildren: Collection<GameObject> = mutableListOf<GameObject>(
+        Background(offset = Vector3(z = -150, y = -115)),
     ).apply {
-        for (tank in tanks) {
-            put(tank.uuid.toString(), tank)
-        }
+        addAll(tanks)
     }
 
     override val scene: Scene = Scene().apply {

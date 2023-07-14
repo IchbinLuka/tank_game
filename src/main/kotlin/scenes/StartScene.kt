@@ -14,7 +14,7 @@ class StartScene : TankPresentingScene(listOf(
 ).map {
     Tank(
         startPosition = Vector3(),
-        player = Player(color = it, name = "")
+        player = Player(color = it, name = "player${it.getHexString()}")
     )
 }) {
     override suspend fun loadAssets() {

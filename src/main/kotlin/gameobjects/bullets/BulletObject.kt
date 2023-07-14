@@ -77,7 +77,7 @@ open class BulletObject protected constructor(
         override fun onIntersectionEnter(intersectingBox: Hittable) {
             super.onIntersectionEnter(intersectingBox)
             Log.d(this@BulletObject.TAG, "intersected with ${intersectingBox.TAG}")
-            if (isNew) return
+            if (isNew || this@BulletObject.proxy) return
             this@BulletObject.onIntersectionEnter(intersectingBox)
         }
     }
@@ -137,14 +137,16 @@ open class BulletObject protected constructor(
     }
 
     private fun initConnection(arg: BulletObjectArgs) {
-        if (arg.proxy) {
+        if (arg.synchronized) {
             ConnectionManager.register(this)
         }
     }
 
     protected open fun onIntersectionEnter(intersectingBox: Hittable) {
+        Log.d(TAG, "onIntersectionEnter: $intersectingBox")
         if (intersectingBox !is BulletTarget) return
         if (!proxy) {
+            Log.d(TAG, "broadcasting bullet impact")
             ConnectionManager.broadcast(GameMessage.fromGameMessageData(
                 GameMessageData.BulletImpact(
                     pos = GameMessageData.Vec3.fromVector3(position),
@@ -218,17 +220,19 @@ open class BulletObject protected constructor(
             isNew = false
         }
 
-        broadcaster?.broadcast(
-            GameMessage.fromGameMessageData(
-                GameMessageData.GameObjectMoveUpdate(
-                    pos = GameMessageData.Vec3.fromVector3(position),
-                    velocity = GameMessageData.Vec3.fromVector3(velocity),
-                    acceleration = GameMessageData.Vec3.fromVector3(acceleration),
-                    rot = GameMessageData.Vec3.fromVector3(globalRotation.toVector3()),
+        if (!proxy) {
+            broadcaster?.broadcast(
+                GameMessage.fromGameMessageData(
+                    GameMessageData.GameObjectMoveUpdate(
+                        pos = GameMessageData.Vec3.fromVector3(position),
+                        velocity = GameMessageData.Vec3.fromVector3(velocity),
+                        acceleration = GameMessageData.Vec3.fromVector3(acceleration),
+                        rot = GameMessageData.Vec3.fromVector3(globalRotation.toVector3()),
+                    ),
+                    topic = topic
                 ),
-                topic = topic
-            ),
-        )
+            )
+        }
     }
 
     companion object : Factory()
@@ -261,7 +265,7 @@ open class BulletObject protected constructor(
             }
 
             is GameMessageData.BulletImpact -> {
-                currentScene.findObject<Hittable>(message.intersectingName)?.let {
+                currentScene.findObject<BulletTarget>(message.intersectingName)?.let {
                     onIntersectionEnter(it)
                 } ?: Log.w(TAG, "could not find intersecting object ${message.intersectingName}")
             }

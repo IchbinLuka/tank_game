@@ -27,27 +27,7 @@ data class GameState(val currentTank: Tank)
 
 class MainSceneSingleplayer(
     private val numPlayers: Int = 3
-) : GameScene(), Observable<GameState> by DefaultObservable(), MultiplayerSynchronized {
-
-    // region - Multiplayer -
-
-    override val topic: String = "MainScene"
-    override fun onMessage(message: GameMessageData) {
-        when (message) {
-            is GameMessageData.TankCreationData -> {
-                addGameObject(
-                    Tank(
-                        startPosition = message.pos.toVector3(),
-                        player = Player(color = message.color.toColor(), name = message.name),
-                    )
-                )
-            }
-
-            else -> {}
-        }
-    }
-
-    // endregion
+) : GameScene(), Observable<GameState> by DefaultObservable() {
 
     override val scene: Scene = Scene().apply {
         background = Color(0x3333ff)

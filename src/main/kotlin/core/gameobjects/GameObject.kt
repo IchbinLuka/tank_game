@@ -110,11 +110,18 @@ abstract class GameObject : Nameable {
     override fun equals(other: Any?): Boolean = other is GameObject && other.uuid == uuid
     override fun hashCode(): Int = uuid.toInt()
 
-    /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
-    open suspend fun preloadAssets() {
+    fun initChildren() {
+        for (child in _children.values) {
+            child.initChildren()
+        }
         for (child in initialChildren) {
             _children[child.name] = child
         }
+    }
+
+    /** Used for loading things that are crucial to the scene. The scene will be shown after this completed */
+    open suspend fun preloadAssets() {
+        initChildren()
         _children.values.forEach { it.preloadAssets() }
         _children.values.forEach { o -> o.renderable?.let { renderable?.add(it) } }
     }

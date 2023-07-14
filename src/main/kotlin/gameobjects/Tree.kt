@@ -28,9 +28,8 @@ class Tree(
         }
     }
 
-    override val _children: MutableMap<String, GameObject> = hashMapOf(
-        "hitBox" to hitBox
-    )
+    override val initialChildren: Collection<GameObject> = listOf(hitBox)
+
     override var renderable: Object3D = Group()
         private set
 

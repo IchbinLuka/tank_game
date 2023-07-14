@@ -37,8 +37,6 @@ class MainSceneMultiplayer(
 
     init {
         ConnectionManager.register(this)
-        currentTankIndex = tanks.indexOf(findObject<Tank>(startData.state.currentTurn))
-        currentTankNotifier.value = currentTank
     }
 
 
@@ -56,6 +54,12 @@ class MainSceneMultiplayer(
                 Topic.MAIN_SCENE
             )
         )
+    }
+
+    override fun onSceneReady() {
+        super.onSceneReady()
+        currentTankIndex = tanks.indexOf(findObject<Tank>(startData.state.currentTurn))
+        currentTankNotifier.value = currentTank
     }
 
     override fun onMessage(message: GameMessageData) {

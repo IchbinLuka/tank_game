@@ -47,6 +47,7 @@ abstract class MainScene(
             Background(name = "background"),
         ).apply {
             addAll(tanks)
+            addAll(startData.treePositions.map { Tree(Vector3(x = it)) })
         }
     }
 

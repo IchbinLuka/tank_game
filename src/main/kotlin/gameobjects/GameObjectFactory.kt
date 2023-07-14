@@ -24,6 +24,9 @@ abstract class GameObjectFactory<T, K>
 
     fun newGameObject(arg: K): T {
         if (!initialized) throw IllegalStateException("Factory is not initialized")
-        return createGameObject(arg).apply { init() }
+        return createGameObject(arg).apply {
+            initChildren()
+            init()
+        }
     }
 }

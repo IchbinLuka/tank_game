@@ -11,9 +11,8 @@ import three.js.DirectionalLight
 import three.js.PerspectiveCamera
 
 class GroundTestScene: GameScene() {
-    override val _children: MutableMap<String, GameObject> = hashMapOf(
-        "ground" to Ground()
-    )
+
+    override val initialChildren: Collection<GameObject> = listOf(Ground())
 
     override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
         position.z = 4.0
