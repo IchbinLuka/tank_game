@@ -7,7 +7,13 @@ plugins {
     kotlin("multiplatform")
     id("io.ktor.plugin") version "2.2.4"
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.kodein.mock.mockmp") version "1.15.0"
     application
+}
+
+
+mockmp {
+    usesHelper = true
 }
 
 group = "com.ichbinluka"

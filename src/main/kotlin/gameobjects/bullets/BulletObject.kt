@@ -12,12 +12,10 @@ import ext.*
 import gameobjects.GameObjectFactory
 import gameobjects.Ground
 import gameobjects.Tank
-import gameobjects.bullets.BigBulletObject.Companion.disc
 import gameobjects.particles.Explosion
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
 import three.js.*
-import util.AssetInitializer
 import util.Log
 import util.ResourceManager
 import kotlin.math.max
@@ -260,9 +258,13 @@ open class BulletObject protected constructor(
     override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.GameObjectMoveUpdate -> {
-                // position = message.pos.toVector3()
-                velocity = message.velocity.toVector3() + (message.pos.toVector3() - position) * 0.5
-                acceleration = message.acceleration.toVector3()
+                val newPos = message.pos.toVector3()
+                if (position.distanceTo(newPos).toDouble() > 5) {
+                    position = newPos
+                } else {
+                    velocity = message.velocity.toVector3() + (message.pos.toVector3() - position) * 0.5
+                    acceleration = message.acceleration.toVector3()
+                }
             }
 
             is GameMessageData.GameObjectMoveStart -> {

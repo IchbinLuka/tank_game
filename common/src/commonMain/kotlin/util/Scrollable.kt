@@ -19,7 +19,7 @@ interface Scrollable<T>: Iterator<T> {
 
 class ScrollableList<T>(
     elements: Collection<T>
-): List<T> by ArrayList<T>(elements = elements), Scrollable<T> {
+) : List<T> by ArrayList<T>(elements), Scrollable<T> {
 
     private var currentIndex = 0
 

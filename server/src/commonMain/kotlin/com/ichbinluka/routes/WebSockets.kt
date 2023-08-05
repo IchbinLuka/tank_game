@@ -39,7 +39,7 @@ fun Application.webSocketRoute(
 
             val session =
                 sessionService.getSessionById(messageData.sessionId) ?: throw NotFoundException("Session not found")
-            session.info.password?.let { if (it != messageData.password) return@webSocket }
+            session.toInfo().password?.let { if (it != messageData.password) return@webSocket }
             val token = uuid4().leastSignificantBits
             val player = Player(messageData.playerData, token, this)
             session.addPlayer(player)
@@ -76,14 +76,14 @@ fun Application.webSocketRoute(
                         if (session.isEmpty()) {
                             sessionService.closeSession(session.toInfo().id)
                         } else {
-                            if (player.data == session.info.host) {
+                            if (player.data == session.host) {
                                 session.host = player.data
                             }
                             session.broadcastUpdate()
                         }
                     }
                     is GameMessageData.GameStartRequest -> {
-                        if (player.data == session.info.host) {
+                        if (player.data == session.host) {
                             println("Got start request")
                             val startData = createGame(session.toInfo().players)
                             session.begin(startData)
