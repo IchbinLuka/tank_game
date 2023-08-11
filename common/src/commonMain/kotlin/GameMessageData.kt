@@ -160,6 +160,12 @@ sealed class GameMessageData {
     @Serializable
     object GameStartRequest : GameMessageData()
 
+    @Serializable
+    data object PingRequest : GameMessageData()
+
+    @Serializable
+    data object PingResponse : GameMessageData()
+
     companion object {
         private inline fun <reified T> decode(array: ByteArray): T = ProtoBuf.decodeFromByteArray<T>(array)
 

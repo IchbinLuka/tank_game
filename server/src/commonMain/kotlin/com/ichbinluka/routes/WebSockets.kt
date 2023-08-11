@@ -82,6 +82,7 @@ fun Application.webSocketRoute(
                             session.broadcastUpdate()
                         }
                     }
+
                     is GameMessageData.GameStartRequest -> {
                         if (player.data == session.host) {
                             println("Got start request")
@@ -95,6 +96,7 @@ fun Application.webSocketRoute(
                             )
                         }
                     }
+
                     is GameMessageData.BulletImpact -> {
                         session.broadcast(message, player)
                         session.nextTurn()
@@ -105,6 +107,18 @@ fun Application.webSocketRoute(
                             )
                         )
                     }
+
+                    is GameMessageData.PingRequest -> {
+                        outgoing.send(
+                            Frame.Binary(
+                                true, GameMessage.fromGameMessageData<GameMessageData.PingResponse>(
+                                    GameMessageData.PingResponse,
+                                    message.topic
+                                ).toByteArray()
+                            )
+                        )
+                    }
+
                     else -> {
                         session.broadcast(message, player)
                     }
