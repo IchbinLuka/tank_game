@@ -1,7 +1,10 @@
 @file:OptIn(ExperimentalSerializationApi::class)
 
-import kotlinx.serialization.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
+import kotlinx.serialization.serializer
 import sessions.SessionInfo
 import util.Direction
 
@@ -72,12 +75,13 @@ sealed class GameMessageData {
         val player: PlayerData,
         val pos: Vec3,
         val rot: Vec3,
-        val health: Double
+        val health: Double,
+        val bulletCounts: BulletCounts
     ) : GameMessageData()
 
     @Serializable
     data class BulletCreationData(
-        val type: String,
+        val type: Bullet,
         val velocity: Vec3
     ) : GameMessageData()
 
@@ -146,19 +150,67 @@ sealed class GameMessageData {
     ) : GameMessageData()
 
     @Serializable
-    object Disconnect : GameMessageData()
+    data class MessageRefusal(
+        val reason: String,
+        val message: GameMessage
+    ) : GameMessageData()
 
     @Serializable
-    object Empty : GameMessageData()
+    data class BulletCounts(
+        val counts: Array<Int?>
+    ) : GameMessageData() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || this::class != other::class) return false
+
+            other as BulletCounts
+
+            return counts.contentEquals(other.counts)
+        }
+
+        override fun hashCode(): Int {
+            return counts.contentHashCode()
+        }
+
+        /**
+         * Returns a map where the keys are the Bullets and the values are the corresponding counts.
+         *
+         * @return a map with the Bullets as keys and their counts as values
+         */
+        fun getCountsMap(): Map<Bullet, Int?> {
+            val entries = Bullet.entries.toTypedArray()
+            return counts.mapIndexedNotNull { index, i -> entries[index] to i }.toMap()
+        }
+
+        companion object {
+            /**
+             * Creates a new BulletCounts object from a map where the keys are the Bullets and the values are the
+             * corresponding counts.
+             *
+             * @param map a map with the Bullets as keys and their counts as values
+             * @return a new BulletCounts object
+             */
+            fun fromMap(map: Map<Bullet, Int?>): BulletCounts {
+                val entries = Bullet.entries.toTypedArray()
+                return BulletCounts(entries.map { map[it] }.toTypedArray())
+            }
+        }
+    }
 
     @Serializable
-    object Spawn : GameMessageData()
+    data object Disconnect : GameMessageData()
 
     @Serializable
-    object Death : GameMessageData()
+    data object Empty : GameMessageData()
 
     @Serializable
-    object GameStartRequest : GameMessageData()
+    data object Spawn : GameMessageData()
+
+    @Serializable
+    data object Death : GameMessageData()
+
+    @Serializable
+    data object GameStartRequest : GameMessageData()
 
     @Serializable
     data object PingRequest : GameMessageData()

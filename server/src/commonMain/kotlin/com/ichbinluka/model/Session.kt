@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.ClosedSendChannelException
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
 import sessions.Topic
+import util.Scrollable
 import util.ScrollableList
 
 
@@ -19,13 +20,9 @@ class Session(
 
     var host: PlayerData = creationInfo.host
 
-    var currentTurn: Player? = null
-    private set
+    val currentTurn: Player? get() = turnIterator?.current
 
-    var currentState: GameMessageData.GameStateData? = null
-    private set
-
-    private var turnIterator: Iterator<Player>? = null
+    private var turnIterator: Scrollable<Player>? = null
 
     fun addPlayer(player: Player) {
         players.add(player)
@@ -35,20 +32,17 @@ class Session(
         players.remove(player)
     }
 
-    fun begin(stateData: GameMessageData.GameStartData) {
-        currentState = stateData.state.copy()
+    fun begin(startData: GameMessageData.GameStartData) {
+
+        for (player in players) {
+            player.initPlayer(startData.state.tanks.first { it.player == player.data })
+        }
         turnIterator = ScrollableList(players)
-        currentTurn = players.first()
-        updateState()
+        turnIterator?.nextWhile { it.data.name != startData.state.currentTurn }
     }
 
     fun nextTurn() {
-        currentTurn = turnIterator?.next()
-        updateState()
-    }
-
-    private fun updateState() {
-        currentState = currentState?.copy(currentTurn = currentTurn!!.data.name)
+        turnIterator?.next()
     }
 
     suspend fun broadcast(message: GameMessage, player: Player? = null) {
@@ -85,6 +79,11 @@ class Session(
         host = host,
         players = players.map { it.data },
         password = creationInfo.password,
+    )
+
+    fun getState(): GameMessageData.GameStateData = GameMessageData.GameStateData(
+        tanks = players.map { it.toTankData() },
+        currentTurn = currentTurn!!.data.name
     )
 
     fun isEmpty(): Boolean = players.isEmpty()

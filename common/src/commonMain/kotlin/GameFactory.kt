@@ -14,7 +14,15 @@ fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
                     it,
                     GameMessageData.Vec3(x = (200 / (players.size - 1)) * index.toDouble() - 100, y = 0.0, z = 1.5),
                     GameMessageData.Vec3(0.0, 0.0, 0.0),
-                    1.0
+                    1.0,
+                    GameMessageData.BulletCounts.fromMap(
+                        mapOf(
+                            Bullet.Normal to null,
+                            Bullet.NoGravity to 5,
+                            Bullet.Big to 3,
+                            Bullet.Teleport to 1,
+                        )
+                    )
                 )
             },
             currentTurn = players.first().name

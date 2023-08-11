@@ -1,5 +1,6 @@
 package scenes
 
+import Bullet
 import GameMessageData
 import core.Game
 import core.Player
@@ -9,7 +10,6 @@ import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.Tree
-import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import org.w3c.dom.events.Event

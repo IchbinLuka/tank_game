@@ -1,14 +1,12 @@
 package gameobjects
 
+import Bullet
 import core.CuboidHitBox
 import core.Hittable
 import core.Player
 import core.gameobjects.GameObject
 import ext.*
-import gameobjects.bullets.Bullet
-import gameobjects.bullets.BulletObject
-import gameobjects.bullets.BulletObjectArgs
-import gameobjects.bullets.BulletTarget
+import gameobjects.bullets.*
 import gameobjects.particles.Fire
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch

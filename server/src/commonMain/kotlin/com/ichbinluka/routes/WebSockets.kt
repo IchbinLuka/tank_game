@@ -6,6 +6,7 @@ import GameMessage
 import GameMessageData
 import MessageType
 import com.benasher44.uuid.uuid4
+import com.ichbinluka.exceptions.MissingBulletException
 import com.ichbinluka.model.Player
 import com.ichbinluka.services.GameSessionService
 import createGame
@@ -71,6 +72,24 @@ fun Application.webSocketRoute(
                 val message = GameMessage.fromByteArray(frame.data)
                 val messageData = GameMessageData.fromGameMessage(message)
                 when (messageData) {
+                    is GameMessageData.BulletCreationData -> {
+                        try {
+                            player.shoot(messageData.type)
+                            session.broadcast(message, player)
+                        } catch (e: MissingBulletException) {
+                            outgoing.send(
+                                Frame.Binary(
+                                    true, GameMessage.fromGameMessageData(
+                                        GameMessageData.MessageRefusal(
+                                            "You don't have any bullets of that type",
+                                            message
+                                        ),
+                                        message.topic
+                                    ).toByteArray()
+                                )
+                            )
+                        }
+                    }
                     is GameMessageData.Disconnect -> {
                         session.removePlayer(player)
                         if (session.isEmpty()) {
@@ -102,7 +121,7 @@ fun Application.webSocketRoute(
                         session.nextTurn()
                         session.broadcast(
                             GameMessage.fromGameMessageData(
-                                session.currentState!!,
+                                session.getState(),
                                 Topic.MAIN_SCENE
                             )
                         )

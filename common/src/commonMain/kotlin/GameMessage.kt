@@ -31,6 +31,7 @@ enum class MessageType(val type: KType) {
     BulletImpact(typeOf<GameMessageData.BulletImpact>()),
     BulletCreation(typeOf<GameMessageData.BulletCreationData>()),
     Explosion(typeOf<GameMessageData.Explosion>()),
+    MessageRefusal(typeOf<GameMessageData.MessageRefusal>()),
     PingRequest(typeOf<GameMessageData.PingRequest>()),
     PingResponse(typeOf<GameMessageData.PingResponse>()),
 }

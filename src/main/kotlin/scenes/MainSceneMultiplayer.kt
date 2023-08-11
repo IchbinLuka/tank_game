@@ -1,20 +1,20 @@
 package scenes
 
+import Bullet
+import GameMessage
 import GameMessageData
 import PlayerData
 import core.ConnectionManager
 import core.Player
 import core.multiplayer.MultiplayerSynchronized
-import ext.TAG
 import ext.fromVector3
 import ext.toVector3
 import gameobjects.MultiplayerTank
 import gameobjects.Tank
-import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObjectArgs
+import gameobjects.bullets.createObject
 import sessions.Topic
 import three.js.Vector3
-import util.Log
 
 class MainSceneMultiplayer(
     startData: GameMessageData.GameStartData,
@@ -48,7 +48,7 @@ class MainSceneMultiplayer(
         ConnectionManager.broadcast(
             GameMessage.fromGameMessageData(
                 GameMessageData.BulletCreationData(
-                    type = type.name,
+                    type = type,
                     velocity = GameMessageData.Vec3.fromVector3(velocity)
                 ),
                 Topic.MAIN_SCENE
@@ -69,10 +69,8 @@ class MainSceneMultiplayer(
                 currentTankNotifier.value = currentTank
             }
             is GameMessageData.BulletCreationData -> {
-                val bullet = Bullet.valueOf(message.type)
-                Log.d(TAG, "Creating bullet ${bullet.name}")
                 currentBulletObject = addSynchronized(
-                    bullet.createObject,
+                    message.type.createObject,
                     BulletObjectArgs(
                         message.velocity.toVector3(),
                         currentTank,
