@@ -131,12 +131,12 @@ sealed class GameMessageData {
     data class ConnectionResponse(
         val successful: Boolean,
         val authToken: Long?
-    ): GameMessageData()
+    ) : GameMessageData()
 
     @Serializable
     data class SessionStateUpdate(
         val session: SessionInfo
-    ): GameMessageData()
+    ) : GameMessageData()
 
     @Serializable
     data class PlayerHealthUpdate(
@@ -157,7 +157,7 @@ sealed class GameMessageData {
 
     @Serializable
     data class BulletCounts(
-        val counts: Array<Int?>
+        val counts: Array<Int>
     ) : GameMessageData() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -177,9 +177,10 @@ sealed class GameMessageData {
          *
          * @return a map with the Bullets as keys and their counts as values
          */
-        fun getCountsMap(): Map<Bullet, Int?> {
+        fun getCountsMap(): HashMap<Bullet, Int?> {
             val entries = Bullet.entries.toTypedArray()
-            return counts.mapIndexedNotNull { index, i -> entries[index] to i }.toMap()
+            return HashMap(entries.mapIndexed { index, bullet -> bullet to counts[index].let { if (it < 0) null else it } }
+                .toMap())
         }
 
         companion object {
@@ -192,10 +193,17 @@ sealed class GameMessageData {
              */
             fun fromMap(map: Map<Bullet, Int?>): BulletCounts {
                 val entries = Bullet.entries.toTypedArray()
-                return BulletCounts(entries.map { map[it] }.toTypedArray())
+                return BulletCounts(entries.map { map[it] ?: -1 }.toTypedArray())
             }
         }
     }
+
+    @Serializable
+    data class GameEnd(
+        val first: String,
+        val second: String,
+        val third: String
+    ) : GameMessageData()
 
     @Serializable
     data object Disconnect : GameMessageData()

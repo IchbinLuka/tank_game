@@ -14,4 +14,6 @@ object Topic {
     const val GLOBAL = "global"
     const val MAIN_SCENE = "main_scene"
     const val GROUND = "ground"
+
+    fun player(player: String) = "player_$player"
 }

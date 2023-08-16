@@ -24,8 +24,7 @@ class Player(
     fun initPlayer(tankData: GameMessageData.TankData) {
         position = tankData.pos
         rotation = tankData.rot
-        bullets.clear()
-        bullets.putAll(tankData.bulletCounts.getCountsMap())
+        bullets = tankData.bulletCounts.getCountsMap()
     }
 
     /**

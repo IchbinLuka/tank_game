@@ -1,14 +1,15 @@
 package gameobjects
 
+import GameMessage
 import GameMessageData
-import core.ConnectionManager
-import core.HeightMap
-import core.HitBox
-import core.Hittable
+import core.*
 import core.gameobjects.GameObject
 import core.multiplayer.MessageBroadcaster
 import core.multiplayer.MultiplayerSynchronized
-import ext.*
+import ext.TAG
+import ext.minus
+import ext.plus
+import ext.toFloatList
 import gameobjects.bullets.BulletObject
 import gameobjects.bullets.BulletTarget
 import noise.GroundNoise
@@ -153,6 +154,9 @@ class Ground(
                     Topic.GROUND
                 )
             )
+        }
+        for (tank in currentScene.findObjects<Tank>()) {
+            tank.adjustTransformToGround(this)
         }
     }
 

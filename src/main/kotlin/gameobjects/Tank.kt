@@ -195,7 +195,7 @@ open class Tank(
         adjustTransformToGround(ground)
     }
 
-    fun adjustTransformToGround(ground: Ground) {
+    open fun adjustTransformToGround(ground: Ground) {
         mainBone?.position?.let {
             val pos = mainBone!!.position.x
             it.y = ground.heightAt(pos)!!

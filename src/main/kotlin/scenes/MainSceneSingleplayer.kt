@@ -1,16 +1,15 @@
 package scenes
 
-import GameMessageData
+import Bullet
 import core.Game
 import core.Player
-import core.gameobjects.GameObject
-import core.multiplayer.MultiplayerSynchronized
-import ext.*
-import gameobjects.Background
+import ext.applyCustomMat
+import ext.aspectRatio
+import ext.enableShadows
+import ext.set
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.Tree
-import gameobjects.bullets.Bullet
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import org.w3c.dom.events.Event
@@ -19,6 +18,16 @@ import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
 import ui.MainTopBar
 import util.*
+import kotlin.collections.ArrayDeque
+import kotlin.collections.MutableList
+import kotlin.collections.filter
+import kotlin.collections.first
+import kotlin.collections.forEach
+import kotlin.collections.getOrNull
+import kotlin.collections.hashMapOf
+import kotlin.collections.isNotEmpty
+import kotlin.collections.listOf
+import kotlin.collections.set
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
@@ -66,9 +75,9 @@ class MainSceneSingleplayer(
                 name = data.first,
                 startInventory = hashMapOf(
                     Bullet.Normal to null,
-                    Bullet.NoGravity to 5u,
-                    Bullet.Big to 2u,
-                    Bullet.Teleport to 2u
+                    Bullet.NoGravity to 5,
+                    Bullet.Big to 2,
+                    Bullet.Teleport to 2
                 )
             ),
             startPosition = Vector3(x = (200 / (numPlayers - 1)) * it - 100, z = 1.5),

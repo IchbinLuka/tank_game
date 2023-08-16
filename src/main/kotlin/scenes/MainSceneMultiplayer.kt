@@ -29,7 +29,7 @@ class MainSceneMultiplayer(
 
     override val tanks: MutableList<Tank> = startData.state.tanks.map {
         MultiplayerTank(
-            player = Player.fromPlayerData(it.player),
+            player = Player.fromTankData(it),
             startPosition = it.pos.toVector3(),
             proxy = it.player.name == player.name
         ).apply { addDeathListener { deadPlayers.addFirst(player) } }
@@ -38,10 +38,6 @@ class MainSceneMultiplayer(
     init {
         ConnectionManager.register(this)
     }
-
-
-
-
 
     override fun onBulletCreation(type: Bullet, velocity: Vector3) {
         super.onBulletCreation(type, velocity)
@@ -67,6 +63,12 @@ class MainSceneMultiplayer(
             is GameMessageData.GameStateData -> {
                 currentTankIndex = tanks.indexOf(findObject<Tank>(message.currentTurn))
                 currentTankNotifier.value = currentTank
+                val tankNames = tanks.associateBy { it.player.name }
+                for (tank in message.tanks) {
+                    val gameTank = tankNames[tank.player.name]!!
+                    gameTank.player.onMessage(tank.bulletCounts)
+                    gameTank.player.onMessage(GameMessageData.PlayerHealthUpdate(tank.health))
+                }
             }
             is GameMessageData.BulletCreationData -> {
                 currentBulletObject = addSynchronized(

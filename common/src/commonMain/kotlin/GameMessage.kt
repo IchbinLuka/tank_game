@@ -8,7 +8,7 @@ import kotlinx.serialization.protobuf.ProtoBuf
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-
+@Suppress("unused")
 enum class MessageType(val type: KType) {
     Death(typeOf<GameMessageData.Death>()),
     TransformationUpdate(typeOf<GameMessageData.TransformationUpdate>()),
@@ -34,9 +34,10 @@ enum class MessageType(val type: KType) {
     MessageRefusal(typeOf<GameMessageData.MessageRefusal>()),
     PingRequest(typeOf<GameMessageData.PingRequest>()),
     PingResponse(typeOf<GameMessageData.PingResponse>()),
+    GameEnd(typeOf<GameMessageData.GameEnd>()),
 }
 
-val typeMessageTypeMap: Map<KType, MessageType> = MessageType.values().associateBy { it.type }
+val typeMessageTypeMap: Map<KType, MessageType> = MessageType.entries.associateBy { it.type }
 
 @Serializable
 data class GameMessage(
