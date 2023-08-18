@@ -26,8 +26,25 @@ class MultiplayerTank(
     private val urgentBroadcaster = ConnectionManager
 
 
+    fun getTransformationUpdate(): GameMessageData.TransformationUpdate = GameMessageData.TransformationUpdate(
+        pos = GameMessageData.Vec3.fromVector3(position),
+        rot = GameMessageData.Vec3.fromVector3(rotation.toVector3())
+    )
+
     init {
         ConnectionManager.register(this)
+    }
+
+    override fun damage(amount: Double) {
+        super.damage(amount)
+        broadcaster.broadcast(
+            GameMessage.fromGameMessageData(
+                GameMessageData.PlayerHealthUpdate(
+                    newHealth = health
+                ),
+                topic
+            )
+        )
     }
 
     override fun createBulletArgs(velocity: Double): BulletObjectArgs {
@@ -42,12 +59,17 @@ class MultiplayerTank(
             }
 
             is GameMessageData.Death -> {
-                die()
+                // die()
+                damage(1.0)
             }
 
             is GameMessageData.CannonUpdateData -> {
                 cannon?.rotation?.z = message.angle
                 setDirection(message.direction)
+            }
+
+            is GameMessageData.PlayerHealthUpdate -> {
+                health = message.newHealth
             }
 
             else -> {}
@@ -73,14 +95,11 @@ class MultiplayerTank(
         urgentBroadcaster.broadcast(GameMessage.fromGameMessageData(GameMessageData.Death, topic))
     }
 
-    override fun move(vector3: Vector3, deltaTime: Double, ground: Ground) {
-        super.move(vector3, deltaTime, ground)
+    override fun adjustTransformToGround(ground: Ground) {
+        super.adjustTransformToGround(ground)
         broadcaster.broadcast(
             GameMessage.fromGameMessageData(
-                GameMessageData.TransformationUpdate(
-                    pos = GameMessageData.Vec3.fromVector3(position),
-                    rot = GameMessageData.Vec3.fromVector3(rotation.toVector3())
-                ),
+                getTransformationUpdate(),
                 topic
             )
         )

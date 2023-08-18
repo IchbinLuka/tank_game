@@ -7,6 +7,8 @@ import kotlinx.serialization.protobuf.ProtoBuf
 import kotlinx.serialization.serializer
 import sessions.SessionInfo
 import util.Direction
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 @Serializable
 sealed class GameMessageData {
@@ -16,7 +18,13 @@ sealed class GameMessageData {
         val x: Double,
         val y: Double,
         val z: Double
-    ) : GameMessageData()
+    ) : GameMessageData() {
+        fun distanceTo(other: Vec3): Double {
+            return sqrt(
+                (other.x - x).pow(2) + (other.y - y).pow(2) + (other.z - z).pow(2)
+            )
+        }
+    }
 
     @Serializable
     data class GroundData(
@@ -67,8 +75,14 @@ sealed class GameMessageData {
     data class GameStartData(
         val state: GameStateData,
         val groundData: GroundData,
-        val treePositions: List<Double>
+        val trees: List<TreeInfo>
     ) : GameMessageData()
+
+    @Serializable
+    data class TreeInfo(
+        val pos: Double,
+        val name: String
+    )
 
     @Serializable
     data class TankData(
@@ -88,7 +102,8 @@ sealed class GameMessageData {
     @Serializable
     data class BulletImpact(
         val pos: Vec3,
-        val intersectingName: String
+        val intersectingName: String,
+        val type: Bullet
     ) : GameMessageData()
 
     @Serializable

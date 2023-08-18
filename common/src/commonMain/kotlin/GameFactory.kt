@@ -6,7 +6,7 @@ const val TREE_COUNT = 40
 fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
     val heightMap = GroundNoise().allValues()
     val random = Random.Default
-    val trees = List(TREE_COUNT) { random.nextDouble() * 600 - 300 }
+    val trees = List(TREE_COUNT) { GameMessageData.TreeInfo(random.nextDouble() * 600 - 300, "tree_$it") }
     return GameMessageData.GameStartData(
         state = GameMessageData.GameStateData(
             players.mapIndexed { index, it ->
@@ -30,6 +30,6 @@ fun createGame(players: Collection<PlayerData>): GameMessageData.GameStartData {
         groundData = GameMessageData.GroundData(
             heightMap,
         ),
-        treePositions = trees
+        trees = trees
     )
 }

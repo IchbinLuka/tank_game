@@ -1,6 +1,7 @@
 package core
 
 import Bullet
+import GameMessage
 import GameMessageData
 import PlayerData
 import core.multiplayer.MultiplayerSynchronized
@@ -12,7 +13,8 @@ import util.ValueNotifier
 class Player(
     val color: Color,
     override val name: String,
-    startInventory: Map<Bullet, Int?> = mapOf()
+    startInventory: Map<Bullet, Int?> = mapOf(),
+    synchronizeUpdates: Boolean = false
 ) : MultiplayerSynchronized {
     val inventory: MutableMap<Bullet, Int?> = hashMapOf<Bullet, Int?>(
         Bullet.Normal to null
@@ -23,6 +25,19 @@ class Player(
 
     init {
         inventory.putAll(startInventory)
+
+        ConnectionManager.register(this)
+        if (synchronizeUpdates) {
+            healthNotifier.addListener {
+                ConnectionManager.broadcast(
+                    GameMessage.fromGameMessageData(
+                        GameMessageData.PlayerHealthUpdate(
+                            it
+                        ), topic
+                    )
+                )
+            }
+        }
     }
 
     override val topic: String = Topic.player(name)
@@ -36,6 +51,7 @@ class Player(
             is GameMessageData.BulletCounts -> {
                 inventory.putAll(message.getCountsMap())
             }
+
             else -> {}
         }
     }

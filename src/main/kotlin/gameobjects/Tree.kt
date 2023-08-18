@@ -13,7 +13,8 @@ import util.Log
 import util.ResourceManager
 
 class Tree(
-    private val startPosition: Vector3
+    private val startPosition: Vector3,
+    override val name: String
 ): GameObject(), BulletTarget, Hittable {
 
     override val hitBox: HitBox = CuboidHitBox(

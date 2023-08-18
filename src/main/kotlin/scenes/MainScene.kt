@@ -47,7 +47,7 @@ abstract class MainScene(
             Background(name = "background"),
         ).apply {
             addAll(tanks)
-            addAll(startData.treePositions.map { Tree(Vector3(x = it)) })
+            addAll(startData.trees.map { Tree(startPosition = Vector3(x = it.pos), name = it.name) })
         }
     }
 
@@ -81,11 +81,23 @@ abstract class MainScene(
         ).apply { addDeathListener { deadPlayers.addFirst(player) } }
     }*/
 
-    protected open val tanks = startData.state.tanks.map {
+    protected fun isGameOver(): Boolean {
+        return deadPlayers.size >= tanks.size - 1
+    }
+
+
+    protected open val tanks: List<Tank> = startData.state.tanks.map {
         Tank(
             player = Player.fromPlayerData(it.player),
             startPosition = it.pos.toVector3(),
-        ).apply { addDeathListener { deadPlayers.addFirst(player) } }
+        ).apply {
+            addDeathListener {
+                deadPlayers.addFirst(player)
+                if (isGameOver()) {
+                    endGame()
+                }
+            }
+        }
     }.toMutableList()
 
     abstract fun isProxy(tank: GameMessageData.TankData): Boolean
@@ -148,7 +160,7 @@ abstract class MainScene(
                         onImpact()
                     }
                 }
-                onBulletCreation(currentTank.currentBullet, currentBulletObject!!.velocity)
+                onBulletCreation(currentBulletObject!!.type, currentBulletObject!!.velocity)
             }
         }
         window.addEventListener("pointermove", pointerMove)
@@ -175,10 +187,7 @@ abstract class MainScene(
     private fun nextTank() {
         val aliveTanks = tanks.filter { it.active }
         if (aliveTanks.size <= 1) {
-            for (tank in aliveTanks) {
-                deadPlayers.addFirst(tank.player)
-            }
-            Game.instance.currentScene = GameEndScene(deadPlayers)
+            endGame()
             return
         } else {
             do {
@@ -187,6 +196,13 @@ abstract class MainScene(
         }
         updateAimingStrength()
         currentTankNotifier.value = currentTank
+    }
+
+    protected fun endGame() {
+        for (tank in tanks.filter { it.active }) {
+            deadPlayers.addFirst(tank.player)
+        }
+        Game.instance.currentScene = GameEndScene(deadPlayers)
     }
 
     override suspend fun preloadAssets() {
@@ -207,8 +223,8 @@ abstract class MainScene(
         for (tank in tanks) {
             tank.adjustTransformToGround(ground)
         }
-        for ((tree, pos) in findObjects<Tree>() zip startData.treePositions) {
-            tree.position.x = pos
+        for ((tree, startTree) in findObjects<Tree>() zip startData.trees) {
+            tree.position.x = startTree.pos
             tree.position.y = ground.heightAt(tree.position.x) ?: 0.0
         }
         centerCamera()

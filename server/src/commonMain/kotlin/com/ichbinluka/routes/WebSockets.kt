@@ -71,6 +71,7 @@ fun Application.webSocketRoute(
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
                 val messageData = GameMessageData.fromGameMessage(message)
+                println("Received message: $messageData on topic ${message.topic}")
                 when (messageData) {
                     is GameMessageData.BulletCreationData -> {
                         try {
@@ -118,13 +119,24 @@ fun Application.webSocketRoute(
 
                     is GameMessageData.BulletImpact -> {
                         session.broadcast(message, player)
-                        session.nextTurn()
-                        session.broadcast(
-                            GameMessage.fromGameMessageData(
-                                session.getState(),
-                                Topic.MAIN_SCENE
+
+                        if (session.nextTurn()) {
+                            session.broadcast(
+                                GameMessage.fromGameMessageData(
+                                    session.getState(),
+                                    Topic.MAIN_SCENE
+                                )
                             )
-                        )
+                        } else {
+                            session.broadcast(
+                                GameMessage.fromGameMessageData(
+                                    GameMessageData.GameEnd("", "", ""),
+                                    Topic.MAIN_SCENE
+                                )
+                            )
+                            break // Game is over → close connection
+                        }
+
                     }
 
                     is GameMessageData.PingRequest -> {
@@ -138,9 +150,25 @@ fun Application.webSocketRoute(
                         )
                     }
 
+                    is GameMessageData.Death -> {
+                        player.health = 0.0
+                        session.broadcast(message, player)
+                    }
+
+                    is GameMessageData.TransformationUpdate -> {
+                        if (message.topic == Topic.player(player.data.name)) {
+                            player.position = messageData.pos
+                            player.rotation = messageData.rot
+                        }
+                        session.broadcast(message, player)
+                    }
+
                     else -> {
                         session.broadcast(message, player)
                     }
+                }
+                if (session.host == player.data) {
+                    sessionService.closeSession(session.id)
                 }
             }
         }

@@ -32,7 +32,14 @@ class MainSceneMultiplayer(
             player = Player.fromTankData(it),
             startPosition = it.pos.toVector3(),
             proxy = it.player.name == player.name
-        ).apply { addDeathListener { deadPlayers.addFirst(player) } }
+        ).apply {
+            addDeathListener {
+                deadPlayers.addFirst(player)
+                if (isGameOver()) {
+                    endGame()
+                }
+            }
+        }
     }.toMutableList()
 
     init {
@@ -67,7 +74,8 @@ class MainSceneMultiplayer(
                 for (tank in message.tanks) {
                     val gameTank = tankNames[tank.player.name]!!
                     gameTank.player.onMessage(tank.bulletCounts)
-                    gameTank.player.onMessage(GameMessageData.PlayerHealthUpdate(tank.health))
+                    // TODO: synchronize health with server
+                    // gameTank.player.onMessage(GameMessageData.PlayerHealthUpdate(tank.health))
                 }
             }
             is GameMessageData.BulletCreationData -> {
@@ -86,6 +94,10 @@ class MainSceneMultiplayer(
                 currentBulletObject?.die()
                 onImpact()
                 // ground.destroy(message.pos.x, message.strength)
+            }
+
+            is GameMessageData.GameEnd -> {
+                endGame()
             }
             else -> {}
         }

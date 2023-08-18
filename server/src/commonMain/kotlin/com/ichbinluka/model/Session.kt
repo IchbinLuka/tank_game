@@ -3,6 +3,7 @@ package com.ichbinluka.model
 import GameMessage
 import GameMessageData
 import PlayerData
+import getBulletDamage
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import sessions.SessionCreationInfo
@@ -41,8 +42,17 @@ class Session(
         turnIterator?.nextWhile { it.data.name != startData.state.currentTurn }
     }
 
-    fun nextTurn() {
+    /**
+     * @return true if there are more turns to be played, false if the game is over
+     */
+    fun nextTurn(): Boolean {
+        if (players.filter { it.health > 0 }.size <= 1) {
+            turnIterator = null
+            return false
+        }
         turnIterator?.next()
+        turnIterator?.nextWhile { it.health <= 0 }
+        return true
     }
 
     suspend fun broadcast(message: GameMessage, player: Player? = null) {
@@ -60,6 +70,12 @@ class Session(
         }
         if (playersChanged) {
             broadcastUpdate()
+        }
+    }
+
+    suspend fun handleBulletImpact(data: GameMessageData.BulletImpact) {
+        for (player in players) {
+            player.health -= getBulletDamage(bullet = data.type, distance = data.pos.distanceTo(player.position))
         }
     }
 

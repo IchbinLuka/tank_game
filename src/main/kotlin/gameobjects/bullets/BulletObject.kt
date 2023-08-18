@@ -1,11 +1,13 @@
 package gameobjects.bullets
 
+import Bullet
 import GameMessage
 import GameMessageData
 import core.*
 import core.gameobjects.GameObject
 import core.gameobjects.MovingGameObject
 import core.gameobjects.SynchronizedInitializer
+import core.multiplayer.MessageBroadcaster
 import core.multiplayer.MultiplayerSynchronized
 import core.multiplayer.RateLimitedBroadcaster
 import ext.*
@@ -57,8 +59,9 @@ open class BulletObject protected constructor(
     override val topic: String = "${tank.player.name}_bullet"
     val proxy = arg.proxy
 
-    protected val broadcaster: RateLimitedBroadcaster? =
+    private val broadcaster: RateLimitedBroadcaster? =
         if (arg.synchronized) RateLimitedBroadcaster(3, ConnectionManager) else null
+    private val urgentBroadcaster: MessageBroadcaster? = if (arg.synchronized) ConnectionManager else null
 
     // region - HitBox -
 
@@ -86,10 +89,12 @@ open class BulletObject protected constructor(
 
     // endregion
 
+    open val type: Bullet = Bullet.Normal
+
     open val gravity = Vector3(0, -20, 0)
 
-    open val explosionWidth: Double = 30.0
-    protected open val damage: Double = 0.4
+    private val explosionWidth: Double get() = type.explosionWidth
+    private val damage: Double get() = type.damage
 
     override val renderable: Object3D by lazy {
         Group().apply {
@@ -134,6 +139,20 @@ open class BulletObject protected constructor(
         initConnection(arg)
     }
 
+    protected open fun broadcastImpact(intersectingBox: Hittable) {
+        if (proxy) return
+        urgentBroadcaster?.broadcast(
+            GameMessage.fromGameMessageData(
+                GameMessageData.BulletImpact(
+                    pos = GameMessageData.Vec3.fromVector3(position),
+                    intersectingName = intersectingBox.name,
+                    type = type
+                ),
+                topic
+            )
+        )
+    }
+
     private fun initConnection(arg: BulletObjectArgs) {
         if (arg.synchronized) {
             ConnectionManager.register(this)
@@ -145,13 +164,7 @@ open class BulletObject protected constructor(
         if (intersectingBox !is BulletTarget) return
         if (!proxy) {
             Log.d(TAG, "broadcasting bullet impact")
-            ConnectionManager.broadcast(GameMessage.fromGameMessageData(
-                GameMessageData.BulletImpact(
-                    pos = GameMessageData.Vec3.fromVector3(position),
-                    intersectingName = intersectingBox.name
-                ),
-                topic)
-            )
+            broadcastImpact(intersectingBox)
         }
         if (!proxy) {
             ground.destroy(this@BulletObject.position.x, strength = explosionWidth, broadcast = true)
@@ -220,6 +233,13 @@ open class BulletObject protected constructor(
         }
         if (ground.heightAt(position.x) == null) {
             die()
+            urgentBroadcaster?.broadcast(
+                GameMessage.fromGameMessageData(
+                    GameMessageData.Death,
+                    topic
+                )
+            )
+            return
         }
         if (isNew) {
             isNew = false
@@ -277,6 +297,10 @@ open class BulletObject protected constructor(
                 currentScene.findObject<BulletTarget>(message.intersectingName)?.let {
                     onIntersectionEnter(it)
                 } ?: Log.w(TAG, "could not find intersecting object ${message.intersectingName}")
+            }
+
+            is GameMessageData.Death -> {
+                die()
             }
 
             else -> {}
