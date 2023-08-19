@@ -2,11 +2,12 @@
 
 package com.ichbinluka.routes
 
+import ConnectionResponseStatus
 import GameMessage
 import GameMessageData
-import MessageType
 import com.benasher44.uuid.uuid4
 import com.ichbinluka.exceptions.MissingBulletException
+import com.ichbinluka.extensions.send
 import com.ichbinluka.model.Player
 import com.ichbinluka.services.GameSessionService
 import createGame
@@ -17,8 +18,6 @@ import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.protobuf.ProtoBuf
 import sessions.Topic
 import sessions.WEBSOCKET_ROUTE
 
@@ -41,24 +40,28 @@ fun Application.webSocketRoute(
             val session =
                 sessionService.getSessionById(messageData.sessionId) ?: throw NotFoundException("Session not found")
             session.toInfo().password?.let { if (it != messageData.password) return@webSocket }
+            if (!session.playerConfigAvailable(messageData.playerData)) {
+                outgoing.send(
+                    GameMessageData.ConnectionResponse(
+                        successful = ConnectionResponseStatus.PlayerConfigUnavailable,
+                    ),
+                    Topic.CONNECTION_RESPONSE
+                )
+                return@webSocket
+            }
+
+
             val token = uuid4().leastSignificantBits
             val player = Player(messageData.playerData, token, this)
             session.addPlayer(player)
-            send(
-                Frame.Binary(
-                    true, GameMessage(
-                        Topic.CONNECTION_RESPONSE,
-                        MessageType.ConnectionResponse,
-                        ProtoBuf.encodeToByteArray(
-                            GameMessageData.ConnectionResponse(
-                                successful = true,
-                                authToken = token
-                            )
-                        )
-                    ).toByteArray()
-                )
-            )
 
+            outgoing.send(
+                GameMessageData.ConnectionResponse(
+                    successful = ConnectionResponseStatus.Success,
+                    authToken = token
+                ),
+                Topic.CONNECTION_RESPONSE
+            )
 
             session.broadcast(
                 GameMessage.fromGameMessageData<GameMessageData.SessionStateUpdate>(
@@ -71,7 +74,7 @@ fun Application.webSocketRoute(
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
                 val messageData = GameMessageData.fromGameMessage(message)
-                println("Received message: $messageData on topic ${message.topic}")
+                this@webSocketRoute.log.debug("Received message: $messageData on topic ${message.topic}")
                 when (messageData) {
                     is GameMessageData.BulletCreationData -> {
                         try {
@@ -105,7 +108,6 @@ fun Application.webSocketRoute(
 
                     is GameMessageData.GameStartRequest -> {
                         if (player.data == session.host) {
-                            println("Got start request")
                             val startData = createGame(session.toInfo().players)
                             session.begin(startData)
                             session.broadcast(

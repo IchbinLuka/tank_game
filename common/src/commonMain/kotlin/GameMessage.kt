@@ -69,7 +69,7 @@ data class GameMessage(
     companion object {
         fun fromByteArray(bytes: ByteArray): GameMessage = ProtoBuf.decodeFromByteArray(bytes)
 
-        inline fun <reified T: GameMessageData> fromGameMessageData(data: T,topic: String) = GameMessage(
+        inline fun <reified T : GameMessageData> fromGameMessageData(data: T, topic: String): GameMessage = GameMessage(
             data = ProtoBuf.encodeToByteArray<T>(data),
             topic = topic,
             type = typeMessageTypeMap[typeOf<T>()]!!

@@ -7,7 +7,6 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import sessions.SessionCreationInfo
 
 
@@ -25,14 +24,6 @@ fun Route.sessions(sessionService: GameSessionService) {
         }
     }
 
-    route("sessions/{id}/join") {
-        post {
-            val playerData = call.receive<PlayerData>()
-            val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("Invalid id")
-            val session = sessionService.getSessionById(id) ?: throw NotFoundException()
-        }
-    }
-
     route("sessions/{id}") {
         delete {
 
@@ -40,6 +31,14 @@ fun Route.sessions(sessionService: GameSessionService) {
         get {
             val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("Invalid id")
             call.respond(sessionService.getSessionById(id)?.toInfo() ?: throw NotFoundException())
+        }
+    }
+
+    route("sessions/{id}/player_config_available") {
+        get {
+            val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("Invalid id")
+            val data: PlayerData = call.receive()
+            call.respond(sessionService.getSessionById(id)?.playerConfigAvailable(data) ?: throw NotFoundException())
         }
     }
 }

@@ -23,5 +23,6 @@
   "waiting_room": "Warteraum",
   "session_name": "Name",
   "start_session": "Spiel starten",
-  "error_could_not_fetch_sessions": "Beim Abrufen der Spiele ist ein Fehler aufgetreten."
+  "error_could_not_fetch_sessions": "Beim Abrufen der Spiele ist ein Fehler aufgetreten.",
+  "please_use_other_name_color": "Bitte wähle einen anderen Namen oder eine andere Farbe."
 }

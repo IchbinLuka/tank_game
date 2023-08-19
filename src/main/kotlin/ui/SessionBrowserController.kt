@@ -3,6 +3,7 @@ package ui
 import PlayerData
 import core.ConnectionManager
 import exceptions.ConnectionFailedException
+import exceptions.InvalidPlayerConfigException
 import ext.TAG
 import ext.addClickListener
 import ext.fromId
@@ -23,15 +24,16 @@ class SessionBrowserController: UIController() {
     private val backButton get() = Element.fromId("backButton")
     private val newButton get() = Element.fromId("newSessionButton")
 
-    private fun joinSession(info: SessionInfo, playerData: PlayerData) {
-        MainScope().launch {
-            try {
-                ConnectionManager.connect(info.id, playerData)
-                val updatedSession = APIHelper.fetchSessionById(info.id)
-                GUIHelper.push(SessionViewController(updatedSession, playerData))
-            } catch (e: ConnectionFailedException) {
-                Log.e(TAG, "Could not connect to session")
-            }
+    private suspend fun joinSession(info: SessionInfo, playerData: PlayerData) {
+        try {
+            ConnectionManager.connect(info.id, playerData)
+            val updatedSession = APIHelper.fetchSessionById(info.id)
+            GUIHelper.push(SessionViewController(updatedSession, playerData))
+        } catch (e: ConnectionFailedException) {
+            Log.e(TAG, "Could not connect to session")
+        } catch (e: InvalidPlayerConfigException) {
+            Log.e(TAG, "Invalid player config")
+            throw e
         }
     }
 

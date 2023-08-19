@@ -54,10 +54,12 @@ object APIHelper {
             body = Json.encodeToString(info),
             headers = Json.encodeToDynamic(Headers(contentType = "application/json"))
         )).await()
-        if (response.status != 200.toShort()) {
-            throw IllegalStateException(response.body.toString())
+        when (response.status) {
+            200.toShort() -> return Json.decodeFromString(response.text().await())
+            409.toShort() -> throw IllegalStateException("Session with name ${info.name} already exists")
+            400.toShort() -> throw IllegalStateException("Invalid name")
+            else -> throw IllegalStateException(response.body.toString())
         }
-        return Json.decodeFromString<SessionInfo>(response.text().await())
     }
 
     @Suppress("unused")

@@ -2,6 +2,7 @@
 
 package core
 
+import ConnectionResponseStatus
 import GameMessage
 import GameMessageData
 import PlayerData
@@ -9,7 +10,9 @@ import core.multiplayer.MessageBroadcaster
 import core.multiplayer.MultiplayerSynchronized
 import decodeFromArrayBuffer
 import exceptions.ConnectionFailedException
-import ext.*
+import exceptions.InvalidPlayerConfigException
+import ext.TAG
+import ext.send
 import js.core.WeakRef
 import kotlinx.browser.window
 import kotlinx.coroutines.sync.Mutex
@@ -25,6 +28,7 @@ import org.w3c.dom.events.Event
 import sessions.Topic
 import sessions.WEBSOCKET_URL
 import util.Log
+import kotlin.collections.set
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -73,9 +77,6 @@ object ConnectionManager : MessageBroadcaster {
         socket!!.onerror = {}
         socket!!.onopen = {}
         suspendCoroutine<Boolean> { continuation ->
-            socket!!.onclose = {
-                continuation.resumeWithException(ConnectionFailedException())
-            }
             socket!!.send(
                 GameMessage.fromGameMessageData(
                     GameMessageData.ConnectionRequest(
@@ -87,18 +88,32 @@ object ConnectionManager : MessageBroadcaster {
             )
             socket!!.onmessage = {
                 socket!!.onmessage = {}
+                socket!!.onclose = {}
                 // it.data as js.buffer.ArrayBuffer
                 val buffer = it.data.unsafeCast<ArrayBuffer>()
                 val decodedMessage = ProtoBuf.decodeFromArrayBuffer<GameMessage>(buffer)
                 val messageData = GameMessageData.fromGameMessage(decodedMessage)
-                if (messageData is GameMessageData.ConnectionResponse && messageData.successful) {
-                    continuation.resume(true)
+                if (messageData is GameMessageData.ConnectionResponse) {
+                    Log.d(TAG, "Connection response received: ${messageData.successful}")
+                    when (messageData.successful) {
+                        ConnectionResponseStatus.Success -> {
+                            continuation.resume(true)
+                        }
+
+                        ConnectionResponseStatus.PlayerConfigUnavailable -> {
+                            continuation.resumeWithException(InvalidPlayerConfigException())
+                        }
+
+                        ConnectionResponseStatus.Failure -> continuation.resumeWithException(ConnectionFailedException())
+                    }
+
                 } else {
                     continuation.resumeWithException(ConnectionFailedException())
                 }
 
             }
         }
+        if (socket!!.readyState != WebSocket.OPEN) throw ConnectionFailedException()
         socket!!.onclose = {
             Log.d(TAG, "Connection closed")
         }

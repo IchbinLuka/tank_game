@@ -21,6 +21,8 @@ class Session(
 
     var host: PlayerData = creationInfo.host
 
+    val hasStarted: Boolean get() = currentTurn != null
+
     val currentTurn: Player? get() = turnIterator?.current
 
     private var turnIterator: Scrollable<Player>? = null
@@ -103,4 +105,10 @@ class Session(
     )
 
     fun isEmpty(): Boolean = players.isEmpty()
+    fun playerConfigAvailable(playerData: PlayerData): Boolean {
+        return players.none {
+            it.data.name == playerData.name ||
+                    it.data.color.toVec3().distanceTo(playerData.color.toVec3()) < 0.1
+        }
+    }
 }

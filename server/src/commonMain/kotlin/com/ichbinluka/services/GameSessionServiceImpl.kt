@@ -16,7 +16,11 @@ class GameSessionServiceImpl : GameSessionService {
 
     override fun getSessionById(sessionId: Long): Session? = sessions[sessionId]
 
-    override fun getPublicSessions(): Collection<Session> = sessions.values.filter { it.creationInfo.password == null }
+    override fun getPublicSessions(): Collection<Session> = sessions.values.filter {
+        it.creationInfo.password == null &&
+                !it.hasStarted &&
+                it.players.size < 5
+    }
 
     override fun addSession(session: Session): Long {
         val id = nextId

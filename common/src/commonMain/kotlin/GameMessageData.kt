@@ -10,6 +10,12 @@ import util.Direction
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+enum class ConnectionResponseStatus {
+    Success,
+    PlayerConfigUnavailable,
+    Failure
+}
+
 @Serializable
 sealed class GameMessageData {
 
@@ -144,8 +150,8 @@ sealed class GameMessageData {
 
     @Serializable
     data class ConnectionResponse(
-        val successful: Boolean,
-        val authToken: Long?
+        val successful: ConnectionResponseStatus,
+        val authToken: Long? = null
     ) : GameMessageData()
 
     @Serializable
