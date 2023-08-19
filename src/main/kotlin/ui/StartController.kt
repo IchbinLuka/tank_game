@@ -1,6 +1,9 @@
 package ui
 
+import ColorData
+import PlayerData
 import core.Game
+import createGame
 import ext.fromId
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -42,7 +45,14 @@ class StartController: UIController() {
 
         Element.fromId("startButton")?.apply {
             addEventListener("click", {
-                Game.instance.currentScene = MainSceneSingleplayer(numPlayers = playersSlider?.value?.toIntOrNull() ?: 3)
+                val playerCount = playersSlider?.value?.toIntOrNull() ?: 3
+                Game.instance.currentScene = MainSceneSingleplayer(startData = createGame(List(playerCount) {
+                    val (name, color) = MainSceneSingleplayer.tankColors[it]
+                    PlayerData(
+                        name = name,
+                        color = ColorData(color.getHex().toInt()),
+                    )
+                }))
             })
         }
         Element.fromId("settingsButton")?.addEventListener("click", {

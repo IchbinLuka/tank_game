@@ -63,24 +63,6 @@ abstract class MainScene(
 
     protected val deadPlayers = ArrayDeque<Player>()
 
-    /*private val tanks = MutableList(numPlayers) {
-        val data = tankColors[it]
-        Tank(
-            player = Player(
-                color = data.second,
-                name = data.first,
-                startInventory = hashMapOf(
-                    Bullet.Normal to null,
-                    Bullet.NoGravity to 5u,
-                    Bullet.Big to 2u,
-                    Bullet.Teleport to 2u
-                )
-            ),
-            startPosition = Vector3(x = (200 / (numPlayers - 1)) * it - 100, z = 1.5),
-        ).apply { addDeathListener { deadPlayers.addFirst(player) } }
-        ).apply { addDeathListener { deadPlayers.addFirst(player) } }
-    }*/
-
     protected fun isGameOver(): Boolean {
         return deadPlayers.size >= tanks.size - 1
     }
@@ -88,7 +70,7 @@ abstract class MainScene(
 
     protected open val tanks: List<Tank> = startData.state.tanks.map {
         Tank(
-            player = Player.fromPlayerData(it.player),
+            player = Player.fromTankData(it),
             startPosition = it.pos.toVector3(),
         ).apply {
             addDeathListener {
@@ -168,7 +150,7 @@ abstract class MainScene(
         Game.instance.gameContainer.addEventListener("click", clickListener)
     }
 
-    private fun updateAimingStrength() {
+    protected fun updateAimingStrength() {
         aimingStrengthValue = min(
             aimIntersection.distanceTo(currentTank.position).toDouble() / MAX_POINTER_DISTANCE,
             max(currentTank.health, 0.3)
@@ -179,23 +161,9 @@ abstract class MainScene(
         camera.lookAt(Vector3(camera.position.x * 0.5, y = 100))
     }
 
+    /// Called when a bullet hits the ground. Resets the current bullet object.
     protected open fun onImpact() {
         currentBulletObject = null
-        // nextTank()
-    }
-
-    private fun nextTank() {
-        val aliveTanks = tanks.filter { it.active }
-        if (aliveTanks.size <= 1) {
-            endGame()
-            return
-        } else {
-            do {
-                currentTankIndex = (currentTankIndex + 1) % tanks.size
-            } while (!currentTank.active)
-        }
-        updateAimingStrength()
-        currentTankNotifier.value = currentTank
     }
 
     protected fun endGame() {
@@ -262,14 +230,6 @@ abstract class MainScene(
     }
 
     companion object {
-        val tankColors = listOf(
-            "Green" to Color(0x11710F),
-            "Orange" to Color(0xfc522f),
-            "Red" to Color(0xef3434),
-            "Blue" to Color(0x323cfc),
-            "Pink" to Color(0xde43f9)
-        )
-
         const val MAX_POINTER_DISTANCE = 125
     }
 }

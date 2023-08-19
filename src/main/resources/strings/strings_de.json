@@ -22,5 +22,6 @@
   "player_color": "Farbe",
   "waiting_room": "Warteraum",
   "session_name": "Name",
-  "start_session": "Spiel starten"
+  "start_session": "Spiel starten",
+  "error_could_not_fetch_sessions": "Beim Abrufen der Spiele ist ein Fehler aufgetreten."
 }

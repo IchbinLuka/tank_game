@@ -1,18 +1,8 @@
 package ui.components
 
-import core.ConnectionManager
-import exceptions.ConnectionFailedException
-import ext.TAG
 import ext.fromId
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import org.w3c.dom.Element
-import services.APIHelper
 import sessions.SessionInfo
-import ui.PlayerConfigurationController
-import ui.SessionViewController
-import util.GUIHelper
-import util.Log
 
 class SessionBrowserItem(
     private val info: SessionInfo,
@@ -32,4 +22,8 @@ class SessionBrowserItem(
             onJoin(info)
         })
     }
+}
+
+class SessionFetchError : UIComponent() {
+    override val componentSource: String = "session_fetch_error"
 }

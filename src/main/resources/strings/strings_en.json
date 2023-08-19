@@ -22,5 +22,6 @@
   "player_color": "Color",
   "waiting_room": "Waiting Room",
   "session_name": "Session Name",
-  "start_session": "Start Session"
+  "start_session": "Start Session",
+  "error_could_not_fetch_sessions": "Could not fetch sessions"
 }

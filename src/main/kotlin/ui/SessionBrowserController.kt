@@ -12,6 +12,7 @@ import org.w3c.dom.Element
 import services.APIHelper
 import sessions.SessionInfo
 import ui.components.SessionBrowserItem
+import ui.components.SessionFetchError
 import util.GUIHelper
 import util.Log
 
@@ -37,20 +38,30 @@ class SessionBrowserController: UIController() {
 
     override suspend fun init() {
         super.init()
-        val sessions = APIHelper.fetchSessions()
         val container = Element.fromId("sessionItemContainer")!!
-        for (session in sessions) {
+        try {
+            val sessions = APIHelper.fetchSessions()
+
+            for (session in sessions) {
+                insertComponent(
+                    SessionBrowserItem(session) {
+                        MainScope().launch {
+                            GUIHelper.push(PlayerConfigurationController { player ->
+                                joinSession(it, player)
+                            })
+                        }
+                    },
+                    container
+                )
+            }
+        } catch (e: Throwable) {
+            Log.e(TAG, "Could not fetch sessions: ${e.message}")
             insertComponent(
-                SessionBrowserItem(session) { session ->
-                    MainScope().launch {
-                        GUIHelper.push(PlayerConfigurationController { player ->
-                            joinSession(session, player)
-                        })
-                    }
-                },
+                SessionFetchError(),
                 container
             )
         }
+
         backButton?.addClickListener {
             MainScope().launch { GUIHelper.pop() }
         }

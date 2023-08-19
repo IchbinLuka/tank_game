@@ -2,12 +2,20 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects.kotlin_game.tank_game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects.kotlin_game.tank_game.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects.kotlin_game.tank_game.test.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects.kotlin_game.tank_game.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/statsjs_kt.tank_game.statsjs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/statsjs_kt.tank_game.statsjs_kt.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/statsjs_kt.tank_game.statsjs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/statsjs_kt.tank_game.statsjs_kt.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tank_game.iml" filepath="$PROJECT_DIR$/.idea/modules/tank_game.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tank_game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tank_game.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/tank_game.server.commonTest.iml" filepath="$PROJECT_DIR$/.idea/modules/server/tank_game.server.commonTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tank_game.test.iml" filepath="$PROJECT_DIR$/.idea/modules/tank_game.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/threejs_kt/tank_game.threejs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/threejs_kt/tank_game.threejs_kt.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/threejs_kt/tank_game.threejs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/threejs_kt/tank_game.threejs_kt.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/threejs_kt/threejs_kt.tank_game.threejs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/threejs_kt/threejs_kt.tank_game.threejs_kt.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/threejs_kt/threejs_kt.tank_game.threejs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/threejs_kt/threejs_kt.tank_game.threejs_kt.test.iml" />
     </modules>
   </component>
 </project>

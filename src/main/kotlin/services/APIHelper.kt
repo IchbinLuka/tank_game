@@ -1,14 +1,15 @@
-@file:OptIn(ExperimentalSerializationApi::class)
+@file:OptIn(ExperimentalSerializationApi::class, ExperimentalSerializationApi::class)
 
 package services
 
 import kotlinx.browser.window
 import kotlinx.coroutines.await
-import kotlinx.serialization.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToDynamic
-import org.w3c.fetch.Headers
 import org.w3c.fetch.RequestInit
 import sessions.HTTP_URL
 import sessions.SessionCreationInfo
@@ -41,7 +42,6 @@ object APIHelper {
     }
 
     suspend fun createSession(info: SessionCreationInfo): SessionInfo {
-        Headers()
         val response = window.fetch("${HTTP_URL}/sessions", RequestInit(
             method = "POST",
             body = Json.encodeToString(info),
@@ -53,5 +53,6 @@ object APIHelper {
         return Json.decodeFromString<SessionInfo>(response.text().await())
     }
 
+    @Suppress("unused")
     private const val TAG = "APIHelper"
 }
