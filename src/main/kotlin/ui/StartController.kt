@@ -5,11 +5,14 @@ import PlayerData
 import core.Game
 import createGame
 import ext.fromId
+import ext.tryCast
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLInputElement
 import scenes.MainSceneSingleplayer
+import services.APIHelper
 import util.GUIHelper
 import util.Localizations
 
@@ -20,6 +23,11 @@ class StartController: UIController() {
     override suspend fun init() {
         super.init()
         initListeners()
+        MainScope().launch {
+            if (!APIHelper.serverAvailable()) {
+                multiplayerButton?.disabled = true
+            }
+        }
     }
     override fun rebuild() {
         updatePlayersDisplay()
@@ -27,14 +35,13 @@ class StartController: UIController() {
 
     private var playersSlider: HTMLInputElement? = null
     private var playersDisplay: Element? = null
-    private var multiplayerButton: Element? = null
+    private val multiplayerButton: HTMLButtonElement? get() = Element.fromId("multiplayerButton")?.tryCast()
 
     private fun updatePlayersDisplay() {
         playersDisplay?.innerHTML = Localizations.getString("player_count", "count" to playersSlider!!.value)
     }
 
     private fun initListeners() {
-        multiplayerButton = Element.fromId("multiplayerButton")
         playersDisplay = Element.fromId("num_players_display")
         playersSlider = (Element.fromId("num_players_slider") as HTMLInputElement).apply {
             addEventListener("input", {

@@ -25,6 +25,13 @@ data class Headers(
 
 object APIHelper {
 
+    suspend fun serverAvailable(): Boolean = try {
+        val response = window.fetch("$HTTP_URL/status").await()
+        response.status == 200.toShort()
+    } catch (e: Throwable) {
+        false
+    }
+
     suspend fun fetchSessions(): Collection<SessionInfo> {
         val response = window.fetch("${HTTP_URL}/sessions").await()
         if (response.status != 200.toShort()) {

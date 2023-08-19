@@ -9,7 +9,6 @@ abstract class UIController {
     open val mainGUIName: String? = null
 
     open suspend fun init() {}
-    open suspend fun initAssets() {}
 
     suspend fun insertComponent(component: UIComponent, container: Element) {
         component.init()

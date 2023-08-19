@@ -5,11 +5,7 @@ import generated.ObjectConfiguration
 import generated.ObjectConfigurationItem
 import generated.Pos
 import generated.Rot
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import three.js.*
-import ui.UIController
-import util.GUIHelper
 
 abstract class GameScene: GameObject() {
 
@@ -41,13 +37,6 @@ abstract class GameScene: GameObject() {
                 it.position.set(conf.pos.x, conf.pos.y, conf.pos.z)
                 it.renderable?.rotation?.set(conf.rot.x, conf.rot.y, conf.rot.z)
             }
-        }
-    }
-
-    protected fun updateUI(uiController: UIController) {
-        GUIHelper.resetGUI()
-        MainScope().launch {
-            uiController.initAssets()
         }
     }
 }
