@@ -11,7 +11,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToDynamic
 import org.w3c.fetch.RequestInit
-import sessions.HTTP_URL
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
 
@@ -25,15 +24,32 @@ data class Headers(
 
 object APIHelper {
 
+    var host: String? = null
+        private set
+
+    // TODO: Allow HTTPS
+    val url: String? get() = host?.let { "http://$it" }
+
+    suspend fun updateHost(host: String): Boolean = try {
+        val response = window.fetch("http://$host/status").await()
+        val successful = response.status == 200.toShort()
+        if (successful) {
+            this.host = host
+        }
+        successful
+    } catch (e: Throwable) {
+        false
+    }
+
     suspend fun serverAvailable(): Boolean = try {
-        val response = window.fetch("$HTTP_URL/status").await()
+        val response = window.fetch("$url/status").await()
         response.status == 200.toShort()
     } catch (e: Throwable) {
         false
     }
 
     suspend fun fetchSessions(): Collection<SessionInfo> {
-        val response = window.fetch("${HTTP_URL}/sessions").await()
+        val response = window.fetch("${url}/sessions").await()
         if (response.status != 200.toShort()) {
             throw IllegalStateException(response.body.toString())
         }
@@ -41,7 +57,7 @@ object APIHelper {
     }
 
     suspend fun fetchSessionById(id: Long): SessionInfo {
-        val response = window.fetch("${HTTP_URL}/sessions/${id}").await()
+        val response = window.fetch("${url}/sessions/${id}").await()
         if (response.status != 200.toShort()) {
             throw IllegalStateException(response.body.toString())
         }
@@ -49,7 +65,8 @@ object APIHelper {
     }
 
     suspend fun createSession(info: SessionCreationInfo): SessionInfo {
-        val response = window.fetch("${HTTP_URL}/sessions", RequestInit(
+        val response = window.fetch(
+            "${url}/sessions", RequestInit(
             method = "POST",
             body = Json.encodeToString(info),
             headers = Json.encodeToDynamic(Headers(contentType = "application/json"))

@@ -23,11 +23,6 @@ class StartController: UIController() {
     override suspend fun init() {
         super.init()
         initListeners()
-        MainScope().launch {
-            if (!APIHelper.serverAvailable()) {
-                multiplayerButton?.disabled = true
-            }
-        }
     }
     override fun rebuild() {
         updatePlayersDisplay()
@@ -66,7 +61,11 @@ class StartController: UIController() {
             MainScope().launch { GUIHelper.push(SettingsController()) }
         })
         multiplayerButton?.addEventListener("click", {
-            MainScope().launch { GUIHelper.push(SessionBrowserController()) }
+            if (APIHelper.url == null) {
+                MainScope().launch { GUIHelper.push(ServerSettingsController()) }
+            } else {
+                MainScope().launch { GUIHelper.push(SessionBrowserController()) }
+            }
         })
         updatePlayersDisplay()
     }

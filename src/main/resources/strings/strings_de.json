@@ -24,5 +24,10 @@
   "session_name": "Name",
   "start_session": "Spiel starten",
   "error_could_not_fetch_sessions": "Beim Abrufen der Spiele ist ein Fehler aufgetreten.",
-  "please_use_other_name_color": "Bitte wähle einen anderen Namen oder eine andere Farbe."
+  "please_use_other_name_color": "Bitte wähle einen anderen Namen oder eine andere Farbe.",
+  "server_settings": "Server Einstellungen",
+  "server_url": "Hostname",
+  "could_not_connect_to_server": "Es konnte keine Verbindung zum Server hergestellt werden",
+  "invalid_server_url": "Ungültige Server URL",
+  "change_server": "Server wechseln"
 }

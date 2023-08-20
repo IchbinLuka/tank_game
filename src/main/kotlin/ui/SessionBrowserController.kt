@@ -23,6 +23,7 @@ class SessionBrowserController: UIController() {
 
     private val backButton get() = Element.fromId("backButton")
     private val newButton get() = Element.fromId("newSessionButton")
+    private val changeServerButton get() = Element.fromId("changeServerButton")
 
     private suspend fun joinSession(info: SessionInfo, playerData: PlayerData) {
         try {
@@ -80,6 +81,9 @@ class SessionBrowserController: UIController() {
                     }
                 })
             }
+        }
+        changeServerButton?.addClickListener {
+            MainScope().launch { GUIHelper.pushReplacement(ServerSettingsController()) }
         }
     }
 

@@ -24,5 +24,10 @@
   "session_name": "Session Name",
   "start_session": "Start Session",
   "error_could_not_fetch_sessions": "Could not fetch sessions",
-  "please_use_other_name_color": "Please use another name or color"
+  "please_use_other_name_color": "Please use another name or color",
+  "server_settings": "Server Settings",
+  "server_url": "Hostname",
+  "could_not_connect_to_server": "Could not connect to server",
+  "invalid_server_url": "Invalid server URL",
+  "change_server": "Change Server"
 }

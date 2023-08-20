@@ -24,9 +24,9 @@ import org.w3c.dom.ARRAYBUFFER
 import org.w3c.dom.BinaryType
 import org.w3c.dom.MessageEvent
 import org.w3c.dom.WebSocket
-import org.w3c.dom.events.Event
+import services.APIHelper
 import sessions.Topic
-import sessions.WEBSOCKET_URL
+import sessions.WEBSOCKET_ROUTE
 import util.Log
 import kotlin.collections.set
 import kotlin.coroutines.resume
@@ -40,6 +40,8 @@ object ConnectionManager : MessageBroadcaster {
     private var shouldReconnect = false
 
     private val connectMutex = Mutex()
+
+    private val url: String? get() = APIHelper.host?.let { "ws://$it" }
 
     init {
         window.onbeforeunload = {
@@ -60,8 +62,8 @@ object ConnectionManager : MessageBroadcaster {
     }
 
     suspend fun connect(sessionId: Long, playerData: PlayerData) = connectMutex.withLock {
-        suspendCoroutine<Event> { continuation ->
-            socket = WebSocket(WEBSOCKET_URL).apply {
+        suspendCoroutine { continuation ->
+            socket = WebSocket("$url/$WEBSOCKET_ROUTE").apply {
                 binaryType = BinaryType.ARRAYBUFFER
                 onopen = continuation::resume
 
