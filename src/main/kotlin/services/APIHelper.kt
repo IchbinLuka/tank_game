@@ -2,6 +2,7 @@
 
 package services
 
+import core.Game
 import kotlinx.browser.window
 import kotlinx.coroutines.await
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -24,8 +25,11 @@ data class Headers(
 
 object APIHelper {
 
-    var host: String? = null
-        private set
+    var host: String?
+        get() = Game.instance.settings.value.server
+        private set(value) {
+            Game.instance.settings.value = Game.instance.settings.value.copy(server = value)
+        }
 
     // TODO: Allow HTTPS
     val url: String? get() = host?.let { "http://$it" }
@@ -39,6 +43,10 @@ object APIHelper {
         successful
     } catch (e: Throwable) {
         false
+    }
+
+    fun resetHost() {
+        host = null
     }
 
     suspend fun serverAvailable(): Boolean = try {

@@ -1,14 +1,14 @@
 package core.models
 
 import kotlinx.browser.localStorage
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.set
 
 @kotlinx.serialization.Serializable
 data class Settings(
-    val language: String = "en"
+    val language: String = "en",
+    val server: String? = null
 ) {
     fun saveToCookies() {
         localStorage["settings"] = Json.encodeToString(this)

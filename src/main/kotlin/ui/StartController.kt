@@ -23,6 +23,14 @@ class StartController: UIController() {
     override suspend fun init() {
         super.init()
         initListeners()
+        MainScope().launch {
+            if (APIHelper.host == null) return@launch
+            multiplayerButton?.disabled = true
+            if (!APIHelper.serverAvailable()) {
+                APIHelper.resetHost()
+            }
+            multiplayerButton?.disabled = false
+        }
     }
     override fun rebuild() {
         updatePlayersDisplay()
