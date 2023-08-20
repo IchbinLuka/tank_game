@@ -16,11 +16,12 @@ fun main(args: Array<String>) {
     val parser = ArgParser("Tank Game Server")
     val keyStoreFilePath by parser.option(ArgType.String, fullName = "keystore", shortName = "k")
         .default("keystore.jks")
-    val keyStorePassword by parser.option(ArgType.String, fullName = "keystore-password", shortName = "p").required()
+    val keyStorePassword by parser.option(ArgType.String, fullName = "keystore-password").required()
     val keyAlias by parser.option(ArgType.String, fullName = "key-alias", shortName = "a").default("tank")
     val keyPassword by parser.option(ArgType.String, fullName = "key-password", shortName = "w").required()
     val port by parser.option(ArgType.Int, fullName = "port", shortName = "p").default(PORT)
 
+    parser.parse(args)
 
     val keyStoreFile = File(keyStoreFilePath)
     val keyStore = buildKeyStore {
