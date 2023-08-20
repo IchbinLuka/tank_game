@@ -62,12 +62,13 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-server-core:$ktor_version")
                 implementation("ch.qos.logback:logback-classic:$logback_version")
-
+                implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.5")
                 implementation("com.benasher44:uuid:0.7.1")
                 implementation(project(mapOf("path" to ":common")))
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
                 implementation("io.ktor:ktor-server-websockets:$ktor_version")
                 implementation("io.ktor:ktor-server-resources:$ktor_version")
+                implementation("io.ktor:ktor-network-tls-certificates:$ktor_version")
                 implementation("io.ktor:ktor-server-cio:$ktor_version")
                 implementation("io.ktor:ktor-server-cors:$ktor_version")
                 implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
