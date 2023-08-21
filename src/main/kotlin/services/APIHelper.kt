@@ -2,7 +2,6 @@
 
 package services
 
-import core.Game
 import kotlinx.browser.window
 import kotlinx.coroutines.await
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -12,6 +11,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToDynamic
 import org.w3c.fetch.RequestInit
+import sessions.DEFAULT_HOST
+import sessions.PORT
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
 
@@ -25,17 +26,17 @@ data class Headers(
 
 object APIHelper {
 
-    var host: String?
-        get() = Game.instance.settings.value.server
-        private set(value) {
-            Game.instance.settings.value = Game.instance.settings.value.copy(server = value)
-        }
+    var host: String? = "$DEFAULT_HOST:$PORT"
+//        get() = Game.instance.settings.value.server
+//        private set(value) {
+//            Game.instance.settings.value = Game.instance.settings.value.copy(server = value)
+//        }
 
     // TODO: Allow HTTPS
-    val url: String? get() = host?.let { "http://$it" }
+    val url: String? get() = host?.let { "https://$it" }
 
     suspend fun updateHost(host: String): Boolean = try {
-        val response = window.fetch("http://$host/status").await()
+        val response = window.fetch("https://$host/status").await()
         val successful = response.status == 200.toShort()
         if (successful) {
             this.host = host

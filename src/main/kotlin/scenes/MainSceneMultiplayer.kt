@@ -7,6 +7,7 @@ import PlayerData
 import core.ConnectionManager
 import core.Player
 import core.multiplayer.MultiplayerSynchronized
+import ext.TAG
 import ext.fromVector3
 import ext.toVector3
 import gameobjects.MultiplayerTank
@@ -15,6 +16,7 @@ import gameobjects.bullets.BulletObjectArgs
 import gameobjects.bullets.createObject
 import sessions.Topic
 import three.js.Vector3
+import util.Log
 
 class MainSceneMultiplayer(
     startData: GameMessageData.GameStartData,
@@ -61,18 +63,22 @@ class MainSceneMultiplayer(
 
     override fun onSceneReady() {
         super.onSceneReady()
-        currentTankIndex = tanks.indexOf(findObject<Tank>(startData.state.currentTurn))
+        currentTankIndex = tanks.indexOfFirst { it.player.name == startData.state.currentTurn }
         currentTankNotifier.value = currentTank
     }
 
     override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.GameStateData -> {
-                currentTankIndex = tanks.indexOf(findObject<Tank>(message.currentTurn))
+                currentTankIndex = tanks.indexOfFirst { it.player.name == message.currentTurn }
                 currentTankNotifier.value = currentTank
                 val tankNames = tanks.associateBy { it.player.name }
                 for (tank in message.tanks) {
-                    val gameTank = tankNames[tank.player.name]!!
+                    val gameTank = tankNames[tank.player.name]
+                    if (gameTank == null) {
+                        Log.e(TAG, "Tank ${tank.player.name} not found")
+                        continue
+                    }
                     gameTank.player.onMessage(tank.bulletCounts)
                     // TODO: synchronize health with server
                     // gameTank.player.onMessage(GameMessageData.PlayerHealthUpdate(tank.health))

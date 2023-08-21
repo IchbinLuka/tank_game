@@ -41,7 +41,7 @@ object ConnectionManager : MessageBroadcaster {
 
     private val connectMutex = Mutex()
 
-    private val url: String? get() = APIHelper.host?.let { "ws://$it" }
+    private val url: String? get() = APIHelper.host?.let { "wss://$it" }
 
     init {
         window.onbeforeunload = {

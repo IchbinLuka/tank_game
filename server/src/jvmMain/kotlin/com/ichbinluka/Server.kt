@@ -10,6 +10,7 @@ import kotlinx.cli.default
 import kotlinx.cli.required
 import sessions.PORT
 import java.io.File
+import java.security.KeyStore
 
 
 fun main(args: Array<String>) {
@@ -20,16 +21,22 @@ fun main(args: Array<String>) {
     val keyAlias by parser.option(ArgType.String, fullName = "key-alias", shortName = "a").default("tank")
     val keyPassword by parser.option(ArgType.String, fullName = "key-password", shortName = "w").required()
     val port by parser.option(ArgType.Int, fullName = "port", shortName = "p").default(PORT)
+    val selfSign by parser.option(ArgType.Boolean, fullName = "self-sign").default(false)
 
     parser.parse(args)
 
     val keyStoreFile = File(keyStoreFilePath)
-    val keyStore = buildKeyStore {
-        certificate(keyAlias) {
-            password = keyPassword
-            domains = listOf("localhost", "lukaborn.de")
+    val keyStore = if (selfSign) {
+        buildKeyStore {
+            certificate(keyAlias) {
+                password = keyPassword
+                domains = listOf("localhost", "lukaborn.de")
+            }
         }
+    } else {
+        KeyStore.getInstance("JKS").apply { load(keyStoreFile.inputStream(), keyStorePassword.toCharArray()) }
     }
+
     val environment = applicationEngineEnvironment {
         sslConnector(
             keyStore = keyStore,

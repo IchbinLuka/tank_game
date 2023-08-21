@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tank_game.iml" filepath="$PROJECT_DIR$/.idea/modules/tank_game.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tank_game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/tank_game.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/tank_game.server.commonTest.iml" filepath="$PROJECT_DIR$/.idea/modules/server/tank_game.server.commonTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/tank_game.server.jvmMain.iml" filepath="$PROJECT_DIR$/.idea/modules/server/tank_game.server.jvmMain.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/tank_game.statsjs_kt.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tank_game.test.iml" filepath="$PROJECT_DIR$/.idea/modules/tank_game.test.iml" />
