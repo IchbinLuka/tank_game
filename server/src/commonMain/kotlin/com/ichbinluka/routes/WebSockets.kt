@@ -119,7 +119,7 @@ fun Application.webSocketRoute(
                         }
                     }
 
-                    is GameMessageData.BulletImpact -> {
+                    is GameMessageData.BulletImpact, GameMessageData.BulletDespawn -> {
                         session.broadcast(message, player)
 
                         if (session.nextTurn()) {

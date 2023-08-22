@@ -232,13 +232,7 @@ open class BulletObject protected constructor(
             updateGeometry()
         }
         if (ground.heightAt(position.x) == null) {
-            die()
-            urgentBroadcaster?.broadcast(
-                GameMessage.fromGameMessageData(
-                    GameMessageData.Death,
-                    topic
-                )
-            )
+            despawn()
             return
         }
         if (isNew) {
@@ -258,6 +252,21 @@ open class BulletObject protected constructor(
                 ),
             )
         }
+    }
+
+    /**
+     * Kills the bullet and broadcasts the death.
+     */
+    protected fun despawn() {
+        if (proxy) return
+        die()
+        urgentBroadcaster?.broadcast(
+            GameMessage.fromGameMessageData(
+                GameMessageData.BulletDespawn,
+                topic
+            )
+        )
+
     }
 
     companion object : Factory()
@@ -299,7 +308,7 @@ open class BulletObject protected constructor(
                 } ?: Log.w(TAG, "could not find intersecting object ${message.intersectingName}")
             }
 
-            is GameMessageData.Death -> {
+            is GameMessageData.Death, GameMessageData.BulletDespawn -> {
                 die()
             }
 

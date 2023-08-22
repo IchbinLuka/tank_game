@@ -1,7 +1,6 @@
 package gameobjects.bullets
 
 import ext.times
-import gameobjects.Tank
 import three.js.Vector3
 
 class NoGravityBulletObject(
@@ -18,7 +17,7 @@ class NoGravityBulletObject(
     override fun update(delta: Double) {
         super.update(delta)
         if (position.y > 300) {
-            die()
+            despawn()
         }
     }
 

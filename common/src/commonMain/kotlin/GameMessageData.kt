@@ -230,6 +230,9 @@ sealed class GameMessageData {
     data object Disconnect : GameMessageData()
 
     @Serializable
+    data object BulletDespawn : GameMessageData()
+
+    @Serializable
     data object Empty : GameMessageData()
 
     @Serializable

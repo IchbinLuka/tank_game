@@ -35,6 +35,7 @@ enum class MessageType(val type: KType) {
     PingRequest(typeOf<GameMessageData.PingRequest>()),
     PingResponse(typeOf<GameMessageData.PingResponse>()),
     GameEnd(typeOf<GameMessageData.GameEnd>()),
+    BulletDespawn(typeOf<GameMessageData.BulletDespawn>()),
 }
 
 val typeMessageTypeMap: Map<KType, MessageType> = MessageType.entries.associateBy { it.type }
