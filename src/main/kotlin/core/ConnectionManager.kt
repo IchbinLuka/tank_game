@@ -78,6 +78,9 @@ object ConnectionManager : MessageBroadcaster {
         }
         socket!!.onerror = {}
         socket!!.onopen = {}
+        socket!!.onclose = {
+            Log.d(TAG, "Connection closed")
+        }
         suspendCoroutine<Boolean> { continuation ->
             socket!!.send(
                 GameMessage.fromGameMessageData(
@@ -90,7 +93,6 @@ object ConnectionManager : MessageBroadcaster {
             )
             socket!!.onmessage = {
                 socket!!.onmessage = {}
-                socket!!.onclose = {}
                 // it.data as js.buffer.ArrayBuffer
                 val buffer = it.data.unsafeCast<ArrayBuffer>()
                 val decodedMessage = ProtoBuf.decodeFromArrayBuffer<GameMessage>(buffer)

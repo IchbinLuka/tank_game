@@ -5,7 +5,6 @@ import GameMessageData
 import PlayerData
 import getBulletDamage
 import io.ktor.websocket.*
-import kotlinx.coroutines.channels.ClosedSendChannelException
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
 import sessions.Topic
@@ -65,7 +64,7 @@ class Session(
             if (p.id == player?.id) continue // Skip broadcaster
             try {
                 p.session.send(messageBytes)
-            } catch (e: ClosedSendChannelException) {
+            } catch (e: Throwable) {
                 iter.remove()
                 playersChanged = true
             }

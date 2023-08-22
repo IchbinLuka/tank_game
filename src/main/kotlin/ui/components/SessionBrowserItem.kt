@@ -1,8 +1,11 @@
 package ui.components
 
+import ext.TAG
+import ext.addClickListener
 import ext.fromId
 import org.w3c.dom.Element
 import sessions.SessionInfo
+import util.Log
 
 class SessionBrowserItem(
     private val info: SessionInfo,
@@ -18,9 +21,10 @@ class SessionBrowserItem(
 
     override fun onMounted() {
         super.onMounted()
-        Element.fromId("button_${info.id}")?.addEventListener("click", {
+        Element.fromId("button_${info.id}")?.addClickListener {
+            Log.d(TAG, "Button clicked")
             onJoin(info)
-        })
+        }
     }
 }
 
