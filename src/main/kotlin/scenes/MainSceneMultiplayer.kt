@@ -104,13 +104,15 @@ class MainSceneMultiplayer(
 
             is GameMessageData.GameEnd -> {
                 val nameTankMap = tanks.associateBy { it.player.name }
+                Log.d(TAG, nameTankMap.toString())
                 Game.instance.currentScene = GameEndScene(
-                    listOf(
+                    ((0..<tanks.size) zip listOf(
                         message.first,
                         message.second,
                         message.third
-                    ).map {
-                        nameTankMap[it]!!.player.apply {
+                    )).map { (_, name) ->
+                        Log.d(TAG, name)
+                        nameTankMap[name]!!.player.apply {
                             if (name != message.first) health = 0.0
                         }
                     }

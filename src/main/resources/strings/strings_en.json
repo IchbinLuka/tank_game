@@ -29,5 +29,7 @@
   "server_url": "Hostname",
   "could_not_connect_to_server": "Could not connect to server",
   "invalid_server_url": "Invalid server URL",
-  "change_server": "Change Server"
+  "change_server": "Change Server",
+  "reset": "Reset",
+  "save": "Save"
 }
