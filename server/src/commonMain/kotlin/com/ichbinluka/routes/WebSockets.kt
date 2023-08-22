@@ -10,6 +10,7 @@ import com.ichbinluka.exceptions.MissingBulletException
 import com.ichbinluka.extensions.send
 import com.ichbinluka.model.Player
 import com.ichbinluka.services.GameSessionService
+import com.ichbinluka.util.log
 import createGame
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
@@ -122,7 +123,11 @@ fun Application.webSocketRoute(
                     is GameMessageData.BulletImpact, GameMessageData.BulletDespawn -> {
                         session.broadcast(message, player)
 
-                        if (session.nextTurn()) {
+                        if (messageData is GameMessageData.BulletImpact) {
+                            session.handleBulletImpact(messageData)
+                        }
+                        val end = session.nextTurn()
+                        if (end == null) {
                             session.broadcast(
                                 GameMessage.fromGameMessageData(
                                     session.getState(),
@@ -132,7 +137,7 @@ fun Application.webSocketRoute(
                         } else {
                             session.broadcast(
                                 GameMessage.fromGameMessageData(
-                                    GameMessageData.GameEnd("", "", ""),
+                                    end,
                                     Topic.MAIN_SCENE
                                 )
                             )
@@ -158,7 +163,8 @@ fun Application.webSocketRoute(
                     }
 
                     is GameMessageData.TransformationUpdate -> {
-                        if (message.topic == Topic.player(player.data.name)) {
+                        if (message.topic == Topic.tank(player.data.name)) {
+                            log.debug("Updating position of {} to {}", player.data.name, messageData.pos)
                             player.position = messageData.pos
                             player.rotation = messageData.rot
                         }

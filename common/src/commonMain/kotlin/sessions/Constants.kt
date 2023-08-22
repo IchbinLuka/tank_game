@@ -16,4 +16,5 @@ object Topic {
     const val GROUND = "ground"
 
     fun player(player: String) = "player_$player"
+    fun tank(player: String) = "tank_$player"
 }

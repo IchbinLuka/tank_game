@@ -15,13 +15,12 @@ import gameobjects.GameObjectFactory
 import gameobjects.Ground
 import gameobjects.Tank
 import gameobjects.particles.Explosion
+import getBulletDamage
 import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
 import three.js.*
 import util.Log
 import util.ResourceManager
-import kotlin.math.max
-import kotlin.math.pow
 
 typealias ImpactListener = (Vector3) -> Unit
 
@@ -58,6 +57,7 @@ open class BulletObject protected constructor(
 
     override val topic: String = "${tank.player.name}_bullet"
     val proxy = arg.proxy
+    val synchronized = arg.synchronized
 
     private val broadcaster: RateLimitedBroadcaster? =
         if (arg.synchronized) RateLimitedBroadcaster(3, ConnectionManager) else null
@@ -176,9 +176,10 @@ open class BulletObject protected constructor(
                 o.damage(damage)
             } else {
                 val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
-                if (distance < explosionWidth) {
-                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
-                }
+                o.damage(getBulletDamage(distance, type))
+//                if (distance < explosionWidth) {
+//                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
+//                }
             }
 
             if (o is Tank) {

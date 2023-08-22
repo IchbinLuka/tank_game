@@ -26,6 +26,8 @@ class Session(
 
     private var turnIterator: Scrollable<Player>? = null
 
+    private val deadPlayers = ArrayDeque<PlayerData>()
+
     fun addPlayer(player: Player) {
         players.add(player)
     }
@@ -46,14 +48,22 @@ class Session(
     /**
      * @return true if there are more turns to be played, false if the game is over
      */
-    fun nextTurn(): Boolean {
-        if (players.filter { it.health > 0 }.size <= 1) {
+    fun nextTurn(): GameMessageData.GameEnd? {
+        val alivePlayers = players.filter { it.health > 0 }
+        if (alivePlayers.size <= 1) {
+            for (player in alivePlayers) {
+                deadPlayers.addFirst(player.data)
+            }
             turnIterator = null
-            return false
+            return GameMessageData.GameEnd(
+                first = deadPlayers.first().name,
+                second = deadPlayers.getOrNull(1)?.name ?: "",
+                third = deadPlayers.getOrNull(2)?.name ?: ""
+            )
         }
         turnIterator?.next()
         turnIterator?.nextWhile { it.health <= 0 }
-        return true
+        return null
     }
 
     suspend fun broadcast(message: GameMessage, player: Player? = null) {
@@ -74,9 +84,14 @@ class Session(
         }
     }
 
-    suspend fun handleBulletImpact(data: GameMessageData.BulletImpact) {
+    fun handleBulletImpact(data: GameMessageData.BulletImpact) {
         for (player in players) {
             player.health -= getBulletDamage(bullet = data.type, distance = data.pos.distanceTo(player.position))
+            if (player.health <= 0) {
+                deadPlayers.addFirst(player.data)
+            }
+            println("Player pos: ${player.position}, bullet pos: ${data.pos}")
+            println("Player ${player.data.name} health: ${player.health}")
         }
     }
 

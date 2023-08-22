@@ -166,10 +166,11 @@ abstract class MainScene(
         currentBulletObject = null
     }
 
-    protected fun endGame() {
+    protected open fun endGame() {
         for (tank in tanks.filter { it.active }) {
             deadPlayers.addFirst(tank.player)
         }
+        Log.d(TAG, "$tanks, length: ${tanks.size}")
         Game.instance.currentScene = GameEndScene(deadPlayers)
     }
 

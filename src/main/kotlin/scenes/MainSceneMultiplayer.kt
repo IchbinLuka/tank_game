@@ -5,13 +5,14 @@ import GameMessage
 import GameMessageData
 import PlayerData
 import core.ConnectionManager
+import core.Game
 import core.Player
 import core.multiplayer.MultiplayerSynchronized
 import ext.TAG
 import ext.fromVector3
 import ext.toVector3
+import ext.tryCast
 import gameobjects.MultiplayerTank
-import gameobjects.Tank
 import gameobjects.bullets.BulletObjectArgs
 import gameobjects.bullets.createObject
 import sessions.Topic
@@ -29,7 +30,7 @@ class MainSceneMultiplayer(
     override val topic: String = Topic.MAIN_SCENE
 
 
-    override val tanks: MutableList<Tank> = startData.state.tanks.map {
+    override val tanks: MutableList<MultiplayerTank> = startData.state.tanks.map {
         MultiplayerTank(
             player = Player.fromTankData(it),
             startPosition = it.pos.toVector3(),
@@ -80,8 +81,7 @@ class MainSceneMultiplayer(
                         continue
                     }
                     gameTank.player.onMessage(tank.bulletCounts)
-                    // TODO: synchronize health with server
-                    // gameTank.player.onMessage(GameMessageData.PlayerHealthUpdate(tank.health))
+                    gameTank.tryCast<MultiplayerTank>()?.onMessage(GameMessageData.PlayerHealthUpdate(tank.health))
                 }
             }
             is GameMessageData.BulletCreationData -> {
@@ -103,6 +103,18 @@ class MainSceneMultiplayer(
             }
 
             is GameMessageData.GameEnd -> {
+                val nameTankMap = tanks.associateBy { it.player.name }
+                Game.instance.currentScene = GameEndScene(
+                    listOf(
+                        message.first,
+                        message.second,
+                        message.third
+                    ).map {
+                        nameTankMap[it]!!.player.apply {
+                            if (name != message.first) health = 0.0
+                        }
+                    }
+                )
                 endGame()
             }
             else -> {}

@@ -9,9 +9,11 @@ import core.multiplayer.RateLimitedBroadcaster
 import ext.fromVector3
 import ext.toVector3
 import gameobjects.bullets.BulletObjectArgs
+import sessions.Topic
 import three.js.Euler
 import three.js.Vector2
 import three.js.Vector3
+import kotlin.math.max
 
 class MultiplayerTank(
     startPosition: Vector3,
@@ -20,10 +22,12 @@ class MultiplayerTank(
     private val proxy: Boolean = false,
 ) : Tank(startPosition, player = player, startRotation = startRotation), MultiplayerSynchronized {
 
-    override val topic: String = player.name
+    override val topic: String = Topic.tank(player.name)
 
     private val broadcaster = RateLimitedBroadcaster(10, ConnectionManager)
     private val urgentBroadcaster = ConnectionManager
+
+    override val invincible: Boolean = true
 
 
     fun getTransformationUpdate(): GameMessageData.TransformationUpdate = GameMessageData.TransformationUpdate(
@@ -33,18 +37,6 @@ class MultiplayerTank(
 
     init {
         ConnectionManager.register(this)
-    }
-
-    override fun damage(amount: Double) {
-        super.damage(amount)
-        broadcaster.broadcast(
-            GameMessage.fromGameMessageData(
-                GameMessageData.PlayerHealthUpdate(
-                    newHealth = health
-                ),
-                topic
-            )
-        )
     }
 
     override fun createBulletArgs(velocity: Double): BulletObjectArgs {
@@ -59,7 +51,6 @@ class MultiplayerTank(
             }
 
             is GameMessageData.Death -> {
-                // die()
                 damage(1.0)
             }
 
@@ -69,7 +60,12 @@ class MultiplayerTank(
             }
 
             is GameMessageData.PlayerHealthUpdate -> {
-                health = message.newHealth
+                if (!active) return
+                health = max(0.0, message.newHealth)
+                if (health == 0.0) {
+                    onDeath()
+                }
+                // super.damage(health - message.newHealth)
             }
 
             else -> {}
@@ -92,7 +88,7 @@ class MultiplayerTank(
     override fun onDeath() {
         super.onDeath()
         if (proxy) return
-        urgentBroadcaster.broadcast(GameMessage.fromGameMessageData(GameMessageData.Death, topic))
+        // urgentBroadcaster.broadcast(GameMessage.fromGameMessageData(GameMessageData.Death, topic))
     }
 
     override fun adjustTransformToGround(ground: Ground) {
