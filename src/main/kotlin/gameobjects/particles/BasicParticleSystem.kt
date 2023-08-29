@@ -1,7 +1,7 @@
 package gameobjects.particles
 
 import core.gameobjects.GameObject
-import ext.plusAssign
+import ext.plus
 import ext.times
 import ext.toDoubleList
 import ext.vector3
@@ -113,7 +113,7 @@ open class BasicParticleSystem(
         val size = (spawnBurst + ceil(particleLifetime / spawnDelta)).toInt()
         geometry.setAttribute(
             "position", BufferAttribute(
-                Float32Array(length = 3 * size).asDynamic(),
+                Float32Array(length = 3 * size).unsafeCast<ArrayLike<Number>>(),
                 3
             )
         )
@@ -187,10 +187,22 @@ open class BasicParticleSystem(
         for (i in 1..number) {
             val deltaTime = particleLifetimeRandomness * particleLifetime * (2 * Random.nextFloat() - 1)
             val deltaVelocity = velocityRandomness * startVelocity * (2 * Random.nextFloat() - 1)
+
             val point = emitter.randomPoint()
+            var velocity = point.second.vector3 * (startVelocity + deltaVelocity)
+
+            if (startDirectionRandomness > 0) {
+                velocity += Vector3(
+                    Random.nextDouble() - 0.5,
+                    Random.nextDouble() - 0.5,
+                    Random.nextDouble() - 0.5
+                ) * startDirectionRandomness * Random.nextDouble()
+            }
+
+
             particles.addFirst(
                 Particle(
-                    velocity = point.second.vector3 * (startVelocity + deltaVelocity),
+                    velocity = velocity,
                     birthTime = time + deltaTime,
                     // size = startSize,
                     // color = startColList,

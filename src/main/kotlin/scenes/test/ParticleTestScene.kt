@@ -3,7 +3,7 @@ package scenes.test
 import core.gameobjects.GameObject
 import ext.aspectRatio
 import gameobjects.particles.BasicParticleSystem
-import gameobjects.particles.emitter.SphereEmitter
+import gameobjects.particles.emitter.ConeEmitter
 import kotlinx.browser.window
 import scenes.GameScene
 import three.js.*
@@ -12,15 +12,22 @@ class ParticleTestScene(
     private val particleSystem: BasicParticleSystem = BasicParticleSystem(
         particleLifetime = 600.0,
         spawnBurst = 100,
-        emitter = SphereEmitter(Vector3(z = -50), 2.0, 0),
-        startVelocity = 10.0,
-        startSize = 2.0,
-        endSize = 10.0,
+        emitter = ConeEmitter(
+            position = Vector3(0, 0, 0),
+            radius = 2.0,
+            height = 10.0,
+            seed = 0
+        ),
+        startVelocity = 0.0,
+        startSize = 0.6,
+        endSize = 0.6,
+        gravity = 0.0,
+        spawnDelta = 1.0,
         startColor = Color(0xfcd125),
         endColor = Color(0xfc3a0f),
         startDirectionRandomness = 0.2,
         particleLifetimeRandomness = 0.3,
-        velocityRandomness = 0.3,
+        velocityRandomness = 0.0,
     )
 ): GameScene() {
     override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
