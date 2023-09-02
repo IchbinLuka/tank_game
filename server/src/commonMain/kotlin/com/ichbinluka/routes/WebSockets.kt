@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package com.ichbinluka.routes
 
 import ConnectionResponseStatus
@@ -9,6 +7,7 @@ import com.benasher44.uuid.uuid4
 import com.ichbinluka.exceptions.MissingBulletException
 import com.ichbinluka.extensions.send
 import com.ichbinluka.model.Player
+import com.ichbinluka.model.SessionStatus
 import com.ichbinluka.services.GameSessionService
 import com.ichbinluka.util.log
 import createGame
@@ -18,7 +17,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.serialization.ExperimentalSerializationApi
 import sessions.Topic
 import sessions.WEBSOCKET_ROUTE
 
@@ -31,17 +29,18 @@ fun Application.webSocketRoute(
     }
     routing {
         webSocket(WEBSOCKET_ROUTE) {
-            val message = withTimeoutOrNull(2000L) {
+            val firstMessage = withTimeoutOrNull(2000L) {
                 GameMessage.fromByteArray(incoming.receive().data)
             } ?: return@webSocket
 
-            val messageData = GameMessageData.fromGameMessage(message)
-            if (messageData !is GameMessageData.ConnectionRequest) return@webSocket
+            val requestMessageData = GameMessageData.fromGameMessage(firstMessage)
+            if (requestMessageData !is GameMessageData.ConnectionRequest) return@webSocket
 
             val session =
-                sessionService.getSessionById(messageData.sessionId) ?: throw NotFoundException("Session not found")
-            session.toInfo().password?.let { if (it != messageData.password) return@webSocket }
-            if (!session.playerConfigAvailable(messageData.playerData)) {
+                sessionService.getSessionById(requestMessageData.sessionId)
+                    ?: throw NotFoundException("Session not found")
+            session.toInfo().password?.let { if (it != requestMessageData.password) return@webSocket }
+            if (!session.playerConfigAvailable(requestMessageData.playerData)) {
                 outgoing.send(
                     GameMessageData.ConnectionResponse(
                         successful = ConnectionResponseStatus.PlayerConfigUnavailable,
@@ -53,7 +52,7 @@ fun Application.webSocketRoute(
 
 
             val token = uuid4().leastSignificantBits
-            val player = Player(messageData.playerData, token, this)
+            val player = Player(requestMessageData.playerData, token, this)
             session.addPlayer(player)
 
             outgoing.send(
@@ -75,11 +74,11 @@ fun Application.webSocketRoute(
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
                 val messageData = GameMessageData.fromGameMessage(message)
-                this@webSocketRoute.log.debug("Received message: $messageData on topic ${message.topic}")
+                this@webSocketRoute.log.debug("Received message: {} on topic {}", messageData, message.topic)
                 when (messageData) {
                     is GameMessageData.BulletCreationData -> {
                         try {
-                            player.shoot(messageData.type)
+                            session.handleBulletSpawn(messageData)
                             session.broadcast(message, player)
                         } catch (e: MissingBulletException) {
                             outgoing.send(
@@ -95,6 +94,7 @@ fun Application.webSocketRoute(
                             )
                         }
                     }
+
                     is GameMessageData.Disconnect -> {
                         session.removePlayer(player)
                         if (session.isEmpty()) {
@@ -126,24 +126,8 @@ fun Application.webSocketRoute(
                         if (messageData is GameMessageData.BulletImpact) {
                             session.handleBulletImpact(messageData)
                         }
-                        val end = session.nextTurn()
-                        if (end == null) {
-                            session.broadcast(
-                                GameMessage.fromGameMessageData(
-                                    session.getState(),
-                                    Topic.MAIN_SCENE
-                                )
-                            )
-                        } else {
-                            session.broadcast(
-                                GameMessage.fromGameMessageData(
-                                    end,
-                                    Topic.MAIN_SCENE
-                                )
-                            )
-                            break // Game is over → close connection
-                        }
-
+                        session.nextTurn()
+                        if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
                     }
 
                     is GameMessageData.PingRequest -> {
@@ -167,6 +151,21 @@ fun Application.webSocketRoute(
                             log.debug("Updating position of {} to {}", player.data.name, messageData.pos)
                             player.position = messageData.pos
                             player.rotation = messageData.rot
+                            if (player.position.y < 0 && player.alive) {
+                                player.health = 0.0
+                                session.updateDeadPlayers()
+                                if (session.awaitingShot && session.currentTurn == player) {
+                                    session.nextTurn()
+                                    if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
+                                } else {
+                                    session.broadcast(
+                                        GameMessage.fromGameMessageData(
+                                            session.getState(),
+                                            Topic.MAIN_SCENE
+                                        )
+                                    )
+                                }
+                            }
                         }
                         session.broadcast(message, player)
                     }

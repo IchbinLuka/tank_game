@@ -1,6 +1,7 @@
 import com.ichbinluka.model.Player
 import com.ichbinluka.model.Session
 import io.ktor.websocket.*
+import kotlinx.coroutines.test.runTest
 import org.kodein.mock.Mock
 import org.kodein.mock.tests.TestsWithMocks
 import sessions.SessionCreationInfo
@@ -13,7 +14,7 @@ class SessionTest : TestsWithMocks() {
     lateinit var webSocketSession: WebSocketSession
 
     @Test
-    fun turnManagementTest() {
+    fun turnManagementTest() = runTest {
         val player1 = PlayerData("player1", ColorData(0))
         val player2 = PlayerData("player2", ColorData(1))
         val session = Session(

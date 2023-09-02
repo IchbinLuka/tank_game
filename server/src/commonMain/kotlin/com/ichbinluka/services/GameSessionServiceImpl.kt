@@ -3,6 +3,7 @@ package com.ichbinluka.services
 import GameMessage
 import GameMessageData
 import com.ichbinluka.model.Session
+import com.ichbinluka.model.SessionStatus
 import sessions.SessionCreationInfo
 import sessions.Topic
 
@@ -18,7 +19,7 @@ class GameSessionServiceImpl : GameSessionService {
 
     override fun getPublicSessions(): Collection<Session> = sessions.values.filter {
         it.creationInfo.password == null &&
-                !it.hasStarted &&
+                it.status == SessionStatus.WAITING_FOR_PLAYERS &&
                 it.players.size < 5
     }
 

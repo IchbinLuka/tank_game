@@ -2,11 +2,30 @@ package scenes
 
 import GameMessageData
 import core.Game
+import core.Player
+import ext.toVector3
+import gameobjects.Tank
 import three.js.Color
 
 class MainSceneSingleplayer(
     startData: GameMessageData.GameStartData
 ) : MainScene(startData) {
+    override val tanks: List<Tank> = startData.state.tanks.map {
+        Tank(
+            player = Player.fromTankData(it),
+            startPosition = it.pos.toVector3(),
+        ).apply {
+            addDeathListener {
+                deadPlayers.addFirst(player)
+                if (currentTank == this) {
+                    nextTank()
+                }
+                if (isGameOver()) {
+                    endGame()
+                }
+            }
+        }
+    }.toMutableList()
 
     override fun isProxy(tank: GameMessageData.TankData): Boolean = false
 

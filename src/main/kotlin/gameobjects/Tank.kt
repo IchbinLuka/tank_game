@@ -197,10 +197,13 @@ open class Tank(
 
     open fun adjustTransformToGround(ground: Ground) {
         mainBone?.position?.let {
-            val pos = mainBone!!.position.x
+            val pos = it.x
             it.y = ground.heightAt(pos)!!
             val rotation = ground.rotationAt(pos) + 1.5 *  PI
             mainBone?.rotation?.z = if (direction == Direction.Right) rotation else (2 * PI - rotation).toFloat()
+            if (it.y < 0) {
+                damage(1.0)
+            }
         }
         updateFireRotation()
     }

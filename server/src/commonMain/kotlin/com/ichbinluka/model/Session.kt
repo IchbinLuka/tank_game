@@ -3,14 +3,23 @@ package com.ichbinluka.model
 import GameMessage
 import GameMessageData
 import PlayerData
+import com.ichbinluka.exceptions.NoCurrentTurnException
 import getBulletDamage
 import io.ktor.websocket.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
 import sessions.Topic
 import util.Scrollable
 import util.ScrollableList
 
+
+enum class SessionStatus {
+    WAITING_FOR_PLAYERS,
+    IN_PROGRESS,
+    FINISHED
+}
 
 class Session(
     val creationInfo: SessionCreationInfo,
@@ -20,7 +29,14 @@ class Session(
 
     var host: PlayerData = creationInfo.host
 
-    val hasStarted: Boolean get() = currentTurn != null
+    var status: SessionStatus = SessionStatus.WAITING_FOR_PLAYERS
+        private set
+
+    // TODO: This is not thread safe
+    var awaitingShot: Boolean = true
+        private set
+
+    private val awaitingShotMutex: Mutex = Mutex()
 
     val currentTurn: Player? get() = turnIterator?.current
 
@@ -43,27 +59,43 @@ class Session(
         }
         turnIterator = ScrollableList(players)
         turnIterator?.nextWhile { it.data.name != startData.state.currentTurn }
+        status = SessionStatus.IN_PROGRESS
     }
 
     /**
      * @return true if there are more turns to be played, false if the game is over
      */
-    fun nextTurn(): GameMessageData.GameEnd? {
+    suspend fun nextTurn() {
         val alivePlayers = players.filter { it.health > 0 }
         if (alivePlayers.size <= 1) {
             for (player in alivePlayers) {
                 deadPlayers.addFirst(player.data)
             }
             turnIterator = null
-            return GameMessageData.GameEnd(
-                first = deadPlayers.first().name,
-                second = deadPlayers.getOrNull(1)?.name ?: "",
-                third = deadPlayers.getOrNull(2)?.name ?: ""
+            status = SessionStatus.FINISHED
+            broadcast(
+                GameMessage.fromGameMessageData(
+                    GameMessageData.GameEnd(
+                        first = deadPlayers.first().name,
+                        second = deadPlayers.getOrNull(1)?.name ?: "",
+                        third = deadPlayers.getOrNull(2)?.name ?: ""
+                    ),
+                    Topic.MAIN_SCENE
+                )
             )
+            return
         }
         turnIterator?.next()
         turnIterator?.nextWhile { it.health <= 0 }
-        return null
+        awaitingShotMutex.withLock {
+            awaitingShot = true
+        }
+        broadcast(
+            GameMessage.fromGameMessageData(
+                getState(),
+                Topic.MAIN_SCENE
+            )
+        )
     }
 
     suspend fun broadcast(message: GameMessage, player: Player? = null) {
@@ -84,14 +116,27 @@ class Session(
         }
     }
 
+    suspend fun handleBulletSpawn(data: GameMessageData.BulletCreationData) {
+        awaitingShotMutex.withLock {
+            awaitingShot = false
+        }
+        currentTurn?.shoot(data.type)
+    }
+
     fun handleBulletImpact(data: GameMessageData.BulletImpact) {
         for (player in players) {
             player.health -= getBulletDamage(bullet = data.type, distance = data.pos.distanceTo(player.position))
+            println("Player pos: ${player.position}, bullet pos: ${data.pos}")
+            println("Player ${player.data.name} health: ${player.health}")
+        }
+        updateDeadPlayers()
+    }
+
+    fun updateDeadPlayers() {
+        for (player in players) {
             if (player.health <= 0) {
                 deadPlayers.addFirst(player.data)
             }
-            println("Player pos: ${player.position}, bullet pos: ${data.pos}")
-            println("Player ${player.data.name} health: ${player.health}")
         }
     }
 
@@ -115,7 +160,7 @@ class Session(
 
     fun getState(): GameMessageData.GameStateData = GameMessageData.GameStateData(
         tanks = players.map { it.toTankData() },
-        currentTurn = currentTurn!!.data.name
+        currentTurn = currentTurn?.data?.name ?: throw NoCurrentTurnException(),
     )
 
     fun isEmpty(): Boolean = players.isEmpty()

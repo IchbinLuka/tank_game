@@ -11,6 +11,7 @@ class Player(
     val id: Long,
     val session: WebSocketSession
 ) {
+    val alive: Boolean get() = health > 0
     var health: Double = 1.0
 
     private lateinit var bullets: HashMap<Bullet, Int?>
@@ -48,4 +49,6 @@ class Player(
         rot = rotation,
         bulletCounts = GameMessageData.BulletCounts.fromMap(bullets)
     )
+
+    override operator fun equals(other: Any?): Boolean = other is Player && other.id == id
 }

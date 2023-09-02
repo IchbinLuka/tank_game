@@ -68,19 +68,7 @@ abstract class MainScene(
     }
 
 
-    protected open val tanks: List<Tank> = startData.state.tanks.map {
-        Tank(
-            player = Player.fromTankData(it),
-            startPosition = it.pos.toVector3(),
-        ).apply {
-            addDeathListener {
-                deadPlayers.addFirst(player)
-                if (isGameOver()) {
-                    endGame()
-                }
-            }
-        }
-    }.toMutableList()
+    protected abstract val tanks: List<Tank>
 
     abstract fun isProxy(tank: GameMessageData.TankData): Boolean
 

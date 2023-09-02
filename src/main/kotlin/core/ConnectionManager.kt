@@ -150,13 +150,13 @@ object ConnectionManager : MessageBroadcaster {
         val buffer = message.data.unsafeCast<ArrayBuffer>()
         val decodedMessage = ProtoBuf.decodeFromArrayBuffer<GameMessage>(buffer)
         val messageData = GameMessageData.fromGameMessage(decodedMessage)
+        Log.d("Websocket", "received $messageData on ${decodedMessage.topic}")
         synchronizedObjects[decodedMessage.topic]?.let {
             val iterator = it.iterator()
             for (o in iterator) {
                 o.deref()?.onMessage(messageData) ?: iterator.remove()
             }
         }
-        Log.d("Websocket", "received $messageData on ${decodedMessage.topic}")
     }
 
     override fun broadcast(message: GameMessage) {
