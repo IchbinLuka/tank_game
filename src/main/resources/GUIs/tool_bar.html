@@ -1,5 +1,6 @@
 <div style="display: flex; height: 100px; flex-direction: row;">
-    <div class="topbarMenu" style="display: flex; justify-content: space-evenly; align-items: center; width: 100%">
+    <div class="topbarMenu unselectable"
+         style="display: flex; justify-content: space-evenly; align-items: center; width: 100%">
         <span class="menu-element">
             <span lang-key="current_player">Current Player: </span>
             <span id="player_name">current player</span>
@@ -15,7 +16,11 @@
             <span lang-key="health">Health: </span>
             <span id="health">100%</span>
         </span>
-        <div class="menu-element" style="display: inline-block; width: 175px">
+        <span class="menu-element">
+            <span lang-key="fuel">Fuel: </span>
+            <span id="fuel">100%</span>
+        </span>
+        <div class="menu-element" style="display: inline-block; width: 175px" id="strength_container">
             <span lang-key="strength">Strength: </span>
             <span id="strength" style="inline-size: 100px">100%</span>
         </div>

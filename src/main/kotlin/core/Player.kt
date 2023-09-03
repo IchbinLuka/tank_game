@@ -5,9 +5,12 @@ import GameMessage
 import GameMessageData
 import PlayerData
 import core.multiplayer.MultiplayerSynchronized
+import core.multiplayer.RateLimitedBroadcaster
+import ext.TAG
 import ext.toColor
 import sessions.Topic
 import three.js.Color
+import util.Log
 import util.ValueNotifier
 
 class Player(
@@ -23,15 +26,32 @@ class Player(
     private val healthNotifier = ValueNotifier(1.0)
     var health: Double by healthNotifier
 
+    val fuelNotifier: ValueNotifier<Double> = ValueNotifier(1.0)
+    var fuel: Double by fuelNotifier
+
+    private val broadcaster = RateLimitedBroadcaster(10, ConnectionManager)
+
+    override val topic: String = Topic.player(name)
+
     init {
         inventory.putAll(startInventory)
 
         ConnectionManager.register(this)
         if (synchronizeUpdates) {
-            healthNotifier.addListener {
-                ConnectionManager.broadcast(
+//            healthNotifier.addListener {
+//                ConnectionManager.broadcast(
+//                    GameMessage.fromGameMessageData(
+//                        GameMessageData.PlayerHealthUpdate(
+//                            it
+//                        ), topic
+//                    )
+//                )
+//            }
+
+            fuelNotifier.addListener {
+                broadcaster.broadcast(
                     GameMessage.fromGameMessageData(
-                        GameMessageData.PlayerHealthUpdate(
+                        GameMessageData.PlayerFuelUpdate(
                             it
                         ), topic
                     )
@@ -39,8 +59,6 @@ class Player(
             }
         }
     }
-
-    override val topic: String = Topic.player(name)
 
     override fun onMessage(message: GameMessageData) {
         when (message) {
@@ -52,6 +70,11 @@ class Player(
                 inventory.putAll(message.getCountsMap())
             }
 
+            is GameMessageData.PlayerFuelUpdate -> {
+                fuel = message.fuel
+                Log.d(TAG, "Updated fuel to $fuel")
+            }
+
             else -> {}
         }
     }
@@ -59,7 +82,12 @@ class Player(
     companion object {
         fun fromPlayerData(playerData: PlayerData): Player = Player(playerData.color.toColor(), playerData.name)
 
-        fun fromTankData(tankData: GameMessageData.TankData): Player =
-            Player(tankData.player.color.toColor(), tankData.player.name, tankData.bulletCounts.getCountsMap())
+        fun fromTankData(tankData: GameMessageData.TankData, synchronizeUpdates: Boolean = false): Player =
+            Player(
+                tankData.player.color.toColor(),
+                tankData.player.name,
+                tankData.bulletCounts.getCountsMap(),
+                synchronizeUpdates = synchronizeUpdates
+            )
     }
 }

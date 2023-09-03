@@ -2,7 +2,9 @@ package ui
 
 import Bullet
 import ext.fromId
+import ext.tryCast
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLElement
 import scenes.MainScene
 import kotlin.math.roundToInt
 
@@ -20,7 +22,10 @@ class MainTopBar(
     private val bulletName by lazy { Element.fromId("bullet_name") }
     private val bulletCount by lazy { Element.fromId("bullet_count") }
 
-    private val aimingStrength by lazy { Element.fromId("strength") }
+    private val aimingStrength: HTMLElement? by lazy { Element.fromId("strength")?.tryCast() }
+    private val aimingStrengthContainer: HTMLElement? by lazy { Element.fromId("strength_container")?.tryCast() }
+
+    private val fuelElement by lazy { Element.fromId("fuel") }
 
     override suspend fun init() {
         super.init()
@@ -47,8 +52,13 @@ class MainTopBar(
     }
 
     private fun updateState() {
-        scene.currentTankNotifier.value.addListener { _, _, new ->
-            updateBulletCount(new)
+        scene.currentTankNotifier.value.apply {
+            addListener { _, _, new ->
+                updateBulletCount(new)
+            }
+            player.fuelNotifier.addListener {
+                updateUI()
+            }
         }
         updateUI()
     }
@@ -63,8 +73,8 @@ class MainTopBar(
         updateBulletCount()
         val tank = scene.currentTankNotifier.value
         healthElement?.innerHTML = "${(tank.health * 100).roundToInt()}%"
+        fuelElement?.innerHTML = "${(tank.player.fuel * 100).roundToInt()}%"
         nameElement?.innerHTML = tank.player.name
+        aimingStrengthContainer?.style?.display = if (scene.hasTurn) "inline" else "none"
     }
-
-
 }

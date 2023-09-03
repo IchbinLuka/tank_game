@@ -96,6 +96,7 @@ sealed class GameMessageData {
         val pos: Vec3,
         val rot: Vec3,
         val health: Double,
+        val fuel: Double,
         val bulletCounts: BulletCounts
     ) : GameMessageData()
 
@@ -225,6 +226,12 @@ sealed class GameMessageData {
         val second: String,
         val third: String
     ) : GameMessageData()
+
+    @Serializable
+    data class PlayerFuelUpdate(val fuel: Double) : GameMessageData()
+
+    @Serializable
+    data class BulletSelectionUpdate(val bullet: Bullet) : GameMessageData()
 
     @Serializable
     data object Disconnect : GameMessageData()

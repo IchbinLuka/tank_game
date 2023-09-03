@@ -13,6 +13,8 @@ class Player(
 ) {
     val alive: Boolean get() = health > 0
     var health: Double = 1.0
+    var fuel: Double = 1.0
+        private set
 
     private lateinit var bullets: HashMap<Bullet, Int?>
 
@@ -26,6 +28,7 @@ class Player(
         position = tankData.pos
         rotation = tankData.rot
         bullets = tankData.bulletCounts.getCountsMap()
+        fuel = tankData.fuel
     }
 
     /**
@@ -47,8 +50,12 @@ class Player(
         player = data,
         pos = position,
         rot = rotation,
-        bulletCounts = GameMessageData.BulletCounts.fromMap(bullets)
+        bulletCounts = GameMessageData.BulletCounts.fromMap(bullets),
+        fuel = fuel
     )
 
     override operator fun equals(other: Any?): Boolean = other is Player && other.id == id
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }

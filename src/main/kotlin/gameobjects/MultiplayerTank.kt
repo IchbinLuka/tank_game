@@ -19,7 +19,7 @@ class MultiplayerTank(
     startPosition: Vector3,
     startRotation: Euler = Euler(),
     player: Player,
-    private val proxy: Boolean = false,
+    proxy: Boolean = false,
 ) : Tank(startPosition, player = player, startRotation = startRotation), MultiplayerSynchronized {
 
     override val topic: String = Topic.tank(player.name)
@@ -30,13 +30,23 @@ class MultiplayerTank(
     override val invincible: Boolean = true
 
 
-    fun getTransformationUpdate(): GameMessageData.TransformationUpdate = GameMessageData.TransformationUpdate(
+    private fun getTransformationUpdate(): GameMessageData.TransformationUpdate = GameMessageData.TransformationUpdate(
         pos = GameMessageData.Vec3.fromVector3(position),
         rot = GameMessageData.Vec3.fromVector3(rotation.toVector3())
     )
 
     init {
         ConnectionManager.register(this)
+        if (!proxy) {
+            addListener { _, _, _ ->
+                urgentBroadcaster.broadcast(
+                    GameMessage.fromGameMessageData(
+                        GameMessageData.BulletSelectionUpdate(currentBullet),
+                        topic
+                    )
+                )
+            }
+        }
     }
 
     override fun createBulletArgs(velocity: Double): BulletObjectArgs {
@@ -65,7 +75,10 @@ class MultiplayerTank(
                 if (health == 0.0) {
                     onDeath()
                 }
-                // super.damage(health - message.newHealth)
+            }
+
+            is GameMessageData.BulletSelectionUpdate -> {
+                currentBullet = message.bullet
             }
 
             else -> {}
@@ -83,12 +96,6 @@ class MultiplayerTank(
                 topic
             )
         )
-    }
-
-    override fun onDeath() {
-        super.onDeath()
-        if (proxy) return
-        // urgentBroadcaster.broadcast(GameMessage.fromGameMessageData(GameMessageData.Death, topic))
     }
 
     override fun adjustTransformToGround(ground: Ground) {

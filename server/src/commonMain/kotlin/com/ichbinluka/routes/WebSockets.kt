@@ -156,7 +156,6 @@ fun Application.webSocketRoute(
                                 session.updateDeadPlayers()
                                 if (session.awaitingShot && session.currentTurn == player) {
                                     session.nextTurn()
-                                    if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
                                 } else {
                                     session.broadcast(
                                         GameMessage.fromGameMessageData(
@@ -173,10 +172,12 @@ fun Application.webSocketRoute(
                     else -> {
                         session.broadcast(message, player)
                     }
+
                 }
-                if (session.host == player.data) {
-                    sessionService.closeSession(session.id)
-                }
+                if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
+            }
+            if (session.host == player.data) {
+                sessionService.closeSession(session.id)
             }
         }
     }

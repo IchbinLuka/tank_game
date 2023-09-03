@@ -8,6 +8,7 @@
   "current_player": "Current Player: ",
   "bullet": "Bullet: ",
   "health": "Health: ",
+  "fuel": "Fuel: ",
   "strength": "Strength: ",
   "loading": "Loading",
   "player_wins": "{name} Wins",

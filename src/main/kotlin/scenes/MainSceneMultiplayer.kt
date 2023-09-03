@@ -31,10 +31,11 @@ class MainSceneMultiplayer(
 
 
     override val tanks: MutableList<MultiplayerTank> = startData.state.tanks.map {
+        val isSelf = it.player.name == player.name
         MultiplayerTank(
-            player = Player.fromTankData(it),
+            player = Player.fromTankData(it, synchronizeUpdates = isSelf),
             startPosition = it.pos.toVector3(),
-            proxy = it.player.name == player.name
+            proxy = !isSelf
         ).apply {
             addDeathListener {
                 deadPlayers.addFirst(player)

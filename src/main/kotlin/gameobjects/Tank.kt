@@ -6,6 +6,7 @@ import core.Hittable
 import core.Player
 import core.gameobjects.GameObject
 import ext.*
+import fuelConsumption
 import gameobjects.bullets.*
 import gameobjects.particles.Fire
 import kotlinx.coroutines.MainScope
@@ -183,6 +184,9 @@ open class Tank(
     )
 
     open fun move(vector3: Vector3, deltaTime: Double = 1.0, ground: Ground) {
+        if (player.fuel <= 0) return
+        if (mainBone == null) return
+        val previousPos = mainBone!!.position.clone()
         mainBone?.position?.let {
             val ascend = abs(ground.rotationAt(it.x))
             var newPos = it.clone()
@@ -193,6 +197,7 @@ open class Tank(
             }
         }
         adjustTransformToGround(ground)
+        player.fuel -= max(fuelConsumption(previousPos.distanceTo(mainBone!!.position).toDouble()), 0.0)
     }
 
     open fun adjustTransformToGround(ground: Ground) {

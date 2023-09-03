@@ -8,6 +8,7 @@
   "current_player": "Aktueller Spieler: ",
   "bullet": "Kugel: ",
   "health": "Gesundheit: ",
+  "fuel": "Treibstoff: ",
   "strength": "Stärke: ",
   "loading": "Wird geladen",
   "player_wins": "{name} gewinnt",
