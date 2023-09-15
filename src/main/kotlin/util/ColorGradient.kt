@@ -18,7 +18,7 @@ class ColorGradient(
     private val colors: List<Color>,
 ) {
     fun getColor(progress: Double): Color {
-        val index = (progress * (colors.size - 1)).toInt()
+        val index = (progress * (colors.size - 1)).toInt() % colors.size
         val color1 = colors[index]
         val color2 = colors[index + 1]
         val scaledProgress = progress * (colors.size - 1) - index
