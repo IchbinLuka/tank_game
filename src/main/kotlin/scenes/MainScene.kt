@@ -130,7 +130,7 @@ abstract class MainScene(
                         onImpact()
                     }
                 }
-                onBulletCreation(currentBulletObject!!.type, currentBulletObject!!.velocity)
+                onBulletCreation(currentBulletObject!!.type, currentBulletObject!!.arg.startVelocity)
             }
         }
         window.addEventListener("pointermove", pointerMove)

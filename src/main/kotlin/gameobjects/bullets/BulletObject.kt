@@ -5,7 +5,6 @@ import GameMessage
 import GameMessageData
 import core.*
 import core.gameobjects.GameObject
-import core.gameobjects.MovingGameObject
 import core.gameobjects.SynchronizedInitializer
 import core.multiplayer.MessageBroadcaster
 import core.multiplayer.MultiplayerSynchronized
@@ -21,6 +20,7 @@ import org.khronos.webgl.Float32Array
 import three.js.*
 import util.Log
 import util.ResourceManager
+import kotlin.math.pow
 
 typealias ImpactListener = (Vector3) -> Unit
 
@@ -37,8 +37,8 @@ data class BulletObjectArgs(
 )
 
 open class BulletObject protected constructor(
-    arg: BulletObjectArgs
-) : MovingGameObject(), Hittable, SynchronizedInitializer, MultiplayerSynchronized {
+    val arg: BulletObjectArgs
+) : GameObject(), Hittable, SynchronizedInitializer, MultiplayerSynchronized {
 
     open class Factory : GameObjectFactory<BulletObject, BulletObjectArgs>() {
         lateinit var disc: Texture
@@ -54,6 +54,8 @@ open class BulletObject protected constructor(
     override val name: String = arg.name
 
     protected val tank: Tank = arg.tank
+
+    private val spawnTime = window.performance.now()
 
     override val topic: String = "${tank.player.name}_bullet"
     val proxy = arg.proxy
@@ -129,10 +131,9 @@ open class BulletObject protected constructor(
 
     private val impactListeners: MutableList<ImpactListener> = mutableListOf()
 
-    override var velocity: Vector3 = arg.startVelocity * 0.75
-    override var acceleration: Vector3
-        get() = gravity
-        set(_) {}
+    open val startVelocity: Vector3 = arg.startVelocity * 0.75
+
+    private val initialPos = tank.cannonTipPos!!
 
 
     init {
@@ -214,8 +215,15 @@ open class BulletObject protected constructor(
         dots.setAttribute("position", BufferAttribute(Float32Array(dotVertices.toTypedArray()).asDynamic(), 3))
     }
 
+    private fun posAtTime(t: Double): Vector3 {
+        return initialPos + startVelocity * t + gravity * t.pow(2) * 0.5
+    }
+
     override fun update(delta: Double) {
         super.update(delta)
+
+        position = posAtTime((window.performance.now() - spawnTime) * 0.001)
+
         dotTimer += delta
         if (dotTimer > 0.5) {
             dotTimer = 0.0
@@ -239,20 +247,20 @@ open class BulletObject protected constructor(
         if (isNew) {
             isNew = false
         }
-
+        /*
         if (!proxy) {
             broadcaster?.broadcast(
                 GameMessage.fromGameMessageData(
                     GameMessageData.GameObjectMoveUpdate(
                         pos = GameMessageData.Vec3.fromVector3(position),
-                        velocity = GameMessageData.Vec3.fromVector3(velocity),
+                        startVelocity = GameMessageData.Vec3.fromVector3(startVelocity),
                         acceleration = GameMessageData.Vec3.fromVector3(acceleration),
                         rot = GameMessageData.Vec3.fromVector3(globalRotation.toVector3()),
                     ),
                     topic = topic
                 ),
             )
-        }
+        }*/
     }
 
     /**
@@ -287,21 +295,6 @@ open class BulletObject protected constructor(
 
     override fun onMessage(message: GameMessageData) {
         when (message) {
-            is GameMessageData.GameObjectMoveUpdate -> {
-                val newPos = message.pos.toVector3()
-                if (position.distanceTo(newPos).toDouble() > 5) {
-                    position = newPos
-                } else {
-                    velocity = message.velocity.toVector3() + (message.pos.toVector3() - position) * 0.5
-                    acceleration = message.acceleration.toVector3()
-                }
-            }
-
-            is GameMessageData.GameObjectMoveStart -> {
-                position = message.pos.toVector3()
-                velocity = message.velocity.toVector3() + (position - message.pos.toVector3()) * 0.5
-                acceleration = message.acceleration.toVector3()
-            }
 
             is GameMessageData.BulletImpact -> {
                 currentScene.findObject<BulletTarget>(message.intersectingName)?.let {

@@ -86,6 +86,7 @@ class MainSceneMultiplayer(
                 }
             }
             is GameMessageData.BulletCreationData -> {
+                Log.d(TAG, "Bullet creation: ${message.type}")
                 currentBulletObject = addSynchronized(
                     message.type.createObject,
                     BulletObjectArgs(

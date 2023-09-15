@@ -73,7 +73,7 @@ open class Tank(
     }
 
     override var position: Vector3
-        get() = mainBone?.position!!
+        get() = mainBone?.position ?: Vector3()
         set(value) {
             mainBone?.position?.set(value)
         }
