@@ -13,13 +13,7 @@ abstract class TankPresentingScene(
     private val tanks: Collection<Tank>
 ): GameScene() {
 
-    override val initialChildren: Collection<GameObject> = mutableListOf<GameObject>(
-        Background(offset = Vector3(z = -150, y = -115)),
-    ).apply {
-        addAll(tanks)
-    }
-
-    override val scene: Scene = Scene().apply {
+    final override val scene: Scene = Scene().apply {
         background = Color(0x3333ff)
         val light = DirectionalLight(0xFDFFD9, 1).apply {
             position.set(-30, 70, 40)
@@ -31,7 +25,14 @@ abstract class TankPresentingScene(
         add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
-    override val camera = PerspectiveCamera(60, window.aspectRatio, 0.1, 1000).apply {
+
+    override val initialChildren: Collection<GameObject> = mutableListOf<GameObject>(
+        Background(offset = Vector3(z = -150, y = -115), scene = scene),
+    ).apply {
+        addAll(tanks)
+    }
+
+    override val camera = PerspectiveCamera(60, window.aspectRatio, 0.1, 3000).apply {
         position.x = -1.6
         position.y = 8.0
         position.z = 36.0

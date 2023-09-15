@@ -35,7 +35,7 @@ abstract class MainScene(
         add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
-    override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 1000).apply {
+    override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 2000).apply {
         position.z = 150.0
         position.y = 120.0
         lookAt(Vector3(y = 100))
@@ -44,7 +44,7 @@ abstract class MainScene(
     override val initialChildren: Collection<GameObject> by lazy {
         mutableListOf(
             ground,
-            Background(name = "background"),
+            Background(name = "background", scene = scene),
         ).apply {
             addAll(tanks)
             addAll(startData.trees.map { Tree(startPosition = Vector3(x = it.pos), name = it.name) })
@@ -196,6 +196,7 @@ abstract class MainScene(
 
     override fun update(delta: Double) {
         super.update(delta)
+
         if (!hasTurn) return
         val currentTank = tanks.getOrNull(currentTankIndex)
         EventManager.keyboardEvents.events.forEach {

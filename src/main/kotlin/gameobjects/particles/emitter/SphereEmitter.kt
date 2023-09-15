@@ -2,9 +2,7 @@ package gameobjects.particles.emitter
 
 import ext.plus
 import three.js.Vector3
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 class SphereEmitter(
@@ -16,17 +14,26 @@ class SphereEmitter(
     private val random = Random(seed)
 
     override fun randomPoint(): Pair<Position, Normal> {
-        val alpha = random.nextDouble() * 2 * PI
-        val beta = random.nextDouble() * 2 * PI
+        val x = random.nextDouble() * 2 - 1
+        val y = random.nextDouble() * 2 - 1
+        val z = random.nextDouble() * 2 - 1
 
-        val sphereCoord = Vector3(
-            x = radius * sin(alpha) * cos(beta),
-            y = radius * sin(alpha) * sin(beta),
-            z = radius * cos(beta)
+        // Just in case
+        if (x == y && y == z) {
+            return Position(position + Vector3(radius, 0, 0)) to Normal(Vector3(1, 0, 0))
+        }
+
+        val coefficient = radius * 1.0 / sqrt(x * x + y * y + z * z)
+
+        val pos = Vector3(
+            x * coefficient,
+            y * coefficient,
+            z * coefficient
         )
+
         return Pair(
-            Position(sphereCoord + this.position),
-            Normal(sphereCoord)
+            Position(pos + this.position),
+            Normal(pos.normalize())
         )
     }
 }

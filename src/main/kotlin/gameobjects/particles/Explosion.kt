@@ -12,7 +12,7 @@ class Explosion(
     particleLifetime = 600.0,
     spawnBurst = 25 * radius.pow(2).toInt(),
     emitter = SphereEmitter(position, radius, 0),
-    startVelocity = 10.0,
+    startVelocity = 15.0,
     startSize = 2.0,
     endSize = 7.0,
     startColor = Color(0xfcd125),
