@@ -120,14 +120,22 @@ class Session(
         awaitingShotMutex.withLock {
             awaitingShot = false
         }
+        for (player in players) {
+            player.positionBeforeImpact = player.position
+        }
         currentTurn?.shoot(data.type)
     }
 
     fun handleBulletImpact(data: GameMessageData.BulletImpact) {
         for (player in players) {
-            player.health -= getBulletDamage(bullet = data.type, distance = data.pos.distanceTo(player.position))
-            println("Player pos: ${player.position}, bullet pos: ${data.pos}")
-            println("Player ${player.data.name} health: ${player.health}")
+            if (player.data.name == data.intersectingName) {
+                player.health -= getBulletDamage(bullet = data.type, distance = 0.0)
+            } else {
+                player.health -= getBulletDamage(
+                    bullet = data.type,
+                    distance = data.pos.distanceTo(player.positionBeforeImpact)
+                )
+            }
         }
         updateDeadPlayers()
     }

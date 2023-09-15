@@ -71,6 +71,8 @@ fun Application.webSocketRoute(
                 null
             )
 
+            var positionBeforeImpact: GameMessageData.Vec3? = null
+
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
                 val messageData = GameMessageData.fromGameMessage(message)
@@ -108,7 +110,7 @@ fun Application.webSocketRoute(
                     }
 
                     is GameMessageData.GameStartRequest -> {
-                        if (player.data == session.host) {
+                        if (player.data == session.host && session.players.size > 1) {
                             val startData = createGame(session.toInfo().players)
                             session.begin(startData)
                             session.broadcast(
@@ -116,6 +118,14 @@ fun Application.webSocketRoute(
                                     data = startData,
                                     topic = Topic.SESSION_STATE
                                 )
+                            )
+                        } else {
+                            outgoing.send(
+                                GameMessageData.MessageRefusal(
+                                    message = message,
+                                    reason = "Not allowed to start game"
+                                ),
+                                message.topic
                             )
                         }
                     }

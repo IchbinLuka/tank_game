@@ -21,6 +21,8 @@ class Player(
     var position: GameMessageData.Vec3 = GameMessageData.Vec3(0.0, 0.0, 0.0)
     var rotation: GameMessageData.Vec3 = GameMessageData.Vec3(0.0, 0.0, 0.0)
 
+    var positionBeforeImpact = position
+
     fun getBulletCount(bullet: Bullet): Int? = bullets[bullet]
 
 

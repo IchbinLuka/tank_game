@@ -251,6 +251,7 @@ sealed class GameMessageData {
     @Serializable
     data object GameStartRequest : GameMessageData()
 
+
     @Serializable
     data object PingRequest : GameMessageData()
 

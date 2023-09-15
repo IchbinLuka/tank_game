@@ -12,7 +12,7 @@ import ext.tryCast
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLButtonElement
 import scenes.MainSceneMultiplayer
 import sessions.SessionInfo
 import sessions.Topic
@@ -28,6 +28,8 @@ class SessionViewController(
 
     override val mainGUIName: String = "session_view"
 
+    private val startButton get() = Element.fromId("startButton")?.tryCast<HTMLButtonElement>()
+
 
     override suspend fun init() {
         ConnectionManager.register(this)
@@ -41,11 +43,12 @@ class SessionViewController(
         for (player in session.players) {
             insertComponent(SessionInfoItem(player), container)
         }
+        startButton?.disabled = session.players.size < 2
     }
 
     override fun rebuild() {
         if (session.host == self) {
-            Element.fromId("startButton")?.tryCast<HTMLElement>()?.let {
+            startButton?.let {
                 it.style.visibility = "visible"
                 it.addClickListener {
                     ConnectionManager.broadcast(
