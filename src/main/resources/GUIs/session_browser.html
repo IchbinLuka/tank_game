@@ -4,14 +4,17 @@
     </div>
 
     <div class="menuContainer">
-        <div class="menu-element" id="sessionItemContainer" style="overflow-y: scroll; height: 300px; width: 500px;">
+        <div class="menu-element" id="sessionItemContainer" style="overflow-y: scroll; height: 300px; width: 500px">
+            <div id="loadingIndicator" style="display: flex; align-items: center; height: 100%">
+                <span class="loader" style="margin: auto"></span>
+            </div>
         </div>
 
         <div>
             <div class="gridContainer" style="grid-template-columns: auto auto auto;">
                 <button lang-key="back" id="backButton" class="menu-element button"></button>
                 <button lang-key="change_server" id="changeServerButton" class="menu-element button"></button>
-                <button lang-key="new_session" id="newSessionButton" class="menu-element button"></button>
+                <button lang-key="new_session" id="newSessionButton" class="menu-element button" disabled></button>
             </div>
         </div>
     </div>

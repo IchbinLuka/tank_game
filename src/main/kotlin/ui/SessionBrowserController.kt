@@ -7,9 +7,12 @@ import exceptions.InvalidPlayerConfigException
 import ext.TAG
 import ext.addClickListener
 import ext.fromId
+import ext.tryCast
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLElement
 import services.APIHelper
 import sessions.SessionInfo
 import ui.components.SessionBrowserItem
@@ -22,8 +25,9 @@ class SessionBrowserController: UIController() {
     override val mainGUIName: String = "session_browser"
 
     private val backButton get() = Element.fromId("backButton")
-    private val newButton get() = Element.fromId("newSessionButton")
+    private val newButton get() = Element.fromId("newSessionButton")?.tryCast<HTMLButtonElement>()
     private val changeServerButton get() = Element.fromId("changeServerButton")
+    private val loadingIndicator get() = Element.fromId("loadingIndicator")?.tryCast<HTMLElement>()
 
     private suspend fun joinSession(info: SessionInfo, playerData: PlayerData) {
         try {
@@ -42,6 +46,14 @@ class SessionBrowserController: UIController() {
     override suspend fun init() {
         super.init()
         val container = Element.fromId("sessionItemContainer")!!
+        backButton?.addClickListener {
+            MainScope().launch { GUIHelper.pop() }
+        }
+
+        changeServerButton?.addClickListener {
+            MainScope().launch { GUIHelper.pushReplacement(ServerSettingsController()) }
+        }
+
         try {
             val sessions = APIHelper.fetchSessions()
 
@@ -63,11 +75,10 @@ class SessionBrowserController: UIController() {
                 SessionFetchError(),
                 container
             )
+        } finally {
+            loadingIndicator?.style?.display = "none"
         }
-
-        backButton?.addClickListener {
-            MainScope().launch { GUIHelper.pop() }
-        }
+        newButton?.disabled = false
         newButton?.addClickListener {
             MainScope().launch {
                 GUIHelper.push(PlayerConfigurationController { player ->
@@ -81,9 +92,6 @@ class SessionBrowserController: UIController() {
                     }
                 })
             }
-        }
-        changeServerButton?.addClickListener {
-            MainScope().launch { GUIHelper.pushReplacement(ServerSettingsController()) }
         }
     }
 
