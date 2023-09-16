@@ -59,6 +59,9 @@ class MainTopBar(
             player.fuelNotifier.addListener {
                 updateUI()
             }
+            player.healthNotifier.addListener {
+                updateUI()
+            }
         }
         updateUI()
     }

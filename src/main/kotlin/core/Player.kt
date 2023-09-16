@@ -23,7 +23,7 @@ class Player(
         Bullet.Normal to null
     )
 
-    private val healthNotifier = ValueNotifier(1.0)
+    val healthNotifier = ValueNotifier(1.0)
     var health: Double by healthNotifier
 
     val fuelNotifier: ValueNotifier<Double> = ValueNotifier(1.0)
@@ -38,16 +38,6 @@ class Player(
 
         ConnectionManager.register(this)
         if (synchronizeUpdates) {
-//            healthNotifier.addListener {
-//                ConnectionManager.broadcast(
-//                    GameMessage.fromGameMessageData(
-//                        GameMessageData.PlayerHealthUpdate(
-//                            it
-//                        ), topic
-//                    )
-//                )
-//            }
-
             fuelNotifier.addListener {
                 broadcaster.broadcast(
                     GameMessage.fromGameMessageData(
