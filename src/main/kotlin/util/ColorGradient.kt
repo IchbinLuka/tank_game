@@ -1,6 +1,7 @@
 package util
 
 import three.js.Color
+import kotlin.math.min
 
 val backgroundGradient = ColorGradient(
     listOf(
@@ -18,10 +19,10 @@ class ColorGradient(
     private val colors: List<Color>,
 ) {
     fun getColor(progress: Double): Color {
-        val index = (progress * (colors.size - 1)).toInt() % colors.size
+        val index = min((progress * (colors.size - 1)).toInt(), colors.size - 2)
         val color1 = colors[index]
         val color2 = colors[index + 1]
-        val scaledProgress = progress * (colors.size - 1) - index
+        val scaledProgress = min(progress * (colors.size - 1) - index, 1.0)
 
         return Color(color1).lerp(color2, scaledProgress)
     }
