@@ -4,6 +4,7 @@ import Bullet
 import core.CuboidHitBox
 import core.Hittable
 import core.Player
+import core.currentScene
 import core.gameobjects.GameObject
 import ext.*
 import fuelConsumption
@@ -51,6 +52,20 @@ open class Tank(
     override var renderable: Object3D = Group()
 
     private val deathListeners: MutableList<() -> Unit> = mutableListOf()
+
+    private var moveDirection: Direction? = null
+
+    fun startMovingRight() {
+        moveDirection = Direction.Right
+    }
+
+    fun stopMoving() {
+        moveDirection = null
+    }
+
+    fun startMovingLeft() {
+        moveDirection = Direction.Left
+    }
 
     fun addDeathListener(listener: () -> Unit) {
         deathListeners.add(listener)
@@ -250,12 +265,21 @@ open class Tank(
 
     override fun update(delta: Double) {
         super.update(delta)
+
         if (spawnedBullet) {
             spawnedBullet = false
         }
+
+        if (moveDirection != null) {
+            move(
+                moveDirection!!.vector3,
+                delta,
+                currentScene.findObject() ?: return
+            )
+        }
     }
 
-    protected fun switchDirection() {
+    private fun switchDirection() {
         setDirection(direction.inverse)
     }
 

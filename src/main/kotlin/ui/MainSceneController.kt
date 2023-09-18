@@ -2,6 +2,7 @@ package ui
 
 import Bullet
 import core.Game
+import ext.TAG
 import ext.addClickListener
 import ext.fromId
 import ext.tryCast
@@ -13,6 +14,7 @@ import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import scenes.MainScene
 import three.js.Vector2
+import util.Log
 import util.PlatformUtil
 import kotlin.math.roundToInt
 
@@ -47,6 +49,9 @@ class MainSceneController(
 
         if (PlatformUtil.isMobile) {
             mobileControls?.style?.visibility = "visible"
+            mobileControls?.oncontextmenu = {
+                it.preventDefault()
+            }
         }
 
         initListeners()
@@ -74,13 +79,23 @@ class MainSceneController(
             scene.currentTankNotifier.value.nextBullet()
         }
 
-        moveRightButton?.addClickListener {
-            // TODO
+        val stop = { _: Event ->
+            scene.currentTankNotifier.value.stopMoving()
         }
 
-        moveLeftButton?.addClickListener {
-            // TODO
-        }
+        moveRightButton?.apply {
+            addEventListener("touchstart", {
+                scene.currentTankNotifier.value.startMovingRight()
+            })
+            addEventListener("touchend", stop)
+        } ?: Log.e(TAG, "Move right button not found")
+
+        moveLeftButton?.apply {
+            addEventListener("touchstart", {
+                scene.currentTankNotifier.value.startMovingLeft()
+            })
+            addEventListener("touchend", stop)
+        } ?: Log.e(TAG, "Move left button not found")
 
         shootButton?.addClickListener {
             scene.performShot()
