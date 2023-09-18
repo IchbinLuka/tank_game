@@ -135,6 +135,14 @@ html, body, #full {
     flex-grow: 1;
 }
 
+@media screen and (max-height: 500px) {
+    .menuPage {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+}
+
 .menuTitle {
     align-self: center;
     font-size: 100px;
@@ -237,4 +245,24 @@ button {
     100% {
         transform: rotate(360deg);
     }
+}
+
+
+.joystickContainer {
+    background: rgba(155, 155, 155, 0.5);
+    width: 20em;
+    height: 20em;
+    border-radius: 50%;
+    position: absolute;
+
+}
+
+.joystickThumb {
+    background: darkgrey;
+    width: 10em;
+    height: 10em;
+    border-radius: 50%;
+    position: absolute;
+    top: 5em;
+    left: 5em;
 }

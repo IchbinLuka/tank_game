@@ -1,6 +1,6 @@
-<div style="display: flex; height: 100px; flex-direction: row;">
+<div style="display: flex; height: 100%; flex-direction: column">
     <div class="topbarMenu unselectable"
-         style="display: flex; justify-content: space-evenly; align-items: center; width: 100%">
+         style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center; width: 100%">
         <span class="menu-element">
             <span lang-key="current_player">Current Player: </span>
             <span id="player_name">current player</span>
@@ -23,6 +23,22 @@
         <div class="menu-element" style="display: inline-block; width: 175px" id="strength_container">
             <span lang-key="strength">Strength: </span>
             <span id="strength" style="inline-size: 100px">100%</span>
+        </div>
+    </div>
+
+    <div id="mobile_controls"
+         style="visibility: hidden; display: flex; bottom: 10px; width: 100%; position: absolute; justify-content: space-between">
+        <div>
+            <button class="button menu-element" id="button_move_left">
+                <i class="arrow-button left"></i>
+            </button>
+            <button class="button menu-element" id="button_move_right">
+                <i class="arrow-button right"></i>
+            </button>
+        </div>
+
+        <div>
+            <button class="button menu-element" id="shoot_button">Shoot</button>
         </div>
     </div>
 </div>

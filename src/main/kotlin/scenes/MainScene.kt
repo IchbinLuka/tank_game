@@ -12,11 +12,8 @@ import gameobjects.Tank
 import gameobjects.Tree
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.MouseEvent
-import org.w3c.dom.pointerevents.PointerEvent
 import three.js.*
-import ui.MainTopBar
+import ui.MainSceneController
 import util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -82,60 +79,39 @@ abstract class MainScene(
 
     val currentTankNotifier by lazy { ValueNotifier(currentTank) }
 
-    private val topBar = MainTopBar(this)
+    private val topBar = MainSceneController(this)
 
-    init {
-        initListeners()
+
+    fun performShot() {
+        if (currentBulletObject == null && hasTurn) {
+            currentBulletObject = currentTank.shoot(aimingStrengthValue * MAX_POINTER_DISTANCE)
+            currentBulletObject!!.let {
+                _children["bullet"] = it
+                renderable?.add(it.renderable)
+                it.addImpactListener { v ->
+                    onImpact()
+                }
+            }
+            onBulletCreation(currentBulletObject!!.type, currentBulletObject!!.arg.startVelocity)
+        }
     }
 
+    fun updateAimingPoint(point: Vector2) {
+        if (!hasTurn || currentBulletObject != null) return
 
-    private lateinit var pointerMove: (Event) -> Unit
-
-    private lateinit var clickListener: (Event) -> Unit
-
-    private fun initListeners() {
-        pointerMove = pointerMove@ {
-            it as PointerEvent
-            if (!hasTurn || currentBulletObject != null) return@pointerMove
-
-            val aimingPoint = Vector2()
-            val containerBox = Game.instance.gameContainer.getBoundingClientRect()
-            val x = it.clientX.toDouble() - containerBox.left
-            val y = it.clientY.toDouble() - containerBox.top
-            aimingPoint.x = ( x / containerBox.width ) * 2 - 1
-            aimingPoint.y = - ( y / containerBox.height ) * 2 + 1
-
-            if (aiming) {
-                updateAimingStrength()
-                aimingCaster.setFromCamera(aimingPoint, camera)
-                val intersection = aimingCaster.intersectObject(aimingAidPlane)
-                if (intersection.isNotEmpty()) {
-                    aimIntersection = intersection.first().point
-                    currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
-                    if (!freeCamera) {
-                        camera.position.x = aimingPoint.x * 40
-                        centerCamera()
-                    }
+        if (aiming) {
+            updateAimingStrength()
+            aimingCaster.setFromCamera(point, camera)
+            val intersection = aimingCaster.intersectObject(aimingAidPlane)
+            if (intersection.isNotEmpty()) {
+                aimIntersection = intersection.first().point
+                currentTank.aim(Vector2(aimIntersection.x, aimIntersection.y))
+                if (!freeCamera) {
+                    camera.position.x = point.x * 40
+                    centerCamera()
                 }
             }
         }
-        clickListener = { event ->
-            event as MouseEvent
-            if (currentBulletObject == null && hasTurn) {
-                currentBulletObject = currentTank.shoot(aimingStrengthValue * MAX_POINTER_DISTANCE)
-                currentBulletObject!!.let {
-                    _children["bullet"] = it
-                    renderable?.add(it.renderable)
-                    it.addImpactListener { v ->
-                        onImpact()
-                    }
-                }
-                onBulletCreation(currentBulletObject!!.type, currentBulletObject!!.arg.startVelocity)
-            }
-        }
-        window.addEventListener("pointermove", pointerMove)
-
-        Game.instance.gameContainer.addEventListener("click", clickListener)
     }
 
     protected fun updateAimingStrength() {
@@ -212,12 +188,6 @@ abstract class MainScene(
     }
 
     protected open fun onBulletCreation(type: Bullet, velocity: Vector3) {}
-
-    override fun dispose() {
-        super.dispose()
-        window.removeEventListener("pointermove", pointerMove)
-        Game.instance.gameContainer.removeEventListener("click", clickListener)
-    }
 
     companion object {
         const val MAX_POINTER_DISTANCE = 125
