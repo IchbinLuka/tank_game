@@ -13,6 +13,7 @@ import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import scenes.MainScene
 import three.js.Vector2
+import util.Direction
 import util.PlatformUtil
 import kotlin.math.roundToInt
 
@@ -74,12 +75,30 @@ class MainSceneController(
             scene.currentTankNotifier.value.nextBullet()
         }
 
-        moveRightButton?.addClickListener {
-            // TODO
+        val cancel = { _: Event ->
+            scene.currentTankNotifier.value.moveDirection = null
         }
 
-        moveLeftButton?.addClickListener {
-            // TODO
+        // Prevent context menu from opening on mobile when long pressing
+        mobileControls?.oncontextmenu = contextMenu@{
+            it.preventDefault()
+            it.stopPropagation()
+            it.stopImmediatePropagation()
+            return@contextMenu false
+        }
+
+        moveRightButton?.apply {
+            addEventListener("touchstart", {
+                scene.currentTankNotifier.value.moveDirection = Direction.Right
+            })
+            addEventListener("touchend", cancel)
+        }
+
+        moveLeftButton?.apply {
+            addEventListener("touchstart", {
+                scene.currentTankNotifier.value.moveDirection = Direction.Left
+            })
+            addEventListener("touchend", cancel)
         }
 
         shootButton?.addClickListener {

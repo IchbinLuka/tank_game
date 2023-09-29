@@ -4,6 +4,7 @@ import Bullet
 import core.CuboidHitBox
 import core.Hittable
 import core.Player
+import core.currentScene
 import core.gameobjects.GameObject
 import ext.*
 import fuelConsumption
@@ -26,6 +27,8 @@ open class Tank(
     override val name: String = player.name
 ) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
     override fun onBulletImpact(bullet: BulletObject) {}
+
+    var moveDirection: Direction? = null
 
     final override val hitBox: CuboidHitBox = CuboidHitBox(
         size = Vector3(5, 10, 5),
@@ -190,7 +193,7 @@ open class Tank(
         mainBone?.position?.let {
             val ascend = abs(ground.rotationAt(it.x))
             var newPos = it.clone()
-            newPos = newPos.addScaledVector(vector3 * cos(ascend), deltaTime)
+            newPos = newPos.addScaledVector(vector3 * cos(ascend), deltaTime * SPEED)
 
             if (ground.heightAt(newPos.x) != null) {
                 it.set(newPos)
@@ -253,6 +256,11 @@ open class Tank(
         if (spawnedBullet) {
             spawnedBullet = false
         }
+        if (moveDirection != null) {
+            currentScene.findObject<Ground>()?.let {
+                move(moveDirection!!.vector3, delta, it)
+            }
+        }
     }
 
     protected fun switchDirection() {
@@ -261,5 +269,9 @@ open class Tank(
 
     override fun toString(): String {
         return "Tank(${player.name}), children: $children"
+    }
+
+    companion object {
+        const val SPEED = 3.0
     }
 }
