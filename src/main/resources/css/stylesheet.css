@@ -27,12 +27,13 @@ html, body, #full {
 }
 
 .menu-element {
-    font-size: 30px;
+    font-size: 25px;
     background: whitesmoke;
     border: 4px solid black;
     border-radius: 5px;
     text-align: center;
     padding: 10px;
+    width: fit-content;
 }
 
 .center {
@@ -93,8 +94,8 @@ html, body, #full {
 .arrow-button {
     border: solid black;
     border-width: 0 3px 3px 0;
-    width: 10px;
-    height: 10px;
+    width: 5px;
+    height: 5px;
     display: inline-block;
     padding: 3px;
     cursor: pointer;
@@ -129,9 +130,12 @@ html, body, #full {
 
 .menuContainer {
     text-align: center;
+
     display: flex;
     justify-content: space-evenly;
     flex-direction: column;
+    align-content: center;
+    align-items: center;
     flex-grow: 1;
 }
 
