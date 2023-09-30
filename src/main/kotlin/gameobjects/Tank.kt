@@ -44,7 +44,7 @@ open class Tank(
 
     val bullets: Map<Bullet, Count?> by ::_bullets
 
-    private val bulletSequence = ScrollableList(bullets.keys)
+    private val bulletSequence = ScrollableList(bullets.keys.sortedBy { it.ordinal })
     var currentBullet: Bullet by Delegates.observable(bulletSequence.current, ::notifyObservers)
 
     override val invincible: Boolean = false
