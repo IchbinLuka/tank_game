@@ -33,7 +33,10 @@ abstract class MainScene(
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
     override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 2000).apply {
-        position.z = 150.0
+        window.addEventListener("resize", {
+            position.z = 250.0 / window.aspectRatio
+        })
+        position.z = 250.0 / window.aspectRatio
         position.y = 120.0
         lookAt(Vector3(y = 100))
     }
