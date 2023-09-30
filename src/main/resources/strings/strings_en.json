@@ -32,5 +32,15 @@
   "invalid_server_url": "Invalid server URL",
   "change_server": "Change Server",
   "reset": "Reset",
-  "save": "Save"
+  "save": "Save",
+  "local_game": "Local Game",
+  "online_game": "Online Game",
+  "how_to_play": "How to play",
+  "guide_shoot_mobile": "Tap on the shoot button to shoot.",
+  "guide_shoot_desktop": "Shoot by left clicking.",
+  "guide_move_mobile": "Tap on the buttons in the bottom left corner to move.",
+  "guide_move_desktop": "Move using the arrow keys or WASD.",
+  "guide_aim_mobile": "To aim, tap on the screen and drag your finger to the desired direction.",
+  "guide_aim_desktop": "To aim, move the cursor to the desired direction.",
+  "guide_select_bullet": "You can iterate through the available bullets by tapping on the arrow buttons beside the current bullet."
 }

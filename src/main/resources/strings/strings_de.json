@@ -32,5 +32,8 @@
   "invalid_server_url": "Ungültige Server URL",
   "change_server": "Server wechseln",
   "reset": "Zurücksetzen",
-  "save": "Speichern"
+  "save": "Speichern",
+  "local_game": "Lokales Spiel",
+  "online_game": "Online Spiel",
+  "how_to_play": "Spielanleitung"
 }

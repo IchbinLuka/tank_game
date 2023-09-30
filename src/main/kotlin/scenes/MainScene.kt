@@ -6,10 +6,7 @@ import core.Game
 import core.Player
 import core.gameobjects.GameObject
 import ext.*
-import gameobjects.Background
-import gameobjects.Ground
-import gameobjects.Tank
-import gameobjects.Tree
+import gameobjects.*
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import three.js.*
@@ -80,7 +77,9 @@ abstract class MainScene(
     val aimingStrength = ValueNotifier<Double>(0.0)
     private var aimingStrengthValue: Double by aimingStrength
 
-    val currentTankNotifier by lazy { ValueNotifier(currentTank) }
+    val currentTankNotifier by lazy {
+        ValueNotifier(currentTank)
+    }
 
     private val topBar = MainSceneController(this)
 

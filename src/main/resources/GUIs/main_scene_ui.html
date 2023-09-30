@@ -1,6 +1,13 @@
 <div style="display: flex; height: 100%; flex-direction: column">
     <div class="topbarMenu unselectable"
-         style="display: flex; flex-direction: row; justify-content: space-evenly; align-items: center; width: 100%">
+         style="
+         display: flex;
+         flex-direction: row;
+         justify-content: space-evenly;
+         align-items: center;
+         width: 100%;
+         margin-top: 5px;
+    ">
         <span class="menu-element">
             <span lang-key="current_player">Current Player: </span>
             <span id="player_name">current player</span>
@@ -22,10 +29,13 @@
             <span lang-key="fuel">Fuel: </span>
             <span id="fuel">100%</span>
         </span>
-        <div class="menu-element" style="display: inline-block; width: 175px" id="strength_container">
+        <div class="menu-element" style="display: inline-block; width: 150px" id="strength_container">
             <span lang-key="strength">Strength: </span>
             <span id="strength" style="inline-size: 100px">100%</span>
         </div>
+        <button id="help_button" class="menu-element button" style="padding-inline: 15px">
+            ?
+        </button>
     </div>
 
     <div id="mobile_controls"

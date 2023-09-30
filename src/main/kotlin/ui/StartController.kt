@@ -4,6 +4,7 @@ import ColorData
 import PlayerData
 import core.Game
 import createGame
+import ext.addClickListener
 import ext.fromId
 import ext.tryCast
 import kotlinx.coroutines.MainScope
@@ -32,49 +33,31 @@ class StartController: UIController() {
             multiplayerButton?.disabled = false
         }
     }
-    override fun rebuild() {
-        updatePlayersDisplay()
-    }
 
-    private var playersSlider: HTMLInputElement? = null
-    private var playersDisplay: Element? = null
+    override fun rebuild() {}
+
     private val multiplayerButton: HTMLButtonElement? get() = Element.fromId("multiplayerButton")?.tryCast()
+    private val localButton: HTMLButtonElement? get() = Element.fromId("localButton")?.tryCast()
+    private val guideButton: HTMLButtonElement? get() = Element.fromId("guideButton")?.tryCast()
 
-    private fun updatePlayersDisplay() {
-        playersDisplay?.innerHTML = Localizations.getString("player_count", "count" to playersSlider!!.value)
-    }
 
     private fun initListeners() {
-        playersDisplay = Element.fromId("num_players_display")
-        playersSlider = (Element.fromId("num_players_slider") as HTMLInputElement).apply {
-            addEventListener("input", {
-                updatePlayersDisplay()
-            })
-            max = MainSceneSingleplayer.tankColors.size.toString()
-        }
-
-        Element.fromId("startButton")?.apply {
-            addEventListener("click", {
-                val playerCount = playersSlider?.value?.toIntOrNull() ?: 3
-                Game.instance.currentScene = MainSceneSingleplayer(startData = createGame(List(playerCount) {
-                    val (name, color) = MainSceneSingleplayer.tankColors[it]
-                    PlayerData(
-                        name = name,
-                        color = ColorData(color.getHex().toInt()),
-                    )
-                }))
-            })
-        }
         Element.fromId("settingsButton")?.addEventListener("click", {
             MainScope().launch { GUIHelper.push(SettingsController()) }
         })
-        multiplayerButton?.addEventListener("click", {
+        multiplayerButton?.addClickListener {
             if (APIHelper.url == null) {
                 MainScope().launch { GUIHelper.push(ServerSettingsController()) }
             } else {
                 MainScope().launch { GUIHelper.push(SessionBrowserController()) }
             }
-        })
-        updatePlayersDisplay()
+        }
+        localButton?.addClickListener {
+            MainScope().launch { GUIHelper.push(LocalGameStart()) }
+        }
+
+        guideButton?.addClickListener {
+            MainScope().launch { GUIHelper.push(GuideController()) }
+        }
     }
 }

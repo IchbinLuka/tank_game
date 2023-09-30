@@ -6,6 +6,8 @@ import ext.addClickListener
 import ext.fromId
 import ext.tryCast
 import kotlinx.browser.window
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
@@ -14,6 +16,7 @@ import org.w3c.dom.events.MouseEvent
 import scenes.MainScene
 import three.js.Vector2
 import util.Direction
+import util.GUIHelper
 import util.PlatformUtil
 import kotlin.math.roundToInt
 
@@ -22,19 +25,19 @@ class MainSceneController(
 ): UIController() {
     override val mainGUIName: String = "main_scene_ui"
 
-    private val healthElement by lazy { Element.fromId("health") }
-    private val nameElement by lazy { Element.fromId("player_name") }
+    private val healthElement get() = Element.fromId("health")
+    private val nameElement get() = Element.fromId("player_name")
 
-    private val bulletLeftButton by lazy { Element.fromId("bullet_button_left") }
-    private val bulletRightButton by lazy { Element.fromId("bullet_button_right") }
+    private val bulletLeftButton get() = Element.fromId("bullet_button_left")
+    private val bulletRightButton get() = Element.fromId("bullet_button_right")
 
-    private val bulletName by lazy { Element.fromId("bullet_name") }
-    private val bulletCount by lazy { Element.fromId("bullet_count") }
+    private val bulletName get() = Element.fromId("bullet_name")
+    private val bulletCount get() = Element.fromId("bullet_count")
 
-    private val aimingStrength: HTMLElement? by lazy { Element.fromId("strength")?.tryCast() }
-    private val aimingStrengthContainer: HTMLElement? by lazy { Element.fromId("strength_container")?.tryCast() }
+    private val aimingStrength: HTMLElement? get() = Element.fromId("strength")?.tryCast()
+    private val aimingStrengthContainer: HTMLElement? get() = Element.fromId("strength_container")?.tryCast()
 
-    private val fuelElement by lazy { Element.fromId("fuel") }
+    private val fuelElement get() = Element.fromId("fuel")
 
 
     // Mobile controls
@@ -42,6 +45,7 @@ class MainSceneController(
     private val moveRightButton get() = Element.fromId("button_move_right")?.tryCast<HTMLButtonElement>()
     private val moveLeftButton get() = Element.fromId("button_move_left")?.tryCast<HTMLButtonElement>()
     private val shootButton get() = Element.fromId("shoot_button")?.tryCast<HTMLButtonElement>()
+    private val helpButton get() = Element.fromId("help_button")?.tryCast<HTMLButtonElement>()
 
     override suspend fun init() {
         super.init()
@@ -73,6 +77,10 @@ class MainSceneController(
         }
         bulletRightButton?.addClickListener {
             scene.currentTankNotifier.value.nextBullet()
+        }
+
+        helpButton?.addClickListener {
+            MainScope().launch { GUIHelper.push(GuideController()) }
         }
 
         val cancel = { _: Event ->
