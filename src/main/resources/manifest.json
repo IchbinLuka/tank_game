@@ -1,0 +1,15 @@
+{
+  "name": "Tank Game 3D",
+  "short_name": "Tank Game",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "textures/icons/tank_game_icon.png",
+      "type": "image/png",
+        "sizes": "256x256"
+    }
+  ]
+}
