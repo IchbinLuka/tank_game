@@ -55,7 +55,7 @@ class GameMessageDataTest {
         val data = GameMessageData.GameStartData(
             state = GameMessageData.GameStateData(listOf(), ""),
             groundData = ground,
-            treePositions = listOf()
+            trees = listOf()
         )
         val proto = ProtoBuf.encodeToByteArray(data)
         assertEquals(data, ProtoBuf.decodeFromByteArray<GameMessageData.GameStartData>(proto))

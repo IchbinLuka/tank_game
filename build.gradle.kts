@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 val kotlinWrappersVersion = "1.0.0-pre.555"
 
 plugins {
-    kotlin("js") version "1.9.0"
+    kotlin("js") version "1.9.10"
     id("io.kotest.multiplatform") version "5.5.0"
     kotlin("plugin.serialization") version "1.7.20"
 }

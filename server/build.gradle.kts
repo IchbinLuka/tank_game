@@ -11,6 +11,12 @@ plugins {
     application
 }
 
+repositories {
+    jcenter()
+    mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
+}
+
 
 mockmp {
     usesHelper = true
@@ -23,12 +29,6 @@ application {
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
-
-repositories {
-    jcenter()
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
 }
 
 kotlin {
@@ -68,8 +68,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
                 implementation("io.ktor:ktor-server-websockets:$ktor_version")
                 implementation("io.ktor:ktor-server-resources:$ktor_version")
-                implementation("io.ktor:ktor-network-tls-certificates:$ktor_version")
-                implementation("io.ktor:ktor-server-cio:$ktor_version")
                 implementation("io.ktor:ktor-server-cors:$ktor_version")
                 implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
@@ -84,15 +82,17 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-server-netty:$ktor_version")
+                implementation("io.ktor:ktor-server-netty")
                 implementation("io.insert-koin:koin-logger-slf4j:$koin_ktor")
+                implementation("io.ktor:ktor-network-tls-certificates")
             }
         }
         val jvmTest by getting
         if (!isMingwX64) {
             val nativeMain by getting {
                 dependencies {
-                    // project("common")
+                    implementation("io.ktor:ktor-server-cio:$ktor_version")
+
                 }
             }
             val nativeTest by getting
