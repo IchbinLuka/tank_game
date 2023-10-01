@@ -27,6 +27,7 @@ html, body, #full {
 }
 
 .menu-element {
+    margin: 2px;
     font-size: 25px;
     background: whitesmoke;
     border: 4px solid black;
@@ -146,6 +147,10 @@ button:hover {
 
 .scrollableMenuContainer {
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
 }
 
 .scrollableMenuContainer * {
