@@ -35,5 +35,12 @@
   "save": "Speichern",
   "local_game": "Lokales Spiel",
   "online_game": "Online Spiel",
-  "how_to_play": "Spielanleitung"
+  "how_to_play": "Spielanleitung",
+  "guide_shoot_mobile": "Tipp auf den Bildschirm um zu schiessen.",
+  "guide_shoot_desktop": "Drücke die linke Maustaste um zu schiessen.",
+  "guide_move_mobile": "Benutze die Tasten unten links um dich zu bewegen.",
+  "guide_move_desktop": "Bewege dich mit dem Pfeiltasten oder WASD.",
+  "guide_aim_mobile": "Um zu Zielen, dragge in die gewünschte Richtung.",
+  "guide_aim_desktop": "Um zu Zielen, bewege den Mauszeiger in die gewünschte Richtung.",
+  "guide_select_bullet": "Du kannst durch die verschiedenen Kugeln wechseln, indem du auf die Pfeile neben der ausgewählten Kugel klickst."
 }
