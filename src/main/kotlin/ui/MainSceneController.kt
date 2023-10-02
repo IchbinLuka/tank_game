@@ -2,27 +2,24 @@ package ui
 
 import Bullet
 import core.Game
+import ext.TAG
 import ext.addClickListener
 import ext.fromId
 import ext.tryCast
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.w3c.dom.Element
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLElement
+import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import scenes.MainScene
 import three.js.Vector2
-import util.Direction
-import util.GUIHelper
-import util.PlatformUtil
+import util.*
 import kotlin.math.roundToInt
 
 class MainSceneController(
     private val scene: MainScene
-): UIController() {
+) : UIController() {
     override val mainGUIName: String = "main_scene_ui"
 
     private val healthElement get() = Element.fromId("health")
@@ -98,14 +95,21 @@ class MainSceneController(
         moveRightButton?.apply {
             addEventListener("touchstart", {
                 scene.currentTankNotifier.value.moveDirection = Direction.Right
+            }, objectOf {
+                passive = true
             })
             addEventListener("touchend", cancel)
         }
 
         moveLeftButton?.apply {
-            addEventListener("touchstart", {
-                scene.currentTankNotifier.value.moveDirection = Direction.Left
-            })
+            addEventListener("touchstart",
+                {
+                    scene.currentTankNotifier.value.moveDirection = Direction.Left
+                },
+                options = objectOf {
+                    passive = true
+                }
+            )
             addEventListener("touchend", cancel)
         }
 
@@ -114,11 +118,21 @@ class MainSceneController(
         }
 
         pointerMove = pointerMove@{
-            it as MouseEvent
+            val (clientX, clientY) = when (it) {
+                is MouseEvent -> it.clientX to it.clientY
+                is TouchEvent -> {
+                    val touch = it.touches[0]
+                    touch!!.clientX to touch.clientY
+                }
+                else -> {
+                    Log.e(TAG, "Unknown event type: ${it.type}")
+                    return@pointerMove
+                }
+            }
             val aimingPoint = Vector2()
             val containerBox = Game.instance.gameContainer.getBoundingClientRect()
-            val x = it.clientX.toDouble() - containerBox.left
-            val y = it.clientY.toDouble() - containerBox.top
+            val x = clientX.toDouble() - containerBox.left
+            val y = clientY.toDouble() - containerBox.top
             aimingPoint.x = (x / containerBox.width) * 2 - 1
             aimingPoint.y = -(y / containerBox.height) * 2 + 1
 
@@ -127,7 +141,13 @@ class MainSceneController(
         clickListener = {
             if (!PlatformUtil.isMobile) scene.performShot()
         }
-        window.addEventListener("pointermove", pointerMove)
+        if (PlatformUtil.isMobile) {
+            window.addEventListener("touchmove", pointerMove, objectOf {
+                passive = false
+            })
+        } else {
+            window.addEventListener("pointermove", pointerMove)
+        }
 
         Game.instance.gameContainer.addEventListener("click", clickListener)
     }

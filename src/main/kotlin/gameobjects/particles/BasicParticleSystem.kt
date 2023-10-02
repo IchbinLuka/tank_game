@@ -89,13 +89,10 @@ open class BasicParticleSystem(
                     vertexShader = it
                 }
                 val texture = ResourceManager.disc.await()
-                uniforms = object {
-                    @property:JsName("color")
-                    val color = Uniform(Color(0xffffff))
-                    @property:JsName("pointTexture")
-                    val pointTexture = Uniform(texture)
-                    @property:JsName("alphaTest")
-                    val alphaTest = Uniform(0.9)
+                uniforms = objectOf {
+                    color = Uniform(Color(0xffffff))
+                    pointTexture = Uniform(texture)
+                    this.alphaTest = Uniform(0.9)
                 }
 
                 uniformsNeedUpdate = true

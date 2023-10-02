@@ -50,8 +50,13 @@ class SettingsController: UIController() {
             }
         })
         document.addEventListener("fullscreenchange", {
-            fullscreenCheckBox?.checked = document.fullscreenElement != null
+            updateFullscreenCheckBox()
         })
+        updateFullscreenCheckBox()
+    }
+
+    private fun updateFullscreenCheckBox() {
+        fullscreenCheckBox?.checked = document.fullscreenElement != null
     }
 
     override fun rebuild() {
