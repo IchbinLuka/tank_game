@@ -40,6 +40,7 @@ object GUIHelper {
     }
 
     suspend fun push(controller: UIController) {
+        controllerStack.firstOrNull()?.dispose()
         controllerStack.addFirst(controller)
         update(controller)
     }
