@@ -71,12 +71,10 @@ fun Application.webSocketRoute(
                 null
             )
 
-            var positionBeforeImpact: GameMessageData.Vec3? = null
-
             for (frame in incoming) {
                 val message = GameMessage.fromByteArray(frame.data)
                 val messageData = GameMessageData.fromGameMessage(message)
-                this@webSocketRoute.log.debug("Received message: {} on topic {}", messageData, message.topic)
+                log.debug("Received message: $messageData on topic ${message.topic}")
                 when (messageData) {
                     is GameMessageData.BulletCreationData -> {
                         try {
@@ -158,7 +156,7 @@ fun Application.webSocketRoute(
 
                     is GameMessageData.TransformationUpdate -> {
                         if (message.topic == Topic.tank(player.data.name)) {
-                            log.debug("Updating position of {} to {}", player.data.name, messageData.pos)
+                            log.debug("Updating position of $player.data.name} to ${messageData.pos}")
                             player.position = messageData.pos
                             player.rotation = messageData.rot
                             if (player.position.y < 0 && player.alive) {

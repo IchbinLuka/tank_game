@@ -5,6 +5,7 @@ import GameMessageData
 import PlayerData
 import com.ichbinluka.exceptions.NoCurrentTurnException
 import getBulletDamage
+import io.ktor.util.logging.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -13,6 +14,9 @@ import sessions.SessionInfo
 import sessions.Topic
 import util.Scrollable
 import util.ScrollableList
+import kotlin.concurrent.Volatile
+
+private val log = KtorSimpleLogger("Session")
 
 
 enum class SessionStatus {
@@ -32,7 +36,7 @@ class Session(
     var status: SessionStatus = SessionStatus.WAITING_FOR_PLAYERS
         private set
 
-    // TODO: This is not thread safe
+    @Volatile
     var awaitingShot: Boolean = true
         private set
 
@@ -53,7 +57,7 @@ class Session(
     }
 
     fun begin(startData: GameMessageData.GameStartData) {
-
+        log.debug("Starting session with $startData")
         for (player in players) {
             player.initPlayer(startData.state.tanks.first { it.player == player.data })
         }
@@ -63,7 +67,7 @@ class Session(
     }
 
     /**
-     * @return true if there are more turns to be played, false if the game is over
+     * Ends the current turn and starts the next one.
      */
     suspend fun nextTurn() {
         val alivePlayers = players.filter { it.health > 0 }
@@ -73,6 +77,7 @@ class Session(
             }
             turnIterator = null
             status = SessionStatus.FINISHED
+            log.debug("Game finished")
             broadcast(
                 GameMessage.fromGameMessageData(
                     GameMessageData.GameEnd(
@@ -90,6 +95,7 @@ class Session(
         awaitingShotMutex.withLock {
             awaitingShot = true
         }
+        log.debug("Next player: ${currentTurn?.data?.name}")
         broadcast(
             GameMessage.fromGameMessageData(
                 getState(),
@@ -107,6 +113,7 @@ class Session(
             try {
                 p.session.send(messageBytes)
             } catch (e: Throwable) {
+                log.info("Could not send message to ${p.data.name}: ${e.message}")
                 iter.remove()
                 playersChanged = true
             }
