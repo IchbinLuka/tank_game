@@ -31,6 +31,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
             implementation(enforcedPlatform("org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:$kotlinWrappersVersion"))
             implementation("org.jetbrains.kotlin-wrappers:kotlin-js")
+            implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.9.1")
             testImplementation(kotlin("test-js"))
         }
 
