@@ -43,6 +43,7 @@ open class BulletObject protected constructor(
     open class Factory : GameObjectFactory<BulletObject, BulletObjectArgs>() {
         lateinit var disc: Texture
         override suspend fun loadAssets() {
+            Log.d(TAG, "loading assets for bullet")
             disc = ResourceManager.disc.await()
         }
 
@@ -178,9 +179,6 @@ open class BulletObject protected constructor(
             } else {
                 val distance = o.position.distanceTo(this@BulletObject.position).toDouble()
                 o.damage(getBulletDamage(distance, type))
-//                if (distance < explosionWidth) {
-//                    o.damage((1 / max(distance.pow(2) * .05, 1.0)) * damage)
-//                }
             }
 
             if (o is Tank) {
@@ -227,6 +225,7 @@ open class BulletObject protected constructor(
         dotTimer += delta
         if (dotTimer > 0.5) {
             dotTimer = 0.0
+            Log.d(TAG, "adding dot")
             dotVertices.apply {
                 position.toFloatList().reversed().forEach {
                     addFirst(it)
@@ -247,20 +246,6 @@ open class BulletObject protected constructor(
         if (isNew) {
             isNew = false
         }
-        /*
-        if (!proxy) {
-            broadcaster?.broadcast(
-                GameMessage.fromGameMessageData(
-                    GameMessageData.GameObjectMoveUpdate(
-                        pos = GameMessageData.Vec3.fromVector3(position),
-                        startVelocity = GameMessageData.Vec3.fromVector3(startVelocity),
-                        acceleration = GameMessageData.Vec3.fromVector3(acceleration),
-                        rot = GameMessageData.Vec3.fromVector3(globalRotation.toVector3()),
-                    ),
-                    topic = topic
-                ),
-            )
-        }*/
     }
 
     /**
@@ -281,13 +266,13 @@ open class BulletObject protected constructor(
     companion object : Factory()
 
     override fun init() {
+        Log.d(TAG, "initializing dots")
         renderable.add(Points(dots,
             PointsMaterial().apply {
                 color = Color(0xffffff)
                 size = 1.5 * window.devicePixelRatio
+                transparent = true
                 alphaMap = disc
-                map = disc
-                alphaTest = 0.5
             }
         ))
         bulletMesh.add(hitBox.renderable)

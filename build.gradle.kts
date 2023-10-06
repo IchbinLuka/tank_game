@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 val kotlinWrappersVersion = "1.0.0-pre.555"
 
 plugins {
-    kotlin("js") version "1.9.0"
+    kotlin("js") version "1.9.10"
     id("io.kotest.multiplatform") version "5.5.0"
     kotlin("plugin.serialization") version "1.7.20"
 }
@@ -31,6 +31,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
             implementation(enforcedPlatform("org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:$kotlinWrappersVersion"))
             implementation("org.jetbrains.kotlin-wrappers:kotlin-js")
+            implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.9.1")
             testImplementation(kotlin("test-js"))
         }
 

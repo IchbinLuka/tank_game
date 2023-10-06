@@ -7,35 +7,34 @@ import ext.addClickListener
 import ext.fromId
 import ext.tryCast
 import kotlinx.browser.window
-import org.w3c.dom.Element
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLElement
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import scenes.MainScene
 import three.js.Vector2
-import util.Log
-import util.PlatformUtil
+import util.*
 import kotlin.math.roundToInt
 
 class MainSceneController(
     private val scene: MainScene
-): UIController() {
+) : UIController() {
     override val mainGUIName: String = "main_scene_ui"
 
-    private val healthElement by lazy { Element.fromId("health") }
-    private val nameElement by lazy { Element.fromId("player_name") }
+    private val healthElement get() = Element.fromId("health")
+    private val nameElement get() = Element.fromId("player_name")
 
-    private val bulletLeftButton by lazy { Element.fromId("bullet_button_left") }
-    private val bulletRightButton by lazy { Element.fromId("bullet_button_right") }
+    private val bulletLeftButton get() = Element.fromId("bullet_button_left")
+    private val bulletRightButton get() = Element.fromId("bullet_button_right")
 
-    private val bulletName by lazy { Element.fromId("bullet_name") }
-    private val bulletCount by lazy { Element.fromId("bullet_count") }
+    private val bulletName get() = Element.fromId("bullet_name")
+    private val bulletCount get() = Element.fromId("bullet_count")
 
-    private val aimingStrength: HTMLElement? by lazy { Element.fromId("strength")?.tryCast() }
-    private val aimingStrengthContainer: HTMLElement? by lazy { Element.fromId("strength_container")?.tryCast() }
+    private val aimingStrength: HTMLElement? get() = Element.fromId("strength")?.tryCast()
+    private val aimingStrengthContainer: HTMLElement? get() = Element.fromId("strength_container")?.tryCast()
 
-    private val fuelElement by lazy { Element.fromId("fuel") }
+    private val fuelElement get() = Element.fromId("fuel")
 
 
     // Mobile controls
@@ -43,15 +42,13 @@ class MainSceneController(
     private val moveRightButton get() = Element.fromId("button_move_right")?.tryCast<HTMLButtonElement>()
     private val moveLeftButton get() = Element.fromId("button_move_left")?.tryCast<HTMLButtonElement>()
     private val shootButton get() = Element.fromId("shoot_button")?.tryCast<HTMLButtonElement>()
+    private val helpButton get() = Element.fromId("help_button")?.tryCast<HTMLButtonElement>()
 
     override suspend fun init() {
         super.init()
 
         if (PlatformUtil.isMobile) {
             mobileControls?.style?.visibility = "visible"
-            mobileControls?.oncontextmenu = {
-                it.preventDefault()
-            }
         }
 
         initListeners()
@@ -79,34 +76,63 @@ class MainSceneController(
             scene.currentTankNotifier.value.nextBullet()
         }
 
-        val stop = { _: Event ->
-            scene.currentTankNotifier.value.stopMoving()
+        helpButton?.addClickListener {
+            MainScope().launch { GUIHelper.push(GuideController()) }
+        }
+
+        val cancel = { _: Event ->
+            scene.currentTankNotifier.value.moveDirection = null
+        }
+
+        // Prevent context menu from opening on mobile when long pressing
+        mobileControls?.oncontextmenu = contextMenu@{
+            it.preventDefault()
+            it.stopPropagation()
+            it.stopImmediatePropagation()
+            return@contextMenu false
         }
 
         moveRightButton?.apply {
             addEventListener("touchstart", {
-                scene.currentTankNotifier.value.startMovingRight()
+                scene.currentTankNotifier.value.moveDirection = Direction.Right
+            }, objectOf {
+                passive = true
             })
-            addEventListener("touchend", stop)
-        } ?: Log.e(TAG, "Move right button not found")
+            addEventListener("touchend", cancel)
+        }
 
         moveLeftButton?.apply {
-            addEventListener("touchstart", {
-                scene.currentTankNotifier.value.startMovingLeft()
-            })
-            addEventListener("touchend", stop)
-        } ?: Log.e(TAG, "Move left button not found")
+            addEventListener("touchstart",
+                {
+                    scene.currentTankNotifier.value.moveDirection = Direction.Left
+                },
+                options = objectOf {
+                    passive = true
+                }
+            )
+            addEventListener("touchend", cancel)
+        }
 
         shootButton?.addClickListener {
             scene.performShot()
         }
 
         pointerMove = pointerMove@{
-            it as MouseEvent
+            val (clientX, clientY) = when (it) {
+                is MouseEvent -> it.clientX to it.clientY
+                is TouchEvent -> {
+                    val touch = it.touches[0]
+                    touch!!.clientX to touch.clientY
+                }
+                else -> {
+                    Log.e(TAG, "Unknown event type: ${it.type}")
+                    return@pointerMove
+                }
+            }
             val aimingPoint = Vector2()
             val containerBox = Game.instance.gameContainer.getBoundingClientRect()
-            val x = it.clientX.toDouble() - containerBox.left
-            val y = it.clientY.toDouble() - containerBox.top
+            val x = clientX.toDouble() - containerBox.left
+            val y = clientY.toDouble() - containerBox.top
             aimingPoint.x = (x / containerBox.width) * 2 - 1
             aimingPoint.y = -(y / containerBox.height) * 2 + 1
 
@@ -115,7 +141,13 @@ class MainSceneController(
         clickListener = {
             if (!PlatformUtil.isMobile) scene.performShot()
         }
-        window.addEventListener("pointermove", pointerMove)
+        if (PlatformUtil.isMobile) {
+            window.addEventListener("touchmove", pointerMove, objectOf {
+                passive = false
+            })
+        } else {
+            window.addEventListener("pointermove", pointerMove)
+        }
 
         Game.instance.gameContainer.addEventListener("click", clickListener)
     }

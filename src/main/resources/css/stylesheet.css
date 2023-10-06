@@ -27,17 +27,21 @@ html, body, #full {
 }
 
 .menu-element {
-    font-size: 30px;
+    margin: 2px;
+    font-size: 25px;
     background: whitesmoke;
     border: 4px solid black;
     border-radius: 5px;
     text-align: center;
-    padding: 10px;
+    padding: 6px;
+    width: fit-content;
 }
 
 .center {
     display: flex;
     justify-content: center;
+    align-items: center;
+    align-content: center;
     flex-direction: column;
     text-align: center;
     position: absolute;
@@ -85,16 +89,19 @@ html, body, #full {
     cursor: pointer;
 }
 
-.button {
+button {
     cursor: pointer;
+}
 
+button:hover {
+    background: #dcdcdc;
 }
 
 .arrow-button {
     border: solid black;
     border-width: 0 3px 3px 0;
-    width: 10px;
-    height: 10px;
+    width: 5px;
+    height: 5px;
     display: inline-block;
     padding: 3px;
     cursor: pointer;
@@ -129,10 +136,27 @@ html, body, #full {
 
 .menuContainer {
     text-align: center;
+
     display: flex;
     justify-content: space-evenly;
     flex-direction: column;
+    align-content: center;
+    align-items: center;
     flex-grow: 1;
+}
+
+.scrollableMenuContainer {
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+}
+
+.scrollableMenuContainer * {
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
 }
 
 @media screen and (max-height: 500px) {

@@ -6,10 +6,7 @@ import core.Game
 import core.Player
 import core.gameobjects.GameObject
 import ext.*
-import gameobjects.Background
-import gameobjects.Ground
-import gameobjects.Tank
-import gameobjects.Tree
+import gameobjects.*
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import three.js.*
@@ -33,7 +30,10 @@ abstract class MainScene(
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
     }
     override val camera = PerspectiveCamera(75, window.aspectRatio, 0.1, 2000).apply {
-        position.z = 150.0
+        window.addEventListener("resize", {
+            position.z = 250.0 / window.aspectRatio
+        })
+        position.z = 250.0 / window.aspectRatio
         position.y = 120.0
         lookAt(Vector3(y = 100))
     }
@@ -77,7 +77,9 @@ abstract class MainScene(
     val aimingStrength = ValueNotifier<Double>(0.0)
     private var aimingStrengthValue: Double by aimingStrength
 
-    val currentTankNotifier by lazy { ValueNotifier(currentTank) }
+    val currentTankNotifier by lazy {
+        ValueNotifier(currentTank)
+    }
 
     private val topBar = MainSceneController(this)
 
@@ -178,10 +180,10 @@ abstract class MainScene(
         EventManager.keyboardEvents.events.forEach {
             when (it.code) {
                 KeyCodes.KEY_A, KeyCodes.ARROW_LEFT -> {
-                    currentTank?.move(Vector3(-6, 0, 0), delta, ground)
+                    currentTank?.move(Direction.Left.vec3.toVector3(), delta, ground)
                 }
                 KeyCodes.KEY_D, KeyCodes.ARROW_RIGHT -> {
-                    currentTank?.move(Vector3(6, 0, 0), delta, ground)
+                    currentTank?.move(Direction.Right.vec3.toVector3(), delta, ground)
                 }
             }
         }

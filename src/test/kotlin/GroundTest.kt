@@ -4,10 +4,10 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.data.blocking.forAll
 import io.kotest.data.row
 import io.kotest.matchers.shouldBe
+import noise.BoundedNoise
 import three.js.Plane
 import three.js.Ray
 import three.js.Vector3
-import util.noise.BoundedNoise
 
 class PlaneNoise(
     private val width: Int,
@@ -31,7 +31,7 @@ class GroundTest : StringSpec({
     "Ground.heightAt with a flat plane as heightmap should always return 0.0" {
         // Game()
         val flat = Ground(data = PlaneNoise(50, 50, Vector3(0, 1, 0)).allValues())
-        flat.initVisual()
+        flat.preloadAssets()
         flat.heightAt(10.0) shouldBe 0.0
         flat.heightAt(30.0) shouldBe 0.0
     }
@@ -39,7 +39,7 @@ class GroundTest : StringSpec({
     "Ground.heightAt with a tilted plane should return the correct height" {
         val plane = PlaneNoise(50, 50, Vector3(1, 2, 0).cross(cross)).allValues()
         val tilted = Ground(data = plane)
-        tilted.initVisual()
+        tilted.preloadAssets()
         forAll(
             row(0.0, 0.0),
             row(10.0, 20.0),
@@ -50,7 +50,7 @@ class GroundTest : StringSpec({
         }
 
         val tiltedOffset = Ground(data = plane, offset = Vector3(x = -10))
-        tiltedOffset.initVisual()
+        tiltedOffset.preloadAssets()
         tiltedOffset.heightAt(15.0) shouldBe 50.0
         tiltedOffset.heightAt(20.0) shouldBe 60.0
     }

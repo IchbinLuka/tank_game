@@ -28,6 +28,8 @@ open class Tank(
 ) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
     override fun onBulletImpact(bullet: BulletObject) {}
 
+    var moveDirection: Direction? = null
+
     final override val hitBox: CuboidHitBox = CuboidHitBox(
         size = Vector3(5, 10, 5),
         associatedObject = this
@@ -42,7 +44,7 @@ open class Tank(
 
     val bullets: Map<Bullet, Count?> by ::_bullets
 
-    private val bulletSequence = ScrollableList(bullets.keys)
+    private val bulletSequence = ScrollableList(bullets.keys.sortedBy { it.ordinal })
     var currentBullet: Bullet by Delegates.observable(bulletSequence.current, ::notifyObservers)
 
     override val invincible: Boolean = false
@@ -52,20 +54,6 @@ open class Tank(
     override var renderable: Object3D = Group()
 
     private val deathListeners: MutableList<() -> Unit> = mutableListOf()
-
-    private var moveDirection: Direction? = null
-
-    fun startMovingRight() {
-        moveDirection = Direction.Right
-    }
-
-    fun stopMoving() {
-        moveDirection = null
-    }
-
-    fun startMovingLeft() {
-        moveDirection = Direction.Left
-    }
 
     fun addDeathListener(listener: () -> Unit) {
         deathListeners.add(listener)
@@ -205,7 +193,7 @@ open class Tank(
         mainBone?.position?.let {
             val ascend = abs(ground.rotationAt(it.x))
             var newPos = it.clone()
-            newPos = newPos.addScaledVector(vector3 * cos(ascend), deltaTime)
+            newPos = newPos.addScaledVector(vector3 * cos(ascend), deltaTime * SPEED)
 
             if (ground.heightAt(newPos.x) != null) {
                 it.set(newPos)
@@ -265,25 +253,25 @@ open class Tank(
 
     override fun update(delta: Double) {
         super.update(delta)
-
         if (spawnedBullet) {
             spawnedBullet = false
         }
-
         if (moveDirection != null) {
-            move(
-                moveDirection!!.vector3,
-                delta,
-                currentScene.findObject() ?: return
-            )
+            currentScene.findObject<Ground>()?.let {
+                move(moveDirection!!.vector3, delta, it)
+            }
         }
     }
 
-    private fun switchDirection() {
+    protected fun switchDirection() {
         setDirection(direction.inverse)
     }
 
     override fun toString(): String {
         return "Tank(${player.name}), children: $children"
+    }
+
+    companion object {
+        const val SPEED = 3.0
     }
 }

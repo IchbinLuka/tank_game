@@ -4,7 +4,11 @@ import Bullet
 import GameMessageData
 import PlayerData
 import com.ichbinluka.exceptions.MissingBulletException
+import io.ktor.util.logging.*
 import io.ktor.websocket.*
+import kotlin.concurrent.Volatile
+
+private val log = KtorSimpleLogger("Player")
 
 class Player(
     val data: PlayerData,
@@ -12,15 +16,22 @@ class Player(
     val session: WebSocketSession
 ) {
     val alive: Boolean get() = health > 0
+
+    @Volatile
     var health: Double = 1.0
+    @Volatile
     var fuel: Double = 1.0
         private set
 
     private lateinit var bullets: HashMap<Bullet, Int?>
 
+    @Volatile
     var position: GameMessageData.Vec3 = GameMessageData.Vec3(0.0, 0.0, 0.0)
+
+    @Volatile
     var rotation: GameMessageData.Vec3 = GameMessageData.Vec3(0.0, 0.0, 0.0)
 
+    @Volatile
     var positionBeforeImpact = position
 
     fun getBulletCount(bullet: Bullet): Int? = bullets[bullet]
@@ -41,7 +52,7 @@ class Player(
      * @throws MissingBulletException if there are no bullets of the specified type
      */
     fun shoot(bullet: Bullet) {
-        Bullet.Normal.ordinal
+        log.debug("Shooting bullet: $bullet")
         val count = bullets[bullet] ?: return
         if (count <= 0) throw MissingBulletException()
         bullets[bullet] = count - 1
