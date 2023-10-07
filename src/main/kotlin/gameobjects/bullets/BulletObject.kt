@@ -168,9 +168,6 @@ open class BulletObject protected constructor(
             Log.d(TAG, "broadcasting bullet impact")
             broadcastImpact(intersectingBox)
         }
-        if (!proxy) {
-            ground.destroy(this@BulletObject.position.x, strength = explosionWidth, broadcast = true)
-        }
         currentScene.addGameObject(Explosion(position = this@BulletObject.position, radius = explosionWidth / 15))
         intersectingBox.onBulletImpact(this)
         for (o in Game.instance.currentScene.children.values) {
@@ -184,6 +181,9 @@ open class BulletObject protected constructor(
             if (o is Tank) {
                 o.adjustTransformToGround(ground)
             }
+        }
+        if (!proxy) {
+            ground.destroy(this@BulletObject.position.x, strength = explosionWidth, broadcast = true)
         }
         Log.d(TAG, "destroying bullet")
         die()
