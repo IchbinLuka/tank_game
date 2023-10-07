@@ -8,11 +8,13 @@ import kotlinx.serialization.json.jsonPrimitive
 
 object Localizations {
 
-    const val DEFAULT_LANG = "en"
+    private const val DEFAULT_LANG = "en"
 
     private val langMutex = Mutex()
 
     var initialized: Boolean = false
+        private set
+
     private var translations: Map<String, String> = mapOf()
 
     fun getString(key: String, vararg args: Pair<String, Any?>): String {
