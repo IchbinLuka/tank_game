@@ -12,7 +12,7 @@
   "strength": "Strength: ",
   "loading": "Loading",
   "player_wins": "{name} Wins",
-  "player_count": "Players: ",
+  "player_count": "Players: {count}",
   "cookie_notice": "Note: This website uses cookies to persist the settings.",
   "fullscreen": "Fullscreen",
   "multiplayer": "Multiplayer",
