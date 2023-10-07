@@ -15,6 +15,7 @@ import kotlinx.html.style
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
+import org.w3c.dom.events.WheelEvent
 import scenes.MainScene
 import three.js.Vector2
 import ui.views.menuButton
@@ -162,6 +163,7 @@ class MainSceneController(
     private lateinit var pointerMove: (Event) -> Unit
 
     private lateinit var clickListener: (Event) -> Unit
+    private lateinit var wheelListener: (Event) -> Unit
 
     private fun initListeners() {
         scene.currentTankNotifier.addListener {
@@ -229,6 +231,17 @@ class MainSceneController(
 
             scene.updateAimingPoint(aimingPoint)
         }
+
+        wheelListener = wheelListener@{
+            if (it !is WheelEvent) return@wheelListener
+
+            if (it.deltaY < 0) {
+                scene.currentTankNotifier.value.previousBullet()
+            } else if (it.deltaY > 0) {
+                scene.currentTankNotifier.value.nextBullet()
+            }
+        }
+
         clickListener = {
             if (!PlatformUtil.isMobile) scene.performShot()
         }
@@ -238,6 +251,7 @@ class MainSceneController(
             })
         } else {
             window.addEventListener("pointermove", pointerMove)
+            window.addEventListener("wheel", wheelListener)
         }
 
         Game.instance.gameContainer.addEventListener("click", clickListener)
@@ -276,6 +290,7 @@ class MainSceneController(
     override fun dispose() {
         super.dispose()
         window.removeEventListener("pointermove", pointerMove)
+        window.removeEventListener("wheel", wheelListener)
         Game.instance.gameContainer.removeEventListener("click", clickListener)
     }
 

@@ -163,7 +163,6 @@ open class CuboidHitBox(
                 }
             }
         }.toList()
-        Log.d(TAG, "updated vertices")
     }
 
     private fun updatePlanes() {
