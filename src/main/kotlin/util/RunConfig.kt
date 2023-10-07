@@ -1,6 +1,6 @@
 package util
 
-val debugLevel = RunConfig.Error
+val debugLevel = RunConfig.Debug
 
 @Suppress("unused")
 enum class RunConfig {

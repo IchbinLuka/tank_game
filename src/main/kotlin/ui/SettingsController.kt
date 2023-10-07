@@ -2,23 +2,60 @@ package ui
 
 import core.Game
 import ext.fromId
+import ext.s
 import ext.tryCast
 import kotlinx.browser.document
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.html.*
+import kotlinx.html.js.onClickFunction
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLInputElement
+import ui.views.backButton
+import ui.views.menuButton
+import ui.views.menuElement
+import ui.views.menuPage
 import util.FullscreenUtil
-import util.GUIHelper
 import util.ScrollableList
 
 class SettingsController: UIController() {
 
-    override val mainGUIName: String = "settings"
+    override val mainUIBuilder: UIBuilder = {
+        menuPage(
+            title = { s("settings") },
+            sections = listOf {
+                style = "flex-grow: 3"
 
-    private val langButton by lazy { Element.fromId("languageButton") }
-    private val langElement by lazy { Element.fromId("langCode") }
-    private val backButton by lazy { Element.fromId("backButton") }
+                div("gridContainer") {
+                    menuButton {
+                        id = "languageButton"
+                        style = "cursor: pointer"
+
+                        onClickFunction = { langButtonClick() }
+
+                        span {
+                            s("language")
+                        }
+                        span {
+                            +settings.language
+                        }
+                    }
+                    menuElement {
+                        label {
+                            span {
+                                s("fullscreen")
+                            }
+                            input(classes = "checkBox", type = InputType.checkBox) {
+                                id = "fullscreen_checkbox"
+                                onClickFunction = { fullscreenClick() }
+                            }
+                        }
+                    }
+                }
+
+                backButton()
+            }
+        )
+    }
+
     private val fullscreenCheckBox: HTMLInputElement? by lazy {
         Element.fromId("fullscreen_checkbox")?.tryCast()
     }
@@ -33,22 +70,19 @@ class SettingsController: UIController() {
         nextWhile { it != settings.language }
     }
 
+    private fun langButtonClick() {
+        locales.next()
+        settings = settings.copy(language = locales.current)
+    }
+
+    private fun fullscreenClick() {
+        fullscreenCheckBox?.checked?.let {
+            FullscreenUtil.setFullscreen(it)
+        }
+    }
 
     override suspend fun init() {
         super.init()
-
-        langButton?.addEventListener("click", {
-            locales.next()
-            settings = settings.copy(language = locales.current)
-        })
-        backButton?.addEventListener("click", {
-            MainScope().launch { GUIHelper.pop() }
-        })
-        fullscreenCheckBox?.addEventListener("click", {
-            fullscreenCheckBox?.checked?.let {
-                FullscreenUtil.setFullscreen(it)
-            }
-        })
         document.addEventListener("fullscreenchange", {
             updateFullscreenCheckBox()
         })
@@ -57,9 +91,5 @@ class SettingsController: UIController() {
 
     private fun updateFullscreenCheckBox() {
         fullscreenCheckBox?.checked = document.fullscreenElement != null
-    }
-
-    override fun rebuild() {
-        langElement?.innerHTML = settings.language
     }
 }

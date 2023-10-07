@@ -1,57 +1,43 @@
 package ui.views
 
 import ext.s
-import kotlinx.html.*
+import kotlinx.html.div
 import kotlinx.html.js.onClickFunction
 
-fun DIV.startScreen(
+fun UI.startScreen(
     onLocalGame: () -> Unit,
     onMultiplayerGame: () -> Unit,
     onGuide: () -> Unit,
     onSettings: () -> Unit
 ) {
     menuPage(
-        title = "Tanks 3D",
+        title = { +"Tanks 3D" },
         listOf {
             div {
-                button(classes = "menu-element button") {
+                menuButton {
                     onClickFunction = { onLocalGame() }
                     s("local_game")
                 }
             }
             div {
-                button(classes = "menu-element button") {
+                menuButton {
                     onClickFunction = { onMultiplayerGame() }
                     s("online_game")
                 }
             }
             div {
-                button(classes = "menu-element button") {
+                menuButton {
                     onClickFunction = { onGuide() }
                     s("how_to_play")
                 }
             }
             div {
-                button(classes = "menu-element button") {
+                menuButton {
                     onClickFunction = { onSettings() }
                     s("settings")
                 }
             }
         }
     )
-}
-
-fun DIV.menuPage(title: String, sections: List<DIV.() -> Unit>) {
-    style = "width: 100%; height: 100%"
-    div("center menuPage") {
-        div("menuContainer") {
-            h1("menu-element menuTitle") { +title }
-        }
-        for (section in sections) {
-            div("menuContainer") {
-                section()
-            }
-        }
-    }
 }
 

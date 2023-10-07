@@ -2,31 +2,138 @@ package ui
 
 import Bullet
 import core.Game
-import ext.TAG
-import ext.addClickListener
-import ext.fromId
-import ext.tryCast
+import ext.*
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.html.i
+import kotlinx.html.id
+import kotlinx.html.js.div
+import kotlinx.html.js.onClickFunction
+import kotlinx.html.span
+import kotlinx.html.style
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import scenes.MainScene
 import three.js.Vector2
+import ui.views.menuButton
+import ui.views.menuElement
 import util.*
 import kotlin.math.roundToInt
 
 class MainSceneController(
     private val scene: MainScene
 ) : UIController() {
-    override val mainGUIName: String = "main_scene_ui"
+
+    override val mainUIBuilder: UIBuilder = {
+        div {
+            style = "display: flex; height: 100%; flex-direction: column"
+            div("topbarMenu unselectable") {
+                style = """
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-evenly;
+                    align-items: center;
+                    width: 100%;
+                    margin-top: 5px;
+                """
+                span("menu-element") {
+                    span { s("current_player") }
+                    span { id = "player_name" }
+                }
+                menuElement {
+                    style = "display: inline"
+                    span { s("bullet") }
+                    div {
+                        style = "display: inline-block"
+                        i("arrow-button left") {
+                            onClickFunction = { scene.currentTankNotifier.value.previousBullet() }
+                        }
+                        span {
+                            id = "bullet_name"
+                        }
+                        span {
+                            id = "bullet_count"
+                        }
+                        i("arrow-button right") {
+                            onClickFunction = { scene.currentTankNotifier.value.nextBullet() }
+                        }
+                    }
+                }
+                span("menu-element") {
+                    span {
+                        s("health")
+                    }
+                    span {
+                        id = "health"
+                    }
+                }
+                span("menu-element") {
+                    span {
+                        s("fuel")
+                    }
+                    span {
+                        id = "fuel"
+                    }
+                }
+                div("menu-element") {
+                    style = "display: inline-block; width: 150px"
+                    id = "strength_container"
+                    span {
+                        attributes["lang-key"] = "strength"
+                        +"""Strength:"""
+                    }
+                    span {
+                        id = "strength"
+                        style = "inline-size: 100px"
+                        +"""100%"""
+                    }
+                }
+                menuButton {
+                    style = "padding-inline: 15px"
+                    +"?"
+                    onClickFunction = {
+                        MainScope().launch { GUIHelper.push(GuideController()) }
+                    }
+                }
+            }
+            div {
+                id = "mobile_controls"
+                style = """
+                    visibility: ${if (PlatformUtil.isMobile) "visible" else "hidden"};
+                    display: flex;
+                    bottom: 10px;
+                    width: 100%;
+                    position: absolute;
+                    justify - content: space-between;
+                    user - select: none;
+                """
+                div {
+                    menuButton {
+                        id = "button_move_left"
+                        style = "margin: 10px"
+                        i("arrow-button left")
+                    }
+                    menuButton {
+                        id = "button_move_right"
+                        style = "margin: 10px"
+                        i("arrow-button right")
+                    }
+                }
+                div {
+                    menuButton {
+                        id = "shoot_button"
+                        style = "margin: 10px"
+                        +"""Shoot"""
+                    }
+                }
+            }
+        }
+    }
 
     private val healthElement get() = Element.fromId("health")
     private val nameElement get() = Element.fromId("player_name")
-
-    private val bulletLeftButton get() = Element.fromId("bullet_button_left")
-    private val bulletRightButton get() = Element.fromId("bullet_button_right")
 
     private val bulletName get() = Element.fromId("bullet_name")
     private val bulletCount get() = Element.fromId("bullet_count")
@@ -42,15 +149,9 @@ class MainSceneController(
     private val moveRightButton get() = Element.fromId("button_move_right")?.tryCast<HTMLButtonElement>()
     private val moveLeftButton get() = Element.fromId("button_move_left")?.tryCast<HTMLButtonElement>()
     private val shootButton get() = Element.fromId("shoot_button")?.tryCast<HTMLButtonElement>()
-    private val helpButton get() = Element.fromId("help_button")?.tryCast<HTMLButtonElement>()
 
     override suspend fun init() {
         super.init()
-
-        if (PlatformUtil.isMobile) {
-            mobileControls?.style?.visibility = "visible"
-        }
-
         initListeners()
     }
 
@@ -68,16 +169,6 @@ class MainSceneController(
         }
         scene.aimingStrength.addListener {
             aimingStrength?.innerHTML = "${(it * 100).roundToInt()}%"
-        }
-        bulletLeftButton?.addClickListener {
-            scene.currentTankNotifier.value.previousBullet()
-        }
-        bulletRightButton?.addClickListener {
-            scene.currentTankNotifier.value.nextBullet()
-        }
-
-        helpButton?.addClickListener {
-            MainScope().launch { GUIHelper.push(GuideController()) }
         }
 
         val cancel = { _: Event ->
@@ -170,7 +261,7 @@ class MainSceneController(
     private fun updateBulletCount(bullet: Bullet = scene.currentTankNotifier.value.currentBullet) {
         val tank = scene.currentTankNotifier.value
         bulletName?.innerHTML = bullet.toString()
-        bulletCount?.innerHTML = tank.bullets[bullet]?.toString() ?: "\u221e"
+        bulletCount?.innerHTML = ": ${tank.bullets[bullet]?.toString() ?: "\u221e"}"
     }
 
     private fun updateUI() {

@@ -1,19 +1,20 @@
 package util
 
 import core.Game
+import ext.tryCast
 import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.dom.clear
+import kotlinx.html.dom.append
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import ui.UIController
 
-private const val GUI_LOAD_FAILURE = "Unable to load GUI"
-
 object GUIHelper {
 
-    private val gUIElement: Element? get() = document.getElementById("uiContainer")
+    private val gUIElement: HTMLElement? get() = document.getElementById("uiContainer")?.tryCast()
     private val topBar: Element? get() = document.getElementById("topBar")
 
     private val cachedGUIs = hashMapOf<String, String>()
@@ -72,32 +73,32 @@ object GUIHelper {
                 element.innerHTML = Localizations.getString(element.getAttribute("lang-key")!!)
             }
         }
-        controller?.rebuild()
+        MainScope().launch { update(controller) }
     }
 
     private suspend fun update(controller: UIController?) {
+        resetGUI()
         if (controller == null) {
-            resetGUI()
             return
         }
-        controller.mainGUIName?.let { loadGUI(it) }
-        controller.topBarName?.let { loadTopBar(it) }
-        translateDocument()
+        controller.mainUIBuilder?.let {
+            gUIElement?.append {
+                it(this)
+            }
+        }
+
+        controller.topBarBuilder?.let {
+            topBar?.append {
+                it(this)
+            }
+        }
         controller.init()
         controller.rebuild()
     }
 
-    private suspend fun loadGUI(name: String) {
-        val content = getContent(name)
-        gUIElement?.innerHTML = content ?: GUI_LOAD_FAILURE
-    }
-
-    private suspend fun loadTopBar(name: String) {
-        topBar?.innerHTML = getContent(name) ?: GUI_LOAD_FAILURE
-    }
 
     fun resetGUI() {
-        gUIElement?.innerHTML = ""
-        topBar?.innerHTML = ""
+        gUIElement?.clear()
+        topBar?.clear()
     }
 }

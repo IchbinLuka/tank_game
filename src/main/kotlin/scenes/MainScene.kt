@@ -6,7 +6,10 @@ import core.Game
 import core.Player
 import core.gameobjects.GameObject
 import ext.*
-import gameobjects.*
+import gameobjects.Background
+import gameobjects.Ground
+import gameobjects.Tank
+import gameobjects.Tree
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import three.js.*
@@ -136,7 +139,7 @@ abstract class MainScene(
         for (tank in tanks.filter { it.active }) {
             deadPlayers.addFirst(tank.player)
         }
-        Log.d(TAG, "$tanks, length: ${tanks.size}")
+        Log.d(TAG, deadPlayers.map { it.name })
         Game.instance.currentScene = GameEndScene(deadPlayers)
     }
 

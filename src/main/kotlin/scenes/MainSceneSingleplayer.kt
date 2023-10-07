@@ -1,11 +1,12 @@
 package scenes
 
 import GameMessageData
-import core.Game
 import core.Player
+import ext.TAG
 import ext.toVector3
 import gameobjects.Tank
 import three.js.Color
+import util.Log
 
 class MainSceneSingleplayer(
     startData: GameMessageData.GameStartData
@@ -16,6 +17,7 @@ class MainSceneSingleplayer(
             startPosition = it.pos.toVector3(),
         ).apply {
             addDeathListener {
+                Log.d(TAG, "Player ${player.name} died")
                 deadPlayers.addFirst(player)
                 if (currentTank == this) {
                     nextTank()
@@ -38,10 +40,6 @@ class MainSceneSingleplayer(
     private fun nextTank() {
         val aliveTanks = tanks.filter { it.active }
         if (aliveTanks.size <= 1) {
-            for (tank in aliveTanks) {
-                deadPlayers.addFirst(tank.player)
-            }
-            Game.instance.currentScene = GameEndScene(deadPlayers)
             return
         } else {
             do {

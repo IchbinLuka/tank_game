@@ -1,7 +1,9 @@
 package ui
 
-class LoadingSceneController: UIController() {
+import ui.views.loadingScreen
 
-    override val mainGUIName: String = "loading_screen"
-    override fun rebuild() {}
+class LoadingSceneController: UIController() {
+    override val mainUIBuilder: UIBuilder = {
+        loadingScreen()
+    }
 }
