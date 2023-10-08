@@ -38,14 +38,17 @@ class SettingsController: UIController() {
                             +settings.language
                         }
                     }
-                    menuElement {
-                        label {
-                            span {
-                                s("fullscreen")
-                            }
-                            input(classes = "checkBox", type = InputType.checkBox) {
-                                id = "fullscreen_checkbox"
-                                onClickFunction = { fullscreenClick() }
+                    if (document.fullscreenEnabled) {
+                        menuElement {
+                            label {
+                                span {
+                                    s("fullscreen")
+                                }
+                                input(classes = "checkBox", type = InputType.checkBox) {
+                                    id = "fullscreen_checkbox"
+                                    checked = isFullscreen
+                                    onClickFunction = { fullscreenClick() }
+                                }
                             }
                         }
                     }
@@ -84,12 +87,9 @@ class SettingsController: UIController() {
     override suspend fun init() {
         super.init()
         document.addEventListener("fullscreenchange", {
-            updateFullscreenCheckBox()
+            fullscreenCheckBox?.checked = isFullscreen
         })
-        updateFullscreenCheckBox()
     }
 
-    private fun updateFullscreenCheckBox() {
-        fullscreenCheckBox?.checked = document.fullscreenElement != null
-    }
+    private val isFullscreen: Boolean get() = document.fullscreenElement != null
 }
