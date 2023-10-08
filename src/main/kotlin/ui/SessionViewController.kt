@@ -93,7 +93,7 @@ class SessionViewController(
 
     override fun onMessage(message: GameMessageData) {
         when (message) {
-            is GameMessageData.SessionStateUpdate -> {
+            is GameMessageData.SessionInfoUpdate -> {
                 session = message.session
                 MainScope().launch { updatePlayers(session) }
             }

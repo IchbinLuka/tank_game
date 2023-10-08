@@ -156,7 +156,7 @@ sealed class GameMessageData {
     ) : GameMessageData()
 
     @Serializable
-    data class SessionStateUpdate(
+    data class SessionInfoUpdate(
         val session: SessionInfo
     ) : GameMessageData()
 

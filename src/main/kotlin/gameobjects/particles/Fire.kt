@@ -16,9 +16,9 @@ class Fire(
     endColor = Color(0xfc3a0f),
     spawnBurst = 20,
     startSize = 10.0,
-    spawnDelta = 20.0,
+    endSize = 6.0,
+    spawnDelta = 10.0,
     gravity = -10.0,
-    endSize = 3.0,
 ) {
     override fun toString(): String {
         return "Fire(position = $position, rotation = ${renderable?.rotation})"

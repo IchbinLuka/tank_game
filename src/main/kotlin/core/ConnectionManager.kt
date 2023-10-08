@@ -124,6 +124,12 @@ object ConnectionManager : MessageBroadcaster {
         socket!!.onmessage = ::onMessage
     }
 
+    fun disconnect() {
+        socket?.onclose = {}
+        socket?.close()
+        socket = null
+    }
+
     fun register(m: MultiplayerSynchronized) {
         Log.d(TAG, "registering $m on ${m.topic}")
         val list = synchronizedObjects[m.topic]
@@ -142,6 +148,18 @@ object ConnectionManager : MessageBroadcaster {
                 return
             }
         }
+    }
+
+    fun addDisconnectListener(listener: () -> Unit) {
+        socket?.addEventListener("close", {
+            listener()
+        })
+    }
+
+    fun removeDisconnectListener(listener: () -> Unit) {
+        socket?.removeEventListener("close", {
+            listener()
+        })
     }
 
 

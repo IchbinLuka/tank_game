@@ -16,7 +16,7 @@ enum class MessageType(val type: KType) {
     TankCreation(typeOf<GameMessageData.TankCreationData>()),
     GroundData(typeOf<GameMessageData.GroundData>()),
     GroundDestruction(typeOf<GameMessageData.GroundDestruction>()),
-    SessionStateChange(typeOf<GameMessageData.SessionStateUpdate>()),
+    SessionStateChange(typeOf<GameMessageData.SessionInfoUpdate>()),
     ConnectionRequest(typeOf<GameMessageData.ConnectionRequest>()),
     ConnectionResponse(typeOf<GameMessageData.ConnectionResponse>()),
     Disconnect(typeOf<GameMessageData.Disconnect>()),

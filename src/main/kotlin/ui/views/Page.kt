@@ -1,11 +1,13 @@
 package ui.views
 
+import core.Game
 import ext.s
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.html.*
 import kotlinx.html.js.onClickFunction
 import org.w3c.dom.HTMLElement
+import scenes.StartScene
 import util.GUIHelper
 
 typealias UI = TagConsumer<HTMLElement>
@@ -46,6 +48,15 @@ fun UI.backButton() {
             MainScope().launch { GUIHelper.pop() }
         }
         s("back")
+    }
+}
+
+fun UI.backToMenuButton() {
+    menuButton {
+        s("return_to_menu")
+        onClickFunction = {
+            Game.instance.currentScene = StartScene()
+        }
     }
 }
 

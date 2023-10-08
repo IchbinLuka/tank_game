@@ -31,8 +31,10 @@ class Session(
 ) {
     val players = mutableListOf<Player>()
 
+    @Volatile
     var host: PlayerData = creationInfo.host
 
+    @Volatile
     var status: SessionStatus = SessionStatus.WAITING_FOR_PLAYERS
         private set
 
@@ -156,13 +158,57 @@ class Session(
     }
 
     suspend fun broadcastUpdate() {
-        broadcast(
-            GameMessage.fromGameMessageData<GameMessageData.SessionStateUpdate>(
-                GameMessageData.SessionStateUpdate(toInfo()),
-                Topic.SESSION_STATE
-            ),
-            null
-        )
+        when (status) {
+            SessionStatus.WAITING_FOR_PLAYERS -> {
+                broadcast(
+                    GameMessage.fromGameMessageData<GameMessageData.SessionInfoUpdate>(
+                        GameMessageData.SessionInfoUpdate(toInfo()),
+                        Topic.SESSION_STATE
+                    ),
+                    null
+                )
+            }
+
+            SessionStatus.IN_PROGRESS -> {
+                broadcast(
+                    GameMessage.fromGameMessageData(
+                        getState(),
+                        Topic.MAIN_SCENE
+                    )
+                )
+            }
+
+            else -> {}
+        }
+
+    }
+
+    suspend fun handleDisconnect(player: Player) {
+        when (status) {
+            SessionStatus.WAITING_FOR_PLAYERS -> {
+                removePlayer(player)
+                broadcastUpdate()
+            }
+
+            SessionStatus.IN_PROGRESS -> {
+                player.health = 0.0
+                updateDeadPlayers()
+                if (player == currentTurn) {
+                    nextTurn()
+                } else {
+                    broadcast(
+                        GameMessage.fromGameMessageData(
+                            getState(),
+                            Topic.MAIN_SCENE
+                        )
+                    )
+                }
+            }
+
+            SessionStatus.FINISHED -> {
+                // Do nothing
+            }
+        }
     }
 
     fun toInfo(): SessionInfo = SessionInfo(

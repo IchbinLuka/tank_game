@@ -15,8 +15,12 @@ import ext.tryCast
 import gameobjects.MultiplayerTank
 import gameobjects.bullets.BulletObjectArgs
 import gameobjects.bullets.createObject
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import sessions.Topic
 import three.js.Vector3
+import ui.DisconnectedMessageController
+import util.GUIHelper
 import util.Log
 
 class MainSceneMultiplayer(
@@ -47,7 +51,12 @@ class MainSceneMultiplayer(
     }.toMutableList()
 
     init {
-        ConnectionManager.register(this)
+        ConnectionManager.apply {
+            register(this@MainSceneMultiplayer)
+            addDisconnectListener {
+                MainScope().launch { GUIHelper.pushReplacement(DisconnectedMessageController()) }
+            }
+        }
     }
 
     override fun onBulletCreation(type: Bullet, velocity: Vector3) {
@@ -107,6 +116,7 @@ class MainSceneMultiplayer(
             is GameMessageData.GameEnd -> {
                 val nameTankMap = tanks.associateBy { it.player.name }
                 Log.d(TAG, nameTankMap.toString())
+                ConnectionManager.disconnect()
                 Game.instance.currentScene = GameEndScene(
                     ((0..<tanks.size) zip listOf(
                         message.first,

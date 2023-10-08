@@ -64,8 +64,8 @@ fun Application.webSocketRoute(
             )
 
             session.broadcast(
-                GameMessage.fromGameMessageData<GameMessageData.SessionStateUpdate>(
-                    GameMessageData.SessionStateUpdate(session.toInfo()),
+                GameMessage.fromGameMessageData<GameMessageData.SessionInfoUpdate>(
+                    GameMessageData.SessionInfoUpdate(session.toInfo()),
                     Topic.SESSION_STATE
                 ),
                 null
@@ -96,12 +96,12 @@ fun Application.webSocketRoute(
                     }
 
                     is GameMessageData.Disconnect -> {
-                        session.removePlayer(player)
+                        session.handleDisconnect(player)
                         if (session.isEmpty()) {
                             sessionService.closeSession(session.toInfo().id)
                         } else {
                             if (player.data == session.host) {
-                                session.host = player.data
+                                session.host = session.players.first().data
                             }
                             session.broadcastUpdate()
                         }
@@ -184,8 +184,15 @@ fun Application.webSocketRoute(
                 }
                 if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
             }
-            if (session.host == player.data) {
-                sessionService.closeSession(session.id)
+
+            session.handleDisconnect(player)
+            if (session.isEmpty()) {
+                sessionService.closeSession(session.toInfo().id)
+            } else {
+                if (player.data == session.host) {
+                    session.host = session.players.first().data
+                    session.broadcastUpdate()
+                }
             }
         }
     }
