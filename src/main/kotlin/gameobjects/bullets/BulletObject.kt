@@ -270,7 +270,7 @@ open class BulletObject protected constructor(
         renderable.add(Points(dots,
             PointsMaterial().apply {
                 color = Color(0xffffff)
-                size = 1.5 * window.devicePixelRatio
+                size = 3.0
                 transparent = true
                 alphaMap = disc
             }

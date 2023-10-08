@@ -82,8 +82,7 @@ class MainSceneController(
                     style = "display: inline-block; width: 150px"
                     id = "strength_container"
                     span {
-                        attributes["lang-key"] = "strength"
-                        +"""Strength:"""
+                        s("strength")
                     }
                     span {
                         id = "strength"
@@ -107,8 +106,8 @@ class MainSceneController(
                     bottom: 10px;
                     width: 100%;
                     position: absolute;
-                    justify - content: space-between;
-                    user - select: none;
+                    justify-content: space-between;
+                    user-select: none;
                 """
                 div {
                     menuButton {
@@ -126,7 +125,7 @@ class MainSceneController(
                     menuButton {
                         id = "shoot_button"
                         style = "margin: 10px"
-                        +"""Shoot"""
+                        s("shoot")
                     }
                 }
             }

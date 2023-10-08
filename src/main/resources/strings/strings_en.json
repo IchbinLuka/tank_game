@@ -10,6 +10,7 @@
   "health": "Health: ",
   "fuel": "Fuel: ",
   "strength": "Strength: ",
+  "shoot": "Shoot",
   "loading": "Loading",
   "player_wins": "{name} Wins",
   "player_count": "Players: {count}",

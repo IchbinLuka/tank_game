@@ -6,7 +6,6 @@ import ext.times
 import ext.toDoubleList
 import ext.vector3
 import gameobjects.particles.emitter.ParticleEmitter
-import kotlinx.browser.window
 import org.khronos.webgl.Float32Array
 import three.DoubleSide
 import three.LessEqualDepth
@@ -72,7 +71,7 @@ open class BasicParticleSystem(
         addParticles(spawnBurst)
     }
 
-    private fun adjustSize(size: Double): Double = size * window.devicePixelRatio
+    private fun adjustSize(size: Double): Double = size
 
     override suspend fun preloadAssets() {
         super.preloadAssets()

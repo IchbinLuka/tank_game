@@ -10,6 +10,7 @@
   "health": "Gesundheit: ",
   "fuel": "Treibstoff: ",
   "strength": "Stärke: ",
+  "shoot": "Schiessen",
   "loading": "Wird geladen",
   "player_wins": "{name} gewinnt",
   "player_count": "Spieler: {count}",
