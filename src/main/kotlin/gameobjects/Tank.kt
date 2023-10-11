@@ -13,7 +13,7 @@ import gameobjects.particles.Fire
 import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.html.dom.append
+import kotlinx.html.dom.create
 import three.CSS2DObject
 import three.GLTF
 import three.js.*
@@ -28,7 +28,8 @@ open class Tank(
     val startPosition: Vector3,
     private val startRotation: Euler = Euler(),
     val player: Player,
-    override val name: String = player.name
+    override val name: String = player.name,
+    showLabel: Boolean = true
 ) : GameObject(), Observable<Bullet> by DefaultObservable(), Hittable, BulletTarget {
     override fun onBulletImpact(bullet: BulletObject) {}
 
@@ -93,6 +94,8 @@ open class Tank(
     protected var cannon: Object3D? = null
     protected var cannonTip: Object3D? = null
 
+    private val label = if (showLabel) CSS2DObject(document.create.nameTag(player)) else null
+
     val cannonTipPos: Vector3? get() = cannonTip?.getWorldPosition(Vector3())
 
     private val fire: Fire?
@@ -134,6 +137,9 @@ open class Tank(
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
         mainBone?.position?.set(startPosition)
         renderable = mainBone!!
+        mainBone?.add()
+        label?.let { renderable.add(it) }
+        adjustLabel()
         rotation = startRotation
         cannon = mainBone?.children?.firstOrNull { it.name == "Cannon" }
         cannonTip = cannon?.children?.firstOrNull { it.name == "CannonTip" }
@@ -141,14 +147,6 @@ open class Tank(
             Log.e(TAG, "Failed to identify mainBone and cannon")
             die()
         }
-
-        renderable.add(CSS2DObject(
-            document.createElement("div").apply {
-                append {
-                    nameTag(player.name)
-                }
-            }
-        ))
 
         Log.d(TAG, "Loaded tank")
         if (player.health <= 0.0) {
@@ -226,7 +224,12 @@ open class Tank(
                 damage(1.0)
             }
         }
+        adjustLabel()
         updateFireRotation()
+    }
+
+    private fun adjustLabel() {
+        label?.position?.set(renderable.worldToLocal(globalPosition - Vector3(0, 5, 0)))
     }
 
     override fun onDeath() {

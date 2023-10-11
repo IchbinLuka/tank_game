@@ -29,7 +29,7 @@ class MainSceneController(
 
     override val mainUIBuilder: UIBuilder = {
         div {
-            style = "display: flex; height: 100%; flex-direction: column"
+            style = "display: flex; height: 100%; width: 100%; flex-direction: column"
             div("topbarMenu unselectable") {
                 style = """
                     display: flex;
@@ -98,10 +98,10 @@ class MainSceneController(
                     }
                 }
             }
-            div {
-                id = "mobile_controls"
-                style = """
-                    visibility: ${if (PlatformUtil.isMobile) "visible" else "hidden"};
+            if (PlatformUtil.isMobile) {
+                div {
+                    id = "mobile_controls"
+                    style = """
                     display: flex;
                     bottom: 10px;
                     width: 100%;
@@ -109,23 +109,24 @@ class MainSceneController(
                     justify-content: space-between;
                     user-select: none;
                 """
-                div {
-                    menuButton {
-                        id = "button_move_left"
-                        style = "margin: 10px"
-                        i("arrow-button left")
+                    div {
+                        menuButton {
+                            id = "button_move_left"
+                            style = "margin: 10px"
+                            i("arrow-button left")
+                        }
+                        menuButton {
+                            id = "button_move_right"
+                            style = "margin: 10px"
+                            i("arrow-button right")
+                        }
                     }
-                    menuButton {
-                        id = "button_move_right"
-                        style = "margin: 10px"
-                        i("arrow-button right")
-                    }
-                }
-                div {
-                    menuButton {
-                        id = "shoot_button"
-                        style = "margin: 10px"
-                        s("shoot")
+                    div {
+                        menuButton {
+                            id = "shoot_button"
+                            style = "margin: 10px"
+                            s("shoot")
+                        }
                     }
                 }
             }

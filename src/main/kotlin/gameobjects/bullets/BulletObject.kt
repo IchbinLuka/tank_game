@@ -285,6 +285,7 @@ open class BulletObject protected constructor(
                 currentScene.findObject<BulletTarget>(message.intersectingName)?.let {
                     onIntersectionEnter(it)
                 } ?: Log.w(TAG, "could not find intersecting object ${message.intersectingName}")
+                die()
             }
 
             is GameMessageData.Death, GameMessageData.BulletDespawn -> {

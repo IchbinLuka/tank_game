@@ -17,6 +17,7 @@ import ui.MainSceneController
 import util.*
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.random.Random
 
 abstract class MainScene(
     val startData: GameMessageData.GameStartData
@@ -47,7 +48,10 @@ abstract class MainScene(
             Background(name = "background", scene = scene),
         ).apply {
             addAll(tanks)
-            addAll(startData.trees.map { Tree(startPosition = Vector3(x = it.pos), name = it.name) })
+            if (Random.Default.nextBoolean()) {
+                addAll(startData.trees.map { Tree(startPosition = Vector3(x = it.pos), name = it.name) })
+            }
+
         }
     }
 

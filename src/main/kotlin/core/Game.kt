@@ -4,14 +4,18 @@ import DevTools
 import core.models.Settings
 import ext.TAG
 import ext.aspectRatio
+import ext.fromId
 import ext.tryCast
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
+import kotlinx.dom.clear
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
 import scenes.GameScene
 import scenes.LoadingScene
 import stats.js.Stats
+import three.CSS2DRenderer
 import three.OrbitControls
 import three.js.*
 import three.postprocessing.*
@@ -38,6 +42,7 @@ class Game(
     var currentScene: GameScene
         get() = _currentScene!!
         set(value) {
+            cssRenderer.domElement.clear()
             _currentScene?.dispose()
             _currentScene = LoadingScene()
             launch { _currentScene!!.loadAssets() }
@@ -72,6 +77,10 @@ class Game(
         override var canvas: dynamic = document.getElementById("gameContainer")!!
     })
 
+    private val cssRenderer = CSS2DRenderer().apply {
+        Element.fromId("cssObjectsContainer")?.appendChild(domElement)
+    }
+
     private suspend fun ensureLocalizationsInitialized() {
         Localizations.load(settings.value.language)
     }
@@ -84,6 +93,7 @@ class Game(
             it.updateProjectionMatrix()
         }
         renderer.setSize(window.innerWidth, window.innerHeight)
+        cssRenderer.setSize(window.innerWidth, window.innerHeight)
     }
 
     private var composer: EffectComposer = EffectComposer(OutlineEffect(renderer))
@@ -131,6 +141,7 @@ class Game(
             currentScene.update(delta * DevTools.gameSpeed)
             currentScene.lateUpdate()
             effect.render(currentScene.scene, currentScene.camera)
+            cssRenderer.render(currentScene.scene, currentScene.camera)
             stats.update()
             val error = renderer.getContext().getError()
             if (error != 0) {

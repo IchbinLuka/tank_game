@@ -1,11 +1,9 @@
 package ui.views
 
-import kotlinx.html.js.div
+import kotlinx.html.div
 
-fun UI.joyStick() {
-    div("joystickContainer") {
-        div("joystickThumb") {
+fun <T> UI<T>.joyStick(): T = div("joystickContainer") {
+    div("joystickThumb") {
 
-        }
     }
 }

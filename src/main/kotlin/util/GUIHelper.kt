@@ -65,7 +65,7 @@ object GUIHelper {
         translateDocument()
     }
 
-    fun translateDocument() {
+    private fun translateDocument() {
         val elements = document.querySelectorAll("[lang-key]")
         for (i in 0 until elements.length) {
             val element = elements[i]
@@ -91,6 +91,7 @@ object GUIHelper {
             topBar?.append {
                 it(this)
             }
+
         }
         controller.init()
         controller.rebuild()
