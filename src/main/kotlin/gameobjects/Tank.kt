@@ -10,10 +10,14 @@ import ext.*
 import fuelConsumption
 import gameobjects.bullets.*
 import gameobjects.particles.Fire
+import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.html.dom.append
+import three.CSS2DObject
 import three.GLTF
 import three.js.*
+import ui.views.nameTag
 import util.*
 import kotlin.math.*
 import kotlin.properties.Delegates
@@ -137,6 +141,15 @@ open class Tank(
             Log.e(TAG, "Failed to identify mainBone and cannon")
             die()
         }
+
+        renderable.add(CSS2DObject(
+            document.createElement("div").apply {
+                append {
+                    nameTag(player.name)
+                }
+            }
+        ))
+
         Log.d(TAG, "Loaded tank")
         if (player.health <= 0.0) {
             addFire()

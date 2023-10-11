@@ -106,6 +106,7 @@ abstract class MainScene(
 
         if (aiming) {
             updateAimingStrength()
+
             aimingCaster.setFromCamera(point, camera)
             val intersection = aimingCaster.intersectObject(aimingAidPlane)
             if (intersection.isNotEmpty()) {
