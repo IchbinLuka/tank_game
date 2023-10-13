@@ -17,7 +17,6 @@ import ui.MainSceneController
 import util.*
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.random.Random
 
 abstract class MainScene(
     val startData: GameMessageData.GameStartData
@@ -48,10 +47,7 @@ abstract class MainScene(
             Background(name = "background", scene = scene),
         ).apply {
             addAll(tanks)
-            if (Random.Default.nextBoolean()) {
-                addAll(startData.trees.map { Tree(startPosition = Vector3(x = it.pos), name = it.name) })
-            }
-
+            addAll(startData.trees.map { Tree(startPosition = Vector3(x = it.pos), name = it.name) })
         }
     }
 
@@ -62,7 +58,8 @@ abstract class MainScene(
 
     private var freeCamera = true
 
-    protected val ground = Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0, data = startData.groundData.data)
+    private val ground =
+        Ground(offset = Vector3(x = -225, y = 40), pointDistance = 3.0, data = startData.groundData.data)
     private val groundRenderable = ground.renderable
 
     protected val deadPlayers = ArrayDeque<Player>()

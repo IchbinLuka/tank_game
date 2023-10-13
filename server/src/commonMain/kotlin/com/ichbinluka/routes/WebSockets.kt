@@ -33,6 +33,8 @@ fun Application.webSocketRoute(
                 GameMessage.fromByteArray(incoming.receive().data)
             } ?: return@webSocket
 
+            pingIntervalMillis = 1000L
+
             val requestMessageData = GameMessageData.fromGameMessage(firstMessage)
             if (requestMessageData !is GameMessageData.ConnectionRequest) return@webSocket
 
@@ -71,127 +73,133 @@ fun Application.webSocketRoute(
                 null
             )
 
-            for (frame in incoming) {
-                val message = GameMessage.fromByteArray(frame.data)
-                val messageData = GameMessageData.fromGameMessage(message)
-                log.debug("Received message: $messageData on topic ${message.topic}")
-                when (messageData) {
-                    is GameMessageData.BulletCreationData -> {
-                        try {
-                            session.handleBulletSpawn(messageData)
+
+
+            try {
+                for (frame in incoming) {
+                    val message = GameMessage.fromByteArray(frame.data)
+                    val messageData = GameMessageData.fromGameMessage(message)
+                    log.debug("Received message: $messageData on topic ${message.topic}")
+                    when (messageData) {
+                        is GameMessageData.BulletCreationData -> {
+                            try {
+                                session.handleBulletSpawn(messageData)
+                                session.broadcast(message, player)
+                            } catch (e: MissingBulletException) {
+                                outgoing.send(
+                                    Frame.Binary(
+                                        true, GameMessage.fromGameMessageData(
+                                            GameMessageData.MessageRefusal(
+                                                "You don't have any bullets of that type",
+                                                message
+                                            ),
+                                            message.topic
+                                        ).toByteArray()
+                                    )
+                                )
+                            }
+                        }
+
+                        is GameMessageData.Disconnect -> {
+                            session.handleDisconnect(player)
+                            if (session.isEmpty()) {
+                                sessionService.closeSession(session.toInfo().id)
+                            } else {
+                                if (player.data == session.host) {
+                                    session.host = session.players.first().data
+                                }
+                                session.broadcastUpdate()
+                            }
+                        }
+
+                        is GameMessageData.GameStartRequest -> {
+                            if (player.data == session.host && session.players.size > 1) {
+                                val startData = createGame(session.toInfo().players)
+                                session.begin(startData)
+                                session.broadcast(
+                                    GameMessage.fromGameMessageData(
+                                        data = startData,
+                                        topic = Topic.SESSION_STATE
+                                    )
+                                )
+                            } else {
+                                outgoing.send(
+                                    GameMessageData.MessageRefusal(
+                                        message = message,
+                                        reason = "Not allowed to start game"
+                                    ),
+                                    message.topic
+                                )
+                            }
+                        }
+
+                        is GameMessageData.BulletImpact, GameMessageData.BulletDespawn -> {
                             session.broadcast(message, player)
-                        } catch (e: MissingBulletException) {
+
+                            if (messageData is GameMessageData.BulletImpact) {
+                                session.handleBulletImpact(messageData)
+                            }
+                            session.nextTurn()
+                            if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
+                        }
+
+                        is GameMessageData.PingRequest -> {
                             outgoing.send(
                                 Frame.Binary(
-                                    true, GameMessage.fromGameMessageData(
-                                        GameMessageData.MessageRefusal(
-                                            "You don't have any bullets of that type",
-                                            message
-                                        ),
+                                    true, GameMessage.fromGameMessageData<GameMessageData.PingResponse>(
+                                        GameMessageData.PingResponse,
                                         message.topic
                                     ).toByteArray()
                                 )
                             )
                         }
-                    }
 
-                    is GameMessageData.Disconnect -> {
-                        session.handleDisconnect(player)
-                        if (session.isEmpty()) {
-                            sessionService.closeSession(session.toInfo().id)
-                        } else {
-                            if (player.data == session.host) {
-                                session.host = session.players.first().data
-                            }
-                            session.broadcastUpdate()
+                        is GameMessageData.Death -> {
+                            player.health = 0.0
+                            session.broadcast(message, player)
                         }
-                    }
 
-                    is GameMessageData.GameStartRequest -> {
-                        if (player.data == session.host && session.players.size > 1) {
-                            val startData = createGame(session.toInfo().players)
-                            session.begin(startData)
-                            session.broadcast(
-                                GameMessage.fromGameMessageData(
-                                    data = startData,
-                                    topic = Topic.SESSION_STATE
-                                )
-                            )
-                        } else {
-                            outgoing.send(
-                                GameMessageData.MessageRefusal(
-                                    message = message,
-                                    reason = "Not allowed to start game"
-                                ),
-                                message.topic
-                            )
-                        }
-                    }
-
-                    is GameMessageData.BulletImpact, GameMessageData.BulletDespawn -> {
-                        session.broadcast(message, player)
-
-                        if (messageData is GameMessageData.BulletImpact) {
-                            session.handleBulletImpact(messageData)
-                        }
-                        session.nextTurn()
-                        if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
-                    }
-
-                    is GameMessageData.PingRequest -> {
-                        outgoing.send(
-                            Frame.Binary(
-                                true, GameMessage.fromGameMessageData<GameMessageData.PingResponse>(
-                                    GameMessageData.PingResponse,
-                                    message.topic
-                                ).toByteArray()
-                            )
-                        )
-                    }
-
-                    is GameMessageData.Death -> {
-                        player.health = 0.0
-                        session.broadcast(message, player)
-                    }
-
-                    is GameMessageData.TransformationUpdate -> {
-                        if (message.topic == Topic.tank(player.data.name)) {
-                            log.debug("Updating position of $player.data.name} to ${messageData.pos}")
-                            player.position = messageData.pos
-                            player.rotation = messageData.rot
-                            if (player.position.y < 0 && player.alive) {
-                                player.health = 0.0
-                                session.updateDeadPlayers()
-                                if (session.awaitingShot && session.currentTurn == player) {
-                                    session.nextTurn()
-                                } else {
-                                    session.broadcast(
-                                        GameMessage.fromGameMessageData(
-                                            session.getState(),
-                                            Topic.MAIN_SCENE
+                        is GameMessageData.TransformationUpdate -> {
+                            if (message.topic == Topic.tank(player.data.name)) {
+                                log.debug("Updating position of $player.data.name} to ${messageData.pos}")
+                                player.position = messageData.pos
+                                player.rotation = messageData.rot
+                                if (player.position.y < 0 && player.alive) {
+                                    player.health = 0.0
+                                    session.updateDeadPlayers()
+                                    if (session.awaitingShot && session.currentTurn == player) {
+                                        session.nextTurn()
+                                    } else {
+                                        session.broadcast(
+                                            GameMessage.fromGameMessageData(
+                                                session.getState(),
+                                                Topic.MAIN_SCENE
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                             }
+                            session.broadcast(message, player)
                         }
-                        session.broadcast(message, player)
-                    }
 
-                    else -> {
-                        session.broadcast(message, player)
-                    }
+                        else -> {
+                            session.broadcast(message, player)
+                        }
 
+                    }
+                    if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
                 }
-                if (session.status == SessionStatus.FINISHED) break // Game is over → close connection
-            }
-
-            session.handleDisconnect(player)
-            if (session.isEmpty()) {
-                sessionService.closeSession(session.toInfo().id)
-            } else {
-                if (player.data == session.host) {
-                    session.host = session.players.first().data
-                    session.broadcastUpdate()
+            } catch (e: Throwable) {
+                log.error("Error in session ${session.toInfo().id}", e)
+            } finally {
+                session.handleDisconnect(player)
+                if (session.isEmpty()) {
+                    sessionService.closeSession(session.toInfo().id)
+                } else {
+                    if (player.data == session.host) {
+                        session.host = session.players.first().data
+                        session.broadcastUpdate()
+                    }
                 }
             }
         }

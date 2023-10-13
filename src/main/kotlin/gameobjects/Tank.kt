@@ -137,7 +137,6 @@ open class Tank(
         mainBone = gltf?.scene?.children?.firstOrNull { it.name == "Main" }
         mainBone?.position?.set(startPosition)
         renderable = mainBone!!
-        mainBone?.add()
         label?.let { renderable.add(it) }
         adjustLabel()
         rotation = startRotation
