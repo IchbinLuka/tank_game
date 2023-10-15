@@ -27,12 +27,15 @@ object ResourceManager {
     val cloud by lazy { gltfAsync("models/cloud.glb") }
 
     val tree by lazy { gltfAsync("models/tree.glb") }
+    val backgroundTree by lazy { gltfAsync("models/tree_background.glb") }
 
     val skyBox get() = gltfAsync("models/skybox.glb")
 
     val sunnySky get() = textureAsync("textures/skies/sky_sunny.jpg")
     val disc by lazy { textureAsync("textures/sprites/disc.png") }
     val box get() = textureAsync("textures/sprites/box.png")
+
+    val backgroundLandscapeHeightMap get() = textureAsync("textures/background_heightmap.png")
 
     val testLandscape get() = gltfAsync("models/test_landscape.glb")
 

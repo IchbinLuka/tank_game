@@ -5,7 +5,10 @@ import GameMessageData
 import core.Game
 import core.Player
 import core.gameobjects.GameObject
-import ext.*
+import ext.TAG
+import ext.aspectRatio
+import ext.enableShadows
+import ext.toVector3
 import gameobjects.Background
 import gameobjects.Ground
 import gameobjects.Tank
@@ -15,6 +18,18 @@ import kotlinx.browser.window
 import three.js.*
 import ui.MainSceneController
 import util.*
+import kotlin.collections.ArrayDeque
+import kotlin.collections.Collection
+import kotlin.collections.List
+import kotlin.collections.filter
+import kotlin.collections.first
+import kotlin.collections.forEach
+import kotlin.collections.getOrNull
+import kotlin.collections.isNotEmpty
+import kotlin.collections.map
+import kotlin.collections.mutableListOf
+import kotlin.collections.set
+import kotlin.collections.zip
 import kotlin.math.max
 import kotlin.math.min
 
@@ -45,6 +60,7 @@ abstract class MainScene(
         mutableListOf(
             ground,
             Background(name = "background", scene = scene),
+            BackgroundLandscape()
         ).apply {
             addAll(tanks)
             addAll(startData.trees.map { Tree(startPosition = Vector3(x = it.pos), name = it.name) })
@@ -147,11 +163,6 @@ abstract class MainScene(
 
     override suspend fun preloadAssets() {
         super.preloadAssets()
-        scene.add(ResourceManager.testLandscape.await().scene.apply {
-            enableShadows()
-            applyCustomMat(MeshToonMaterial().apply { color = Color(0x195917) })
-            scale.set(Vector3(4, 4, 4))
-        })
         // _children.values.forEach { o -> o.renderable?.let { scene.add(it) } }
         scene.add(groundRenderable, aimingAidPlane)
         centerCamera()

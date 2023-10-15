@@ -278,8 +278,9 @@ open class Tank(
         }
     }
 
-    protected fun switchDirection() {
+    private fun switchDirection() {
         setDirection(direction.inverse)
+        adjustLabel()
     }
 
     override fun toString(): String {
