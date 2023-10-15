@@ -6,10 +6,7 @@ import core.*
 import core.gameobjects.GameObject
 import core.multiplayer.MessageBroadcaster
 import core.multiplayer.MultiplayerSynchronized
-import ext.TAG
-import ext.minus
-import ext.plus
-import ext.toFloatList
+import ext.*
 import gameobjects.bullets.BulletObject
 import gameobjects.bullets.BulletTarget
 import noise.GroundNoise
@@ -59,10 +56,11 @@ class Ground(
     override val renderable: Object3D by lazy {
         Group().apply {
             add(Mesh(geometry, MeshPhongMaterial().apply {
-                color = Color(0x156812)
+                // color = Color(0x156812)
                 side = DoubleSide
                 shininess = 30
                 flatShading = true
+                vertexColors = true
             }))
             if (showVertex) {
                 add(Points(geometry, PointsMaterial().apply {
@@ -74,10 +72,14 @@ class Ground(
     }
     private val geometry = BufferGeometry()
     private val positionAttribute: BufferAttribute
-        get() = geometry.getAttribute("position") as BufferAttribute
+        get() = geometry.getAttribute("position")
 
-    // private val heightData: Array<Double> = Array(res) { (height * 0.2 * (1 - sin(0.5 * it))) + height / 2 }
-    private var groundVertices = Array<Array<Vector3>>(data.size) { i ->
+    private var initialPositions: BufferAttribute? = null
+
+    private val colorAttribute: BufferAttribute
+        get() = geometry.getAttribute("color")
+
+    private var groundVertices = Array(data.size) { i ->
         Array<Vector3>(data[i].size) { j ->
             Vector3(
                 i * pointDistance,
@@ -111,9 +113,10 @@ class Ground(
                 min(
                     height - sqrt(maxDistance.pow(2) - distance.pow(2)),
                     it.y
-                ) //- abs((offset.y - it.z) * 0.0005).pow(2)
+                )
             }
         }
+
         val attribute = positionAttribute
         val nearestVertex = floor(normalizePos(position)).toInt()
         val range = max(
@@ -125,14 +128,25 @@ class Ground(
         for (i in range) {
             for (j in BACK_SMOOTHING_WIDTH until groundVertices[i].size) {
                 val index = getIndex(i, j)
-                attribute.setY(
-                    index, function2(
-                        Vector3(
-                            attribute.getX(index),
-                            attribute.getY(index),
-                            attribute.getZ(index)
-                        )
+                val newY = function2(
+                    Vector3(
+                        attribute.getX(index),
+                        attribute.getY(index),
+                        attribute.getZ(index)
                     )
+                )
+                if (newY != attribute.getY(index)) {
+                    val color = Color(
+                        if (initialPositions!!.getY(index).toDouble() - newY > 15) {
+                            ROCK_COLOR
+                        } else {
+                            DIRT_COLOR
+                        }
+                    )
+                    colorAttribute.setXYZ(index, color.r, color.g, color.b)
+                }
+                attribute.setY(
+                    index, newY
                 )
             }
             val newHeight = attribute.getY(getIndex(i, BACK_SMOOTHING_WIDTH))
@@ -141,6 +155,7 @@ class Ground(
                 attribute.setY(index, newHeight - (BACK_SMOOTHING_WIDTH - j).toDouble().pow(2))
             }
         }
+        colorAttribute.needsUpdate = true
         attribute.needsUpdate = true
         geometry.setAttribute("position", attribute)
         geometry.computeVertexNormals()
@@ -234,6 +249,7 @@ class Ground(
             // sequenceOf(it.first() - Vector3(y = 1, z = pointDistance))
         }
 
+
         for (row in groundVertices) {
             for (vertex in row) {
                 positions.addAll(vertex.toFloatList())
@@ -251,14 +267,31 @@ class Ground(
                 )
             }
         }
+
+        val colors = sequenceOf(Color(0x238e1f)).repeat().take(positions.size).flatMap { it.toFloatList() }.toList()
+
         geometry.setAttribute("position", BufferAttribute(Float32Array(positions.toTypedArray()).asDynamic(), 3))
+        geometry.setAttribute("color", BufferAttribute(Float32Array(colors.toTypedArray()).asDynamic(), 3))
         geometry.setIndex(indices.toTypedArray())
         geometry.computeVertexNormals()
+        initialPositions = positionAttribute.clone()
     }
     //endregion
 
+    fun getIndices(x: Int, y: Int): Array<Int> {
+        val frontStart: Int = x * groundVertices[x].size + y
+        val backStart: Int = frontStart - groundVertices[y].size
+        return arrayOf(
+            frontStart, backStart, backStart + 1,
+            frontStart, backStart + 1, frontStart + 1,
+        )
+    }
+
     companion object {
         const val TAG = "Ground"
+        const val GRASS_COLOR = 0x238e1f
+        const val DIRT_COLOR = 0x8b4513
+        const val ROCK_COLOR = 0x808080
     }
 
     override fun onMessage(message: GameMessageData) {

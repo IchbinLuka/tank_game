@@ -42,7 +42,7 @@ open external class BufferGeometry : EventDispatcher {
     open fun setIndex(index: Array<Number>?)
     open fun setAttribute(name: String, attribute: BufferAttribute): BufferGeometry
     open fun setAttribute(name: String, attribute: InterleavedBufferAttribute): BufferGeometry
-    open fun getAttribute(name: String): dynamic /* BufferAttribute | InterleavedBufferAttribute */
+    open fun getAttribute(name: String): BufferAttribute /* BufferAttribute | InterleavedBufferAttribute */
     open fun deleteAttribute(name: String): BufferGeometry
     open fun addGroup(start: Number, count: Number, materialIndex: Number = definedExternally)
     open fun clearGroups()
