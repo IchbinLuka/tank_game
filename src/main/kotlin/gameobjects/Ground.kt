@@ -135,24 +135,17 @@ class Ground(
                         attribute.getZ(index)
                     )
                 )
-                if (newY != attribute.getY(index)) {
-                    val color = Color(
-                        if (initialPositions!!.getY(index).toDouble() - newY > 15) {
-                            ROCK_COLOR
-                        } else {
-                            DIRT_COLOR
-                        }
-                    )
-                    colorAttribute.setXYZ(index, color.r, color.g, color.b)
-                }
                 attribute.setY(
                     index, newY
                 )
+                adaptColorToHeight(newY, index)
             }
-            val newHeight = attribute.getY(getIndex(i, BACK_SMOOTHING_WIDTH))
+            val newMaxHeight = attribute.getY(getIndex(i, BACK_SMOOTHING_WIDTH))
             for (j in 0 until BACK_SMOOTHING_WIDTH) {
                 val index = getIndex(i, j)
-                attribute.setY(index, newHeight - (BACK_SMOOTHING_WIDTH - j).toDouble().pow(2))
+                val newHeight = newMaxHeight - (BACK_SMOOTHING_WIDTH - j).toDouble().pow(2)
+                adaptColorToHeight(newHeight, index)
+                attribute.setY(index, newHeight)
             }
         }
         colorAttribute.needsUpdate = true
@@ -191,6 +184,21 @@ class Ground(
             attribute.getY(nextIndex).toDouble(),
             progress
         )
+    }
+
+    private fun adaptColorToHeight(newY: Double, index: Int) {
+        val delta = initialPositions!!.getY(index).toDouble() - newY
+
+        val color = Color(
+            if (delta > 15) {
+                ROCK_COLOR
+            } else if (delta > 0) {
+                DIRT_COLOR
+            } else {
+                GRASS_COLOR
+            }
+        )
+        colorAttribute.setXYZ(index, color.r, color.g, color.b)
     }
 
     fun rotationAt(position: Double): Double {
@@ -268,7 +276,7 @@ class Ground(
             }
         }
 
-        val colors = sequenceOf(Color(0x238e1f)).repeat().take(positions.size).flatMap { it.toFloatList() }.toList()
+        val colors = sequenceOf(Color(GRASS_COLOR)).repeat().take(positions.size).flatMap { it.toFloatList() }.toList()
 
         geometry.setAttribute("position", BufferAttribute(Float32Array(positions.toTypedArray()).asDynamic(), 3))
         geometry.setAttribute("color", BufferAttribute(Float32Array(colors.toTypedArray()).asDynamic(), 3))
@@ -278,18 +286,10 @@ class Ground(
     }
     //endregion
 
-    fun getIndices(x: Int, y: Int): Array<Int> {
-        val frontStart: Int = x * groundVertices[x].size + y
-        val backStart: Int = frontStart - groundVertices[y].size
-        return arrayOf(
-            frontStart, backStart, backStart + 1,
-            frontStart, backStart + 1, frontStart + 1,
-        )
-    }
 
     companion object {
         const val TAG = "Ground"
-        const val GRASS_COLOR = 0x238e1f
+        const val GRASS_COLOR = 0x1e7c1b
         const val DIRT_COLOR = 0x8b4513
         const val ROCK_COLOR = 0x808080
     }
