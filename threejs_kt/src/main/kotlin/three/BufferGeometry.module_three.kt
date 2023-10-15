@@ -3,46 +3,16 @@
 @file:Suppress("ABSTRACT_MEMBER_NOT_IMPLEMENTED", "VAR_TYPE_MISMATCH_ON_OVERRIDE", "INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION", "PackageDirectoryMismatch")
 package three.js
 
-import kotlin.js.*
 import kotlin.js.Json
-import org.khronos.webgl.*
-import org.w3c.dom.*
-import org.w3c.dom.events.*
-import org.w3c.dom.parsing.*
-import org.w3c.dom.svg.*
-import org.w3c.dom.url.*
-import org.w3c.fetch.*
-import org.w3c.files.*
-import org.w3c.notifications.*
-import org.w3c.performance.*
-import org.w3c.workers.*
-import org.w3c.xhr.*
 
-external interface `T$16` {
-    @nativeGetter
-    operator fun get(name: String): dynamic /* BufferAttribute? | InterleavedBufferAttribute? */
-    @nativeSetter
-    operator fun set(name: String, value: BufferAttribute)
-    @nativeSetter
-    operator fun set(name: String, value: InterleavedBufferAttribute)
-}
 
-external interface `T$17` {
-    @nativeGetter
-    operator fun get(name: String): Array<dynamic /* BufferAttribute | InterleavedBufferAttribute */>?
-    @nativeSetter
-    operator fun set(name: String, value: Array<dynamic /* BufferAttribute | InterleavedBufferAttribute */>)
-}
-
-external interface `T$18` {
+external interface BufferGeometryGroup {
     var start: Number
     var count: Number
-    var materialIndex: Number?
-        get() = definedExternally
-        set(value) = definedExternally
+    var materialIndex: Int
 }
 
-external interface `T$19` {
+external interface DrawRange {
     var start: Number
     var count: Number
 }
@@ -53,13 +23,18 @@ open external class BufferGeometry : EventDispatcher {
     open var name: String
     open var type: String
     open var index: BufferAttribute?
-    open var attributes: `T$16`
-    open var morphAttributes: `T$17`
+
+    /**
+     * Use [setAttribute] and [getAttribute] instead.
+     */
+    open var attributes: dynamic
+
+    open var morphAttributes: dynamic
     open var morphTargetsRelative: Boolean
-    open var groups: Array<`T$18`>
+    open var groups: Array<BufferGeometryGroup>
     open var boundingBox: Box3?
     open var boundingSphere: Sphere?
-    open var drawRange: `T$19`
+    open var drawRange: DrawRange
     open var userData: Json
     open var isBufferGeometry: Boolean
     open fun getIndex(): BufferAttribute?
@@ -84,8 +59,6 @@ open external class BufferGeometry : EventDispatcher {
     open fun setFromPoints(points: Array<Vector3>): BufferGeometry
     open fun setFromPoints(points: Array<Vector2>): BufferGeometry
     open fun updateFromObject(obj: Object3D)
-    open fun fromGeometry(geometry: Geometry, settings: Any = definedExternally): BufferGeometry
-    open fun fromDirectGeometry(geometry: DirectGeometry): BufferGeometry
     open fun computeBoundingBox()
     open fun computeBoundingSphere()
     open fun computeVertexNormals()

@@ -14,8 +14,8 @@ import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.html.dom.create
-import three.CSS2DObject
-import three.GLTF
+import three.addons.loaders.GLTF
+import three.addons.renderers.CSS2DObject
 import three.js.*
 import ui.views.nameTag
 import util.*

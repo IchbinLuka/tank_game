@@ -1,7 +1,7 @@
 @file:JsModule("three/examples/jsm/effects/OutlineEffect")
 @file:JsNonModule
 
-package three.postprocessing
+package three.addons.postprocessing
 
 import org.w3c.dom.HTMLCanvasElement
 import three.js.*

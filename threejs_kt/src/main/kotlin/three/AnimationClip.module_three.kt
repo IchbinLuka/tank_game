@@ -18,6 +18,16 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
+external interface MorphTarget {
+    var name: String
+    var vertices: Array<Vector3>
+}
+
+external interface MorphNormals {
+    var name: String
+    var normals: Array<Vector3>
+}
+
 open external class AnimationClip(name: String = definedExternally, duration: Number = definedExternally, tracks: Array<KeyframeTrack> = definedExternally, blendMode: AnimationBlendMode = definedExternally) {
     open var name: String
     open var tracks: Array<KeyframeTrack>

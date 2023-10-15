@@ -2,8 +2,8 @@ package util
 
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.asDeferred
-import three.GLTF
-import three.GLTFLoader
+import three.addons.loaders.GLTF
+import three.addons.loaders.GLTFLoader
 import three.js.*
 
 object ResourceManager {

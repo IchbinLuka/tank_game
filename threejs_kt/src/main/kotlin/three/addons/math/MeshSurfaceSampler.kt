@@ -1,7 +1,7 @@
 @file:JsModule("three/examples/jsm/math/MeshSurfaceSampler")
 @file:JsNonModule
 
-package three
+package three.addons.math
 
 import three.js.Color
 import three.js.Mesh

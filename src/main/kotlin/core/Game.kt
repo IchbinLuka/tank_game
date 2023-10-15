@@ -15,10 +15,10 @@ import org.w3c.dom.HTMLCanvasElement
 import scenes.GameScene
 import scenes.LoadingScene
 import stats.js.Stats
-import three.CSS2DRenderer
-import three.OrbitControls
+import three.addons.controls.OrbitControls
+import three.addons.postprocessing.*
+import three.addons.renderers.CSS2DRenderer
 import three.js.*
-import three.postprocessing.*
 import util.*
 import kotlin.coroutines.CoroutineContext
 

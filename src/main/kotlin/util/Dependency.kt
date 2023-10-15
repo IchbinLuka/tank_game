@@ -2,7 +2,7 @@ package util
 
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.asDeferred
-import three.GLTF
+import three.addons.loaders.GLTF
 
 abstract class Dependency<T> {
     val value: T? get() = _value

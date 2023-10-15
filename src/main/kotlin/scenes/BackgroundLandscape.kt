@@ -4,7 +4,7 @@ import core.gameobjects.GameObject
 import ext.*
 import gameobjects.Tree
 import three.DoubleSide
-import three.MeshSurfaceSampler
+import three.addons.math.MeshSurfaceSampler
 import three.js.*
 import util.Log
 import util.ResourceManager
@@ -33,11 +33,10 @@ class BackgroundLandscape : GameObject() {
         val landscape = ResourceManager.testLandscape.await().scene.apply {
             traverse {
                 it.tryCast<Mesh<*, *>>()?.apply {
-                    geometry?.unsafeCast<Geometry>()?.apply {
+                    geometry?.unsafeCast<BufferGeometry>()?.apply {
                         computeVertexNormals()
                         computeBoundingBox()
                         computeBoundingSphere()
-                        computeFaceNormals()
                     }
                 }
             }
@@ -50,31 +49,12 @@ class BackgroundLandscape : GameObject() {
         }.apply {
             position.y = -50.0
         }
-//        landscape = Mesh(
-//            PlaneGeometry(
-//                width = LANDSCAPE_SIZE,
-//                height = LANDSCAPE_SIZE,
-//                heightSegments = LANDSCAPE_RESOLUTION,
-//                widthSegments = LANDSCAPE_RESOLUTION
-//            ).apply {
-//                computeVertexNormals()
-//                rotateX(-PI * 0.5)
-//            },
-//            MeshToonMaterial().apply {
-//                color = Color(0x195917)
-//                side = DoubleSide
-//                displacementMap = heightMap
-//                displacementScale = LANDSCAPE_HEIGHT
-//            }
-//        ).apply {
-//            position.y = -100.0
-//        }
 
         renderable.add(landscape)
 
         val tree = ResourceManager.backgroundTree.await().scene
-        val leaves = tree.getObjectByName("Leaves")?.tryCast<Mesh<*, *>>()?.geometry.unsafeCast<BufferGeometry?>()
-        val trunk = tree.getObjectByName("Trunk")?.tryCast<Mesh<*, *>>()?.geometry.unsafeCast<BufferGeometry?>()
+        val leaves = tree.getObjectByName("Leaves")?.tryCast<Mesh<*, *>>()?.geometry
+        val trunk = tree.getObjectByName("Trunk")?.tryCast<Mesh<*, *>>()?.geometry
 
         if (leaves == null || trunk == null) {
             Log.e(TAG, "Failed to load tree geometry")

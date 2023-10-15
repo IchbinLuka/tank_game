@@ -6,7 +6,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import scenes.GameScene
-import three.CSS2DObject
+import three.addons.renderers.CSS2DObject
 import three.js.*
 import util.GUIHelper
 import util.Log

@@ -1,12 +1,13 @@
 @file:JsModule("three/examples/jsm/loaders/GLTFLoader")
 @file:JsNonModule
-package three
+
+package three.addons.loaders
 
 import org.w3c.xhr.ProgressEvent
-import three.js.Group
 import org.w3c.xhr.XMLHttpRequest
 import three.js.AnimationClip
 import three.js.Camera
+import three.js.Group
 import three.js.Loader
 import kotlin.js.Promise
 

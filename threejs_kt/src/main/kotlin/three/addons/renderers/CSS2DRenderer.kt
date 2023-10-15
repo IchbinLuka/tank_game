@@ -1,7 +1,7 @@
 @file:JsModule("three/examples/jsm/renderers/CSS2DRenderer")
 @file:JsNonModule
 
-package three
+package three.addons.renderers
 
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
@@ -12,7 +12,7 @@ import three.js.Scene
 open external class CSS2DRenderer(parameters: dynamic = definedExternally) {
     val domElement: HTMLElement = definedExternally
 
-    fun getSize(): dynamic
+    fun getSize(): Size
 
     fun setSize(width: Number, height: Number)
 

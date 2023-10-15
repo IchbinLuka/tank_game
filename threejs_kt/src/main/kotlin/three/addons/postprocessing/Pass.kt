@@ -1,8 +1,7 @@
 @file:JsModule("three/examples/jsm/postprocessing/Pass")
 @file:JsNonModule
-package three.postprocessing
 
-import three.js.Renderer
+package three.addons.postprocessing
 
 abstract external class Pass {
     open var enabled: Boolean = definedExternally

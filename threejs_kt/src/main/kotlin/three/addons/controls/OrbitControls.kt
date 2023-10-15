@@ -1,6 +1,7 @@
 @file:JsModule("three/examples/jsm/controls/OrbitControls")
 @file:JsNonModule
-package three
+
+package three.addons.controls
 
 import org.w3c.dom.HTMLCanvasElement
 import three.js.Camera

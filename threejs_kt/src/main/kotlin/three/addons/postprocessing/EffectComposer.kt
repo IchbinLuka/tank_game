@@ -1,6 +1,7 @@
 @file:JsModule("three/examples/jsm/postprocessing/EffectComposer")
 @file:JsNonModule
-package three.postprocessing
+
+package three.addons.postprocessing
 
 import three.js.RenderTarget
 import three.js.Renderer

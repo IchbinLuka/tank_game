@@ -18,7 +18,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-external interface `T$41` {
+external interface BoxGeometryParameters {
     var width: Number
     var height: Number
     var depth: Number
@@ -27,7 +27,14 @@ external interface `T$41` {
     var depthSegments: Number
 }
 
-open external class BoxGeometry(width: Number = definedExternally, height: Number = definedExternally, depth: Number = definedExternally, widthSegments: Number = definedExternally, heightSegments: Number = definedExternally, depthSegments: Number = definedExternally) : Geometry {
+open external class BoxGeometry(
+    width: Number = definedExternally,
+    height: Number = definedExternally,
+    depth: Number = definedExternally,
+    widthSegments: Number = definedExternally,
+    heightSegments: Number = definedExternally,
+    depthSegments: Number = definedExternally
+) : BufferGeometry {
     override var type: String
-    open var parameters: `T$41`
+    open var parameters: BoxGeometryParameters
 }
