@@ -2,6 +2,7 @@ package gameobjects
 
 import core.gameobjects.GameObject
 import ext.set
+import three.js.Light
 import three.js.Object3D
 import three.js.Scene
 import three.js.Vector3
@@ -12,7 +13,8 @@ const val DAY_PERIOD = 400000.0
 class Background(
     private val offset: Vector3 = Vector3(),
     override val name: String = "background",
-    val scene: Scene? = null
+    val scene: Scene? = null,
+    val light: Light? = null
 ) : GameObject() {
     override val renderable: Object3D = Scene().apply {
         position.set(offset)
@@ -35,7 +37,7 @@ class Background(
     }
 
     override val initialChildren: Collection<GameObject> = listOf(
-        Sky(scene = scene, period = DAY_PERIOD),
+        Sky(scene = scene, period = DAY_PERIOD, light = light),
         *clouds,
     )
 

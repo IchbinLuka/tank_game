@@ -15,6 +15,18 @@ val backgroundGradient = ColorGradient(
     )
 )
 
+val lightGradient = ColorGradient(
+    listOf(
+        Color(0xd6f3fc),
+        Color(0xd6f3fc),
+        Color(0xf98057),
+        Color(0xf98057),
+        Color(0x013699),
+        Color(0x5b79af),
+        Color(0x5b79af),
+    )
+)
+
 class ColorGradient(
     private val colors: List<Color>,
 ) {

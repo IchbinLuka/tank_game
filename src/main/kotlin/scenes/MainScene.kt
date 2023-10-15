@@ -18,31 +18,23 @@ import kotlinx.browser.window
 import three.js.*
 import ui.MainSceneController
 import util.*
-import kotlin.collections.ArrayDeque
-import kotlin.collections.Collection
-import kotlin.collections.List
-import kotlin.collections.filter
-import kotlin.collections.first
-import kotlin.collections.forEach
-import kotlin.collections.getOrNull
-import kotlin.collections.isNotEmpty
-import kotlin.collections.map
-import kotlin.collections.mutableListOf
 import kotlin.collections.set
-import kotlin.collections.zip
 import kotlin.math.max
 import kotlin.math.min
 
 abstract class MainScene(
     val startData: GameMessageData.GameStartData
 ) : GameScene() {
+    private val light = DirectionalLight(0xFDFFD9, 1).apply {
+        position.set(-30, 70, 40)
+        castShadow = true
+        enableShadows()
+    }
+
+
+
     override val scene: Scene = Scene().apply {
         background = Color(0x3333ff)
-        val light = DirectionalLight(0xFDFFD9, 1).apply {
-            position.set(-30, 70, 40)
-            castShadow = true
-            enableShadows()
-        }
         add(light)
         add(AmbientLight(0x404040, 0.1))
         add(HemisphereLight(skyColor = 0x47C4F3, groundColor = 0xABAF9E, intensity = 0.5))
@@ -59,7 +51,7 @@ abstract class MainScene(
     override val initialChildren: Collection<GameObject> by lazy {
         mutableListOf(
             ground,
-            Background(name = "background", scene = scene),
+            Background(name = "background", scene = scene, light = light),
             BackgroundLandscape()
         ).apply {
             addAll(tanks)

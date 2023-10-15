@@ -223,7 +223,7 @@ open class BulletObject protected constructor(
         position = posAtTime((window.performance.now() - spawnTime) * 0.001)
 
         dotTimer += delta
-        if (dotTimer > 0.5) {
+        if (dotTimer > 0.4) {
             dotTimer = 0.0
             Log.d(TAG, "adding dot")
             dotVertices.apply {

@@ -13,13 +13,14 @@ abstract class TankPresentingScene(
     private val tanks: Collection<Tank>
 ): GameScene() {
 
+    private val light = DirectionalLight(0xFDFFD9, 1).apply {
+        position.set(-30, 70, 40)
+        castShadow = true
+        enableShadows()
+    }
+
     final override val scene: Scene = Scene().apply {
         background = Color(0x3333ff)
-        val light = DirectionalLight(0xFDFFD9, 1).apply {
-            position.set(-30, 70, 40)
-            castShadow = true
-            enableShadows()
-        }
         background = Color(0x64DBFF)
         add(light)
         add(AmbientLight(0x404040, 0.1))
@@ -27,7 +28,7 @@ abstract class TankPresentingScene(
     }
 
     override val initialChildren: Collection<GameObject> = mutableListOf<GameObject>(
-        Background(offset = Vector3(z = -150, y = -115), scene = scene),
+        Background(offset = Vector3(z = -150, y = -115), scene = scene, light = light),
     ).apply {
         addAll(tanks)
     }
@@ -60,4 +61,5 @@ abstract class TankPresentingScene(
             tank.updateFireRotation()
         }
     }
+
 }

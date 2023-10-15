@@ -1,8 +1,10 @@
 package gameobjects
 
+import DevTools
 import core.gameobjects.GameObject
 import three.js.*
 import util.backgroundGradient
+import util.lightGradient
 import kotlin.js.Date
 import kotlin.math.PI
 import kotlin.math.sin
@@ -10,7 +12,8 @@ import kotlin.math.sin
 
 class Sky(
     val period: Double = 10000.0,
-    val scene: Scene? = null
+    val scene: Scene? = null,
+    val light: Light? = null
 ) : GameObject() {
     override val renderable: Object3D = Object3D().apply {
         add(
@@ -41,9 +44,11 @@ class Sky(
 
     override fun update(delta: Double) {
         super.update(delta)
-        val time = Date.now()
+        val time = Date.now() * DevTools.gameSpeed
         val rotation = (time * 2 * PI / period + PI / 2) % (2 * PI)
         renderable.rotation.z = rotation
-        scene?.background = backgroundGradient.getColor(0.5 + 0.5 * sin(time * 2 * PI / period))
+        val progress = 0.5 + 0.5 * sin(time * 2 * PI / period)
+        scene?.background = backgroundGradient.getColor(progress)
+        light?.color = lightGradient.getColor(progress)
     }
 }
