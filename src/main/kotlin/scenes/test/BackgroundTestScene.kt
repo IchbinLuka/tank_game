@@ -2,8 +2,8 @@ package scenes.test
 
 import core.gameobjects.GameObject
 import ext.aspectRatio
+import gameobjects.BackgroundLandscape
 import kotlinx.browser.window
-import scenes.BackgroundLandscape
 import scenes.GameScene
 import three.js.AmbientLight
 import three.js.Color

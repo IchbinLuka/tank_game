@@ -2,6 +2,7 @@ package gameobjects
 
 import DevTools
 import core.gameobjects.GameObject
+import ext.clamp
 import ext.toFloatList
 import gameobjects.particles.emitter.SphereEmitter
 import org.khronos.webgl.Float32Array
@@ -51,6 +52,7 @@ class Stars(
     override fun update(delta: Double) {
         super.update(delta)
         val time = Date.now() * DevTools.gameSpeed
-        material.opacity = 0.5 + 0.5 * sin(time * 2 * PI / period)
+
+        material.opacity = (0.3 + 1.3 * sin(time * 2 * PI / period)).clamp(0.0, 1.0)
     }
 }

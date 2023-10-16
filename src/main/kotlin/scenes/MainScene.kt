@@ -9,10 +9,7 @@ import ext.TAG
 import ext.aspectRatio
 import ext.enableShadows
 import ext.toVector3
-import gameobjects.Background
-import gameobjects.Ground
-import gameobjects.Tank
-import gameobjects.Tree
+import gameobjects.*
 import gameobjects.bullets.BulletObject
 import kotlinx.browser.window
 import three.js.*

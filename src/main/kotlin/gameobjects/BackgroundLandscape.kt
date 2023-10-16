@@ -1,8 +1,7 @@
-package scenes
+package gameobjects
 
 import core.gameobjects.GameObject
 import ext.*
-import gameobjects.Tree
 import three.DoubleSide
 import three.addons.math.MeshSurfaceSampler
 import three.js.*
