@@ -42,14 +42,19 @@ class Game(
     var currentScene: GameScene
         get() = _currentScene!!
         set(value) {
+            Log.d(TAG, "Setting current scene to: ${value::class.simpleName}")
             cssRenderer.domElement.clear()
             _currentScene?.dispose()
+            Log.d(TAG, "Loading scene: ${value::class.simpleName}")
             _currentScene = LoadingScene()
             launch { _currentScene!!.loadAssets() }
             updateComposer()
+            Log.d(TAG, "Preloading assets in background")
             launch(Dispatchers.Unconfined) {
                 Localizations.ensureInitialized()
+                Log.d(TAG, "Preloading assets")
                 value.preloadAssets()
+                Log.d(TAG, "Finished preloading assets")
                 GUIHelper.resetGUI()
                 _currentScene = value
                 _currentScene!!.onSceneReady()

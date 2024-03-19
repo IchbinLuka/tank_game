@@ -6,14 +6,14 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class SessionCreationInfo(
-        val name: String,
-        val host: PlayerData,
-        val password: String? = null
+    val name: String,
+    val host: PlayerData,
+    val password: String? = null
 )
 
 @Serializable
 data class SessionInfo(
-    val id: Long,
+    val id: String,
     @Transient val password: String? = null,
     val name: String,
     val host: PlayerData,

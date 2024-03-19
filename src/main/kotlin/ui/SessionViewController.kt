@@ -18,6 +18,7 @@ import kotlinx.html.js.onClickFunction
 import kotlinx.html.style
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLButtonElement
+import scenes.LoadingScene
 import scenes.MainSceneMultiplayer
 import sessions.SessionInfo
 import sessions.Topic
@@ -98,7 +99,10 @@ class SessionViewController(
                 MainScope().launch { updatePlayers(session) }
             }
             is GameMessageData.GameStartData -> {
-                Game.instance.currentScene = MainSceneMultiplayer(message, self)
+                ConnectionManager.unregister(this)
+                if (Game.instance.currentScene !is LoadingScene) {
+                    Game.instance.currentScene = MainSceneMultiplayer(message, self)
+                }
             }
             is GameMessageData.Disconnect -> {
                 MainScope().launch { GUIHelper.pop() }

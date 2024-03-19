@@ -8,7 +8,7 @@ import kotlinx.serialization.json.jsonPrimitive
 
 object Localizations {
 
-    private const val DEFAULT_LANG = "en"
+    private const val DEFAULT_LANG = "en-US"
 
     private val langMutex = Mutex()
 

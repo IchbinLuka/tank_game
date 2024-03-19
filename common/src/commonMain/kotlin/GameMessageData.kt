@@ -140,7 +140,7 @@ sealed class GameMessageData {
         val playerData: PlayerData,
         val authToken: Long? = null,
         val password: String? = null,
-        val sessionId: Long
+        val sessionId: String
     ) : GameMessageData()
 
     @Serializable

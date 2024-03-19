@@ -5,8 +5,12 @@ import types.debug
 object Log {
     private fun shouldLog(config: RunConfig) = debugLevel.ordinal <= config.ordinal
 
-    private fun getMessage(tag: String, message: Any?, config: RunConfig) =
-        "$tag::${config.name.uppercase()}:: $message"
+    private fun getMessage(tag: String, message: Any?, config: RunConfig): String {
+        val msg = "$tag::${config.name.uppercase()}:: $message"
+        // If message is longer than 1000 characters, cut it off
+        return if (msg.length > 1000) msg.substring(0, 1000) else msg
+    }
+
 
     fun d(tag: String, message: Any?) {
         if (shouldLog(RunConfig.Debug)) console.debug(getMessage(tag, message, RunConfig.Debug))

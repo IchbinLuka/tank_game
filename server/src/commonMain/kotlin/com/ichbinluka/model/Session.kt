@@ -27,7 +27,8 @@ enum class SessionStatus {
 
 class Session(
     val creationInfo: SessionCreationInfo,
-    val id: Long
+    val id: String,
+    val public: Boolean,
 ) {
     val players = mutableListOf<Player>()
 

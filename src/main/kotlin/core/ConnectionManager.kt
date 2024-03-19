@@ -61,7 +61,7 @@ object ConnectionManager : MessageBroadcaster {
         }
     }
 
-    suspend fun connect(sessionId: Long, playerData: PlayerData) = connectMutex.withLock {
+    suspend fun connect(sessionId: String, playerData: PlayerData) = connectMutex.withLock {
         suspendCoroutine { continuation ->
             socket = WebSocket("$url/$WEBSOCKET_ROUTE").apply {
                 binaryType = BinaryType.ARRAYBUFFER
@@ -140,10 +140,11 @@ object ConnectionManager : MessageBroadcaster {
     }
 
     fun unregister(m: MultiplayerSynchronized) {
-        Log.d(TAG, "unregistering $m on ${m.topic}")
         val iterator = synchronizedObjects[m.topic]?.iterator() ?: return
         for (o in iterator) {
             if (o.deref()?.name == m.name) {
+                Log.d(TAG, "unregistering ${m.name} on ${m.topic}")
+
                 iterator.remove()
                 return
             }
@@ -165,6 +166,7 @@ object ConnectionManager : MessageBroadcaster {
 
     @OptIn(ExperimentalSerializationApi::class)
     fun onMessage(message: MessageEvent) {
+        Log.d(TAG, "Received message, ${message.type}")
         val buffer = message.data.unsafeCast<ArrayBuffer>()
         val decodedMessage = ProtoBuf.decodeFromArrayBuffer<GameMessage>(buffer)
         val messageData = GameMessageData.fromGameMessage(decodedMessage)

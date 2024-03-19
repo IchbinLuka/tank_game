@@ -20,7 +20,18 @@ fun Route.sessions(sessionService: GameSessionService) {
             if (info.name.trim() == "") {
                 throw BadRequestException("Invalid name")
             }
-            call.respond(sessionService.createSession(info).toInfo())
+            call.respond(sessionService.createSession(info, public = true).toInfo())
+        }
+    }
+
+    post("sessions/discord/{channelId}") {
+        val channelId: String = call.parameters["channelId"] ?: throw BadRequestException("Invalid channelId")
+        val info = call.receive<SessionCreationInfo>()
+        val session = sessionService.getSessionById(channelId)
+        if (session != null) {
+            call.respond(session.toInfo())
+        } else {
+            call.respond(sessionService.createSession(info, public = false, id = channelId).toInfo())
         }
     }
 
@@ -29,14 +40,14 @@ fun Route.sessions(sessionService: GameSessionService) {
 
         }
         get {
-            val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("Invalid id")
+            val id = call.parameters["id"] ?: throw BadRequestException("Invalid id")
             call.respond(sessionService.getSessionById(id)?.toInfo() ?: throw NotFoundException())
         }
     }
 
     route("sessions/{id}/player_config_available") {
         get {
-            val id = call.parameters["id"]?.toLongOrNull() ?: throw BadRequestException("Invalid id")
+            val id = call.parameters["id"] ?: throw BadRequestException("Invalid id")
             val data: PlayerData = call.receive()
             call.respond(sessionService.getSessionById(id)?.playerConfigAvailable(data) ?: throw NotFoundException())
         }

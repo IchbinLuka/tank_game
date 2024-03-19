@@ -27,17 +27,41 @@ external class VoiceChannel {
     // TODO: add more properties
 }
 
+external class DiscordAuthUser {
+    val username: String
+    val discriminator: String
+    val id: String
+    val avatar: String
+    val public_flags: Int
+    val global_name: String
+}
+
+external class DiscordAuthApplication {
+    val description: String
+    val icon: String?
+    val id: String
+    val name: String
+}
 external class DiscordAPIAuth {
     val access_token: String
+    val user: DiscordAuthUser
+    val scopes: Array<String>
+    val expires: String
+    val application: DiscordAuthApplication
+}
 
+external class UserSettingsLocale {
+    val locale: String
 }
 
 external class Commands {
     fun authorize(arg: dynamic): Promise<dynamic>
 
-    fun authenticate(arg: dynamic): Promise<dynamic>
+    fun authenticate(arg: dynamic): Promise<DiscordAPIAuth?>
 
     fun getChannel(arg: GetChannelArgs): Promise<VoiceChannel>
+
+    fun userSettingsGetLocale(): Promise<UserSettingsLocale>
 
 }
 

@@ -1,11 +1,11 @@
 package sessions
 
-const val DEFAULT_HOST = "localhost"
+const val DEFAULT_HOST = "a5c5-2003-c0-2f4a-3100-1468-4d0-d638-82d5.ngrok-free.app"
 const val PORT = 8081
 const val WEBSOCKET_ROUTE = "sessions/connect"
 
-const val HTTP_URL = "https://${DEFAULT_HOST}:${PORT}"
-const val WEBSOCKET_URL = "ws://${DEFAULT_HOST}:${PORT}/${WEBSOCKET_ROUTE}"
+const val HTTP_URL = "https://${DEFAULT_HOST}"
+const val WEBSOCKET_URL = "ws://${DEFAULT_HOST}/${WEBSOCKET_ROUTE}"
 
 const val DISCORD_CLIENT_ID = "1219342090610278500"
 
