@@ -32,6 +32,7 @@ kotlin {
             implementation(enforcedPlatform("org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:$kotlinWrappersVersion"))
             implementation("org.jetbrains.kotlin-wrappers:kotlin-js")
             implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.9.1")
+            implementation(npm("@discord/embedded-app-sdk", "1.0.0"))
             testImplementation(kotlin("test-js"))
         }
 
@@ -40,7 +41,7 @@ kotlin {
     sourceSets {
         dependencies {
             val pathToLocalNpmModule = rootProject.projectDir.resolve("rust/pkg").canonicalPath
-            implementation(npm("rust_js", "file:$pathToLocalNpmModule", generateExternals = false))
+            // implementation(npm("rust_js", "file:$pathToLocalNpmModule", generateExternals = false))
         }
 
         test {

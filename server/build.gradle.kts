@@ -69,8 +69,10 @@ kotlin {
                 implementation("io.ktor:ktor-server-websockets:$ktor_version")
                 implementation("io.ktor:ktor-server-resources:$ktor_version")
                 implementation("io.ktor:ktor-server-cors:$ktor_version")
+                implementation("io.ktor:ktor-network-tls:$ktor_version")
                 implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+                implementation("io.ktor:ktor-client-core:$ktor_version")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
             }
@@ -85,6 +87,7 @@ kotlin {
                 implementation("io.ktor:ktor-server-netty")
                 implementation("io.insert-koin:koin-logger-slf4j:$koin_ktor")
                 implementation("io.ktor:ktor-network-tls-certificates")
+                implementation("io.ktor:ktor-client-okhttp:$ktor_version")
             }
         }
         val jvmTest by getting
@@ -92,7 +95,7 @@ kotlin {
             val nativeMain by getting {
                 dependencies {
                     implementation("io.ktor:ktor-server-cio:$ktor_version")
-
+                    implementation("io.ktor:ktor-client-cio:$ktor_version")
                 }
             }
             val nativeTest by getting
@@ -103,4 +106,8 @@ kotlin {
 tasks.named<JavaExec>("run") {
     dependsOn(tasks.named<Jar>("jvmJar"))
     classpath(tasks.named<Jar>("jvmJar"))
+}
+dependencies {
+    implementation("io.ktor:ktor-client-cio-jvm:2.2.4")
+    implementation("io.ktor:ktor-client-okhttp-jvm:2.2.4")
 }

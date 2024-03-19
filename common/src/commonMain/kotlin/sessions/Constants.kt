@@ -1,11 +1,13 @@
 package sessions
 
-const val DEFAULT_HOST = "lukaborn.de"
+const val DEFAULT_HOST = "localhost"
 const val PORT = 8081
 const val WEBSOCKET_ROUTE = "sessions/connect"
 
-const val HTTP_URL = "http://${DEFAULT_HOST}:${PORT}"
+const val HTTP_URL = "https://${DEFAULT_HOST}:${PORT}"
 const val WEBSOCKET_URL = "ws://${DEFAULT_HOST}:${PORT}/${WEBSOCKET_ROUTE}"
+
+const val DISCORD_CLIENT_ID = "1219342090610278500"
 
 object Topic {
     const val CONNECTION_RESPONSE = "connection_response"

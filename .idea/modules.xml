@@ -4,6 +4,12 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects.kotlin_game.tank_game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects.kotlin_game.tank_game.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects.kotlin_game.tank_game.test.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects.kotlin_game.tank_game.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kotlin.tank_game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Kotlin.tank_game.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Kotlin.tank_game.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Kotlin.tank_game.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/com.liorgonnen.tank_game.statsjs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/com.liorgonnen.tank_game.statsjs_kt.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/com.liorgonnen.tank_game.statsjs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/com.liorgonnen.tank_game.statsjs_kt.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/threejs_kt/com.liorgonnen.tank_game.threejs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/threejs_kt/com.liorgonnen.tank_game.threejs_kt.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/threejs_kt/com.liorgonnen.tank_game.threejs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/threejs_kt/com.liorgonnen.tank_game.threejs_kt.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/statsjs_kt.tank_game.statsjs_kt.main.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/statsjs_kt.tank_game.statsjs_kt.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/statsjs_kt/statsjs_kt.tank_game.statsjs_kt.test.iml" filepath="$PROJECT_DIR$/.idea/modules/statsjs_kt/statsjs_kt.tank_game.statsjs_kt.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tank_game.iml" filepath="$PROJECT_DIR$/.idea/modules/tank_game.iml" />

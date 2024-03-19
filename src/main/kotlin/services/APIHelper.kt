@@ -20,7 +20,9 @@ data class Headers(
     @SerialName("Content-Type")
     val contentType: String = "text/plain",
     @SerialName("Access-Control-Allow-Origin")
-    val accessControlAllowOrigin: String = "*"
+    val accessControlAllowOrigin: String = "*",
+    @SerialName("Origin")
+    val origin: String = "*"
 )
 
 object APIHelper {

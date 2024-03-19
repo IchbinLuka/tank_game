@@ -22,7 +22,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import sessions.Topic
 import sessions.WEBSOCKET_ROUTE
 
-val log = KtorSimpleLogger("WebSockets")
+private val log = KtorSimpleLogger("WebSockets")
 
 private suspend fun DefaultWebSocketServerSession.handleMessages(
     session: Session,
