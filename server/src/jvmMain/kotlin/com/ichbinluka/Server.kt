@@ -20,15 +20,15 @@ fun main(args: Array<String>) {
     val keyAlias by parser.option(ArgType.String, fullName = "key-alias", shortName = "a").default("tank")
     val keyPassword by parser.option(ArgType.String, fullName = "key-password", shortName = "w").default("123")
     val port by parser.option(ArgType.Int, fullName = "port", shortName = "p").default(PORT)
-    val selfSign by parser.option(ArgType.Boolean, fullName = "self-sign").default(true)
-    val useHttps by parser.option(ArgType.Boolean, fullName = "use-https").default(false)
+    val selfSign by parser.option(ArgType.Boolean, fullName = "self-sign").default(false)
+    val useHttp by parser.option(ArgType.Boolean, fullName = "use-http").default(false)
     val discordClientId by parser.option(ArgType.String, fullName = "discord-client-id").required()
     val discordClientSecret by parser.option(ArgType.String, fullName = "discord-client-secret").required()
 
     parser.parse(args)
 
     val environment = applicationEngineEnvironment {
-        if (useHttps) {
+        if (!useHttp) {
             createHttpsConnector(
                 keyStoreFilePath,
                 keyStorePassword,
@@ -67,7 +67,14 @@ fun ApplicationEngineEnvironmentBuilder.createHttpsConnector(
         buildKeyStore {
             certificate(keyAlias) {
                 password = keyPassword
-                domains = listOf("localhost", "lukaborn.de", "discord.com")
+                domains = listOf(
+                    "localhost",
+                    "lukaborn.de",
+                    "discord.com",
+                    "discordsays.com",
+                    "discordapp.com",
+                    "1219342090610278500.discordsays.com"
+                )
             }
         }
     } else {

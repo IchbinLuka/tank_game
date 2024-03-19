@@ -1,10 +1,9 @@
 package sessions
 
-const val DEFAULT_HOST = "lukaborn.de:8081"
+const val DEFAULT_HOST = "lukaborn.de"
 const val PORT = 8081
 const val WEBSOCKET_ROUTE = "sessions/connect"
 
-const val HTTP_URL = "https://${DEFAULT_HOST}"
 const val WEBSOCKET_URL = "ws://${DEFAULT_HOST}/${WEBSOCKET_ROUTE}"
 
 const val DISCORD_CLIENT_ID = "1219342090610278500"
