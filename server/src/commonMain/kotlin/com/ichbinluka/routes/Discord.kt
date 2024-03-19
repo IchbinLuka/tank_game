@@ -18,6 +18,8 @@ import kotlinx.serialization.json.Json
 private val log = KtorSimpleLogger("Discord")
 
 val client = getHttpClient()
+
+@OptIn(InternalAPI::class)
 fun Route.discordSdk(
     clientId: String,
     clientSecret: String

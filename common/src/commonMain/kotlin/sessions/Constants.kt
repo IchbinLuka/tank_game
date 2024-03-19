@@ -1,6 +1,6 @@
 package sessions
 
-const val DEFAULT_HOST = "a5c5-2003-c0-2f4a-3100-1468-4d0-d638-82d5.ngrok-free.app"
+const val DEFAULT_HOST = "lukaborn.de:8081"
 const val PORT = 8081
 const val WEBSOCKET_ROUTE = "sessions/connect"
 

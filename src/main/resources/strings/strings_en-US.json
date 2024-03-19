@@ -44,5 +44,6 @@
   "guide_aim_mobile": "To aim, tap on the screen and drag your finger to the desired direction.",
   "guide_aim_desktop": "To aim, move the cursor to the desired direction.",
   "guide_select_bullet": "You can iterate through the available bullets by tapping on the arrow buttons beside the current bullet or by scrolling with your mouse.",
-  "disconnected": "Disconnected"
+  "disconnected": "Disconnected",
+  "back_to_lobby": "Back to Lobby"
 }

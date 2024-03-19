@@ -69,7 +69,7 @@ class SettingsController: UIController() {
 
     private var settings by settingsNotifier
 
-    private val locales = ScrollableList(listOf("en", "de")).apply {
+    private val locales = ScrollableList(listOf("en-US", "de")).apply {
         nextWhile { it != settings.language }
     }
 

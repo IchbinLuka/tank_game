@@ -205,7 +205,7 @@ fun Application.webSocketRoute(
                 log.error("Error in session ${session.toInfo().id}", e)
             } finally {
                 session.handleDisconnect(player)
-                if (session.isEmpty()) {
+                if (session.isEmpty() || session.status == SessionStatus.FINISHED) {
                     sessionService.closeSession(session.toInfo().id)
                 } else {
                     if (player.data == session.host) {

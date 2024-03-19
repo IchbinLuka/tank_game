@@ -1,6 +1,7 @@
 package util
 
 import core.Game
+import ext.TAG
 import ext.tryCast
 import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
@@ -76,23 +77,30 @@ object GUIHelper {
         MainScope().launch { update(controller) }
     }
 
-    private suspend fun update(controller: UIController?) {
-        resetGUI()
-        if (controller == null) {
-            return
-        }
-        controller.mainUIBuilder?.let {
+    fun refresh() {
+        Log.d(TAG, "Refreshing GUI")
+        controller?.mainUIBuilder?.let {
+            gUIElement?.clear()
             gUIElement?.append {
                 it(this)
             }
         }
 
-        controller.topBarBuilder?.let {
+        controller?.topBarBuilder?.let {
+            topBar?.clear()
             topBar?.append {
                 it(this)
             }
 
         }
+    }
+
+    private suspend fun update(controller: UIController?) {
+        resetGUI()
+        if (controller == null) {
+            return
+        }
+        refresh()
         controller.init()
         controller.rebuild()
     }

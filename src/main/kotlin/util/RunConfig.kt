@@ -1,6 +1,6 @@
 package util
 
-val debugLevel = RunConfig.Debug
+val debugLevel = RunConfig.Warning
 
 @Suppress("unused")
 enum class RunConfig {

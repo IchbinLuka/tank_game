@@ -11,7 +11,6 @@ import ColorData
 import PlayerData
 import core.Game
 import ext.TAG
-import ext.fromId
 import kotlinx.browser.window
 import kotlinx.coroutines.await
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -20,11 +19,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToDynamic
-import org.w3c.dom.Element
 import org.w3c.dom.url.URLSearchParams
 import org.w3c.fetch.RequestInit
 import sessions.DISCORD_CLIENT_ID
-import sessions.HTTP_URL
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
 import three.js.Color
@@ -56,10 +53,16 @@ object APIHelper {
             }
         }
 
-    val url: String? get() = host?.let { "https://$it" }
+    val url: String? get() = getAPIHost()?.let { "https://${it}" }
+
+    fun getAPIHost(): String? = if (discord.shouldUseDiscord()) {
+        "$DISCORD_CLIENT_ID.discordsays.com/api"
+    } else {
+        host
+    }
 
     suspend fun updateHost(host: String): Boolean = try {
-        val response = window.fetch("https://$host/status").await()
+        val response = window.fetch("https://${getAPIHost()}/status").await()
         val successful = response.status == 200.toShort()
         if (successful) {
             this.host = host
@@ -136,7 +139,7 @@ class DiscordHelper(private val discordClientId: String) {
 
     suspend fun createSession(playerData: PlayerData): SessionInfo {
         val response = window.fetch(
-            "$HTTP_URL/sessions/discord/${discordSDK.channelId}", RequestInit(
+            "${APIHelper.url}/sessions/discord/${discordSDK.channelId}", RequestInit(
                 method = "POST",
                 headers = Json.encodeToDynamic(Headers(contentType = "application/json")),
                 body = Json.encodeToString(
@@ -155,11 +158,15 @@ class DiscordHelper(private val discordClientId: String) {
         }
     }
 
+    suspend fun ensureInitialized() {
+        if (auth == null) {
+            setup()
+        }
+    }
+
     suspend fun setup() {
         discordSDK = DiscordSDK(discordClientId)
         discordSDK.ready().await()
-        Element.fromId("cssObjectsContainer")?.innerHTML =
-            "Discord SDK ready. Guild ID: ${discordSDK.guildId}, Channel ID: ${discordSDK.channelId}"
 
         val code = discordSDK.commands.authorize(objectOf {
             client_id = DISCORD_CLIENT_ID
@@ -169,18 +176,14 @@ class DiscordHelper(private val discordClientId: String) {
             scope = Json.encodeToDynamic(listOf("identify", "guilds"))
         }).await()
 
-        Log.d(TAG, "Code: ${JSON.stringify(code)}")
-
         val tokenResponse = window.fetch(
-            "$HTTP_URL/discord_token", RequestInit(
+            "https://$DISCORD_CLIENT_ID.discordsays.com/api/discord_token", RequestInit(
                 method = "POST",
                 headers = Json.encodeToDynamic(Headers(contentType = "application/json")),
                 body = Json.encodeToString(APITokenRequest(code.code as String))
             )
         ).await()
         val accessToken: APITokenResponse = Json.decodeFromString(tokenResponse.text().await())
-
-        Log.d(TAG, "Access token: ${JSON.stringify(accessToken)}")
 
         val auth = discordSDK.commands.authenticate(objectOf {
             access_token = accessToken.accessToken
@@ -194,8 +197,6 @@ class DiscordHelper(private val discordClientId: String) {
         }
 
         setupLocale()
-
-        Log.i(TAG, "Auth: ${JSON.stringify(auth)}")
     }
 
     private suspend fun setupLocale() {

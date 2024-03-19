@@ -6,8 +6,8 @@ import PlayerData
 import core.ConnectionManager
 import core.Game
 import core.multiplayer.MultiplayerSynchronized
+import ext.TAG
 import ext.fromId
-import ext.replace
 import ext.s
 import ext.tryCast
 import kotlinx.coroutines.MainScope
@@ -27,6 +27,7 @@ import ui.views.menuElement
 import ui.views.menuPage
 import ui.views.sessionItem
 import util.GUIHelper
+import util.Log
 
 class SessionViewController(
     private var session: SessionInfo,
@@ -43,6 +44,10 @@ class SessionViewController(
                     div {
                         menuElement {
                             id = "playerInfoContainer"
+                            Log.d(TAG, "Players: ${session.players}")
+                            for (player in session.players) {
+                                sessionItem(player)
+                            }
                         }
                     }
                 },
@@ -54,6 +59,8 @@ class SessionViewController(
                             s("start_game")
 
                             onClickFunction = { startGame() }
+
+                            disabled = session.players.size < 2
                         }
                     }
                 }
@@ -67,7 +74,7 @@ class SessionViewController(
     override suspend fun init() {
         ConnectionManager.register(this)
         super.init()
-        updatePlayers(session)
+        updateSession(session)
     }
 
     private fun startGame() {
@@ -79,15 +86,9 @@ class SessionViewController(
         )
     }
 
-    private fun updatePlayers(session: SessionInfo) {
-        val container = Element.fromId("playerInfoContainer") ?: return
-        container.innerHTML = ""
-        container.replace {
-            for (player in session.players) {
-                sessionItem(player)
-            }
-        }
-        startButton?.disabled = session.players.size < 2
+    private fun updateSession(session: SessionInfo) {
+        this.session = session
+        GUIHelper.refresh()
     }
 
     override val topic: String = Topic.SESSION_STATE
@@ -95,8 +96,7 @@ class SessionViewController(
     override fun onMessage(message: GameMessageData) {
         when (message) {
             is GameMessageData.SessionInfoUpdate -> {
-                session = message.session
-                MainScope().launch { updatePlayers(session) }
+                updateSession(message.session)
             }
             is GameMessageData.GameStartData -> {
                 ConnectionManager.unregister(this)

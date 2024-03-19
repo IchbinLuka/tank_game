@@ -1,8 +1,13 @@
 package ui
 
+import core.Game
 import ext.s
+import kotlinx.html.js.onClickFunction
+import scenes.DiscordStartScene
 import scenes.GameEndScene
+import services.APIHelper
 import ui.views.backToMenuButton
+import ui.views.menuButton
 import ui.views.menuPage
 
 class GameEndController(
@@ -15,7 +20,16 @@ class GameEndController(
                 s("player_wins", "name" to scene.winners.first().name)
             },
             sections = listOf {
-                backToMenuButton()
+                if (APIHelper.discord.shouldUseDiscord()) {
+                    menuButton {
+                        s("back_to_lobby")
+                        onClickFunction = {
+                            Game.instance.currentScene = DiscordStartScene()
+                        }
+                    }
+                } else {
+                    backToMenuButton()
+                }
             }
         )
     }

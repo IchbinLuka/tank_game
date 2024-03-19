@@ -5,6 +5,11 @@
     z-index: 10;
 }
 
+@font-face {
+    font-family: 'Mouse Memoirs';
+    src: url('/fonts/MouseMemoirs-Regular.ttf');
+}
+
 body {
     font-family: 'Mouse Memoirs', sans-serif;
 }

@@ -37,7 +37,7 @@ class DiscordStartScene : StartScene() {
     override suspend fun preloadAssets() {
         super.preloadAssets()
         APIHelper.discord.apply {
-            setup()
+            ensureInitialized()
             val player = getPlayer()
             val session = createSession(player)
             Log.d(TAG, "Session created: $session")
@@ -45,8 +45,10 @@ class DiscordStartScene : StartScene() {
             ConnectionManager.connect(session.id, player)
             Log.d(TAG, "Connected to session")
 
+            val updatedSession = APIHelper.fetchSessionById(session.id)
+
             controller = SessionViewController(
-                session, player
+                updatedSession, player
             )
         }
     }

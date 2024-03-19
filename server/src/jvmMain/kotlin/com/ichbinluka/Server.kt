@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
     val keyPassword by parser.option(ArgType.String, fullName = "key-password", shortName = "w").default("123")
     val port by parser.option(ArgType.Int, fullName = "port", shortName = "p").default(PORT)
     val selfSign by parser.option(ArgType.Boolean, fullName = "self-sign").default(true)
-    val useHttps by parser.option(ArgType.Boolean, fullName = "use-https").default(true)
+    val useHttps by parser.option(ArgType.Boolean, fullName = "use-https").default(false)
     val discordClientId by parser.option(ArgType.String, fullName = "discord-client-id").required()
     val discordClientSecret by parser.option(ArgType.String, fullName = "discord-client-secret").required()
 
