@@ -1,8 +1,12 @@
 package com.ichbinluka
 
 import io.ktor.network.tls.certificates.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
+import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
@@ -24,6 +28,7 @@ fun main(args: Array<String>) {
     val useHttp by parser.option(ArgType.Boolean, fullName = "use-http").default(false)
     val discordClientId by parser.option(ArgType.String, fullName = "discord-client-id").required()
     val discordClientSecret by parser.option(ArgType.String, fullName = "discord-client-secret").required()
+    val websitePath by parser.option(ArgType.String, fullName = "website-path")
 
     parser.parse(args)
 
@@ -42,6 +47,16 @@ fun main(args: Array<String>) {
         }
         module {
             module(ApplicationConfig(discordClientId, discordClientSecret))
+
+            // TODO: Remove this once the website is hosted elsewhere
+            if (websitePath != null) {
+                routing {
+                    staticFiles("/", File(websitePath!!))
+                    get("/") {
+                        call.respondFile(File(websitePath!!, "index.html"))
+                    }
+                }
+            }
         }
     }
 
@@ -88,4 +103,6 @@ fun ApplicationEngineEnvironmentBuilder.createHttpsConnector(
         this.port = port
         keyStorePath = keyStoreFile
     }
+
+
 }

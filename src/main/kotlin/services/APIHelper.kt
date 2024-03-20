@@ -22,6 +22,7 @@ import kotlinx.serialization.json.encodeToDynamic
 import org.w3c.dom.url.URLSearchParams
 import org.w3c.fetch.RequestInit
 import sessions.DISCORD_CLIENT_ID
+import sessions.PORT
 import sessions.SessionCreationInfo
 import sessions.SessionInfo
 import three.js.Color
@@ -56,7 +57,7 @@ object APIHelper {
     val url: String? get() = getAPIHost()?.let { "https://${it}" }
 
     fun getAPIHost(): String? = if (discord.shouldUseDiscord()) {
-        "$DISCORD_CLIENT_ID.discordsays.com/api"
+        "$DISCORD_CLIENT_ID.discordsays.com:$PORT/api"
     } else {
         host
     }
@@ -177,7 +178,7 @@ class DiscordHelper(private val discordClientId: String) {
         }).await()
 
         val tokenResponse = window.fetch(
-            "https://$DISCORD_CLIENT_ID.discordsays.com/api/discord_token", RequestInit(
+            "${APIHelper.url}/api/discord_token", RequestInit(
                 method = "POST",
                 headers = Json.encodeToDynamic(Headers(contentType = "application/json")),
                 body = Json.encodeToString(APITokenRequest(code.code as String))

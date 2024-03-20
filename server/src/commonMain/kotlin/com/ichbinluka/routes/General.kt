@@ -8,4 +8,10 @@ fun Route.status() {
     get("status") {
         call.respond("OK")
     }
+
+    get("/") {
+
+    }
+
+
 }
